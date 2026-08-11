@@ -1,145 +1,89 @@
 # Knowledge-note authoring guide
 
-## IP inventory
+## Candidate selection
 
-| Category | Capture |
-|---|---|
-| Problem | Important problem, affected audience, stakes, and pain points |
-| Guiding Principles | Memorable directional statements that anchor the note |
-| Rationale | Why the Guiding Principles matter and what follows from them |
-| Practices | Best practices and emerging industry applications of the Guiding Principles |
-| Examples | Incidents, analogies, demonstrations, counterexamples |
-| Constraints | Limits, risks, exceptions, failure conditions, and misuse |
-| Influences | Related ideas, disciplines, and prior work |
-| Glossary | Canonical terms, memorable phrases, and deprecated alternatives |
+Read the approved sources and extract only ideas that can earn space in a 300-word note. Group duplicates and preserve meaningful tensions rather than smoothing them away.
 
-## Artifact manifest
+Present candidates in a compact table:
 
-Present and confirm this before analysis:
+| Candidate idea | Why it matters | Suggested action |
+|---|---|---|
+| Short label | One-sentence meaning or value | Keep, merge, park, or drop |
 
-| Field | Confirm |
-|---|---|
-| Sources | Files or materials to read and their authority |
-| Read-only files | Existing sources and assets that must not change |
-| Mode | Create or revise |
-| Canonical output | Exact output path for the knowledge note |
-| Write authority | Exact files permitted to change |
+Include the central idea, possible guiding principles, useful practices, strongest examples, real constraints, and related ideas. Do not catalogue every topic in the source.
 
-Source precedence controls idea authority, not write authority. Never infer an output path from the location or authority of a source.
+Let the user keep, drop, merge, park, or reframe any candidate. Then propose two to five guiding principles that are:
 
-## Candidate concept map
+- short enough to remember;
+- directional rather than descriptive;
+- distinct from one another;
+- supported by the selected source material.
 
-Present:
+## Approval summary
 
-| Candidate concept | What it says | Why it may matter | Relationship or influences | Suggested disposition |
-|---|---|---|---|---|
+Before writing, confirm in one compact message:
 
-Include primary concepts, reusable secondary insights, examples, possible frameworks, tensions, unrelated substantial topics, and ideas that may synthesize established practices.
+- title;
+- selected ideas;
+- guiding principles;
+- create or revise mode;
+- exact output path and files allowed to change.
 
-Dynamically list every candidate concept as a selectable option. Let the user select any combination and provide free-form instructions to keep, drop, park, merge, or reanalyse concepts. Do not use a fixed option list.
+Explicit approval is required before writing. If the user changes several fields, accept them together and reconfirm only what changed.
 
-## Knowledge-note contract
+## Structure
 
-Confirm:
+Use 5–8 sections. Default to these six:
 
-- artifact manifest;
-- working title;
-- objectives;
-- selected concepts;
-- Guiding Principles;
-- Rationale;
-- audience;
-- Glossary;
-- influences;
-- examples;
-- constraints;
-- excluded or parked topics.
+1. Core Idea
+2. Guiding Principles
+3. Practices
+4. Examples
+5. Constraints
+6. Related Ideas
 
-### Approval consolidation
+Omit a section when the source cannot support it. Add no more than two sections when they improve retrieval or preserve an essential idea. Useful additions include Questions, Terms, and Implications.
 
-Let the user correct several contract fields at once. After a correction, re-present only changed fields, then ask once for final write authorization. Approval of concepts or a title alone is not permission to write.
+Headings must describe the content. Do not use empty sections, filler, repeated conclusions, or document-production language.
 
-## Integrity checks
+## Word limit
 
-- Are the Guiding Principles memorable and directional?
-- Does the Rationale explain why they matter and what follows from them?
-- Are recommendations supported?
-- Is synthesis distinguished from established practice?
-- Are influences, constraints, trade-offs, and failure conditions explicit?
-- Can a downstream author reproduce the idea without the source material?
-- Are contradictions resolved or marked?
+The complete visible Markdown note must be 300 words or fewer. Count the title, headings, prose, list items, link labels, and table text. Do not count Markdown punctuation or hidden metadata, although metadata should be omitted by default.
 
-Do not overstate novelty, causality, validation, or generality.
+If the draft is too long, tighten in this order:
 
-## Writing rules
+1. Remove repetition and process narrative.
+2. Keep one strong example rather than several weak ones.
+3. Merge overlapping practices or related ideas.
+4. Shorten context before cutting critical constraints.
+5. Preserve the Core Idea and approved guiding principles.
+
+## Writing style
 
 - Write like a thoughtful practitioner sharing lived understanding.
-- Keep the tone human, experiential, light, and easy to understand.
-- Use plain language, short paragraphs, and concrete examples.
+- Use plain language, short paragraphs, and compact lists.
 - Minimize jargon; define any specialist term that must remain.
-- Avoid cold, detached, academic, overly objective, or dense prose.
-- Keep rigor by distinguishing observation, interpretation, recommendation, and uncertainty.
-- Use direct headings and a clear perspective.
-- Follow abstractions with concrete examples.
-- Define canonical terms in the Glossary.
-- Tie practices to the Guiding Principles and Rationale.
-- Cite sources where available.
+- Use markdown headings over bold titles.
+- Use concrete examples and state practical implications directly.
+- Preserve source terminology when it carries meaning.
+- Briefly label interpretation, recommendation, or uncertainty when confusion is possible.
+- Link sources and related notes only when supplied or verifiable.
 - Do not write a transcript summary, meeting recap, marketing brochure, or slide deck in prose.
-- Do not narrate the workshop or harvesting process.
-- Avoid “this paper,” “this whitepaper,” and “the workshop showed.”
-- Keep metadata and provenance out of the visible argument.
+- Do not narrate the harvesting or writing process.
+- Do not overstate novelty, causality, validation, or generality.
 
-## Downstream extraction map
-
-End with:
-
-| Field | Canonical content |
-|---|---|
-| Objectives | What the note should help the reader understand, decide, or do |
-| Guiding Principles | Memorable directional statements |
-| Rationale | Why they matter and what follows from them |
-| Audience problem | Who, what, and why it matters |
-| Practices | Best practices and emerging industry applications |
-| Example/demo | Best demonstration candidate |
-| Constraints | Risks, exceptions, trade-offs, and failure conditions |
-| Glossary | Terms and phrases downstream assets must preserve |
-| Influences | Related ideas, disciplines, and prior work |
-
-## Post-write contract audit
+## Final checks
 
 Before completion, verify:
 
 - the file was written only to the approved output path;
 - no read-only source or unapproved asset changed;
-- objectives, Guiding Principles, Rationale, and practices match the approved contract;
-- observation, interpretation, recommendation, and synthesis remain distinguishable;
-- constraints are explicit;
-- the Glossary is stable and defined;
-- the voice is human, experiential, concise, conversational, and low-jargon;
-- abstractions are grounded in concrete examples;
-- the extraction map is complete and consistent with the note;
-- the metadata records the current version, sources, and provenance;
-- stale downstream assets are identified;
-- contradictions, uncertainty, and unsupported claims of certainty are resolved or marked.
-
-## Invisible metadata
-
-Use an HTML comment footer:
-
-```markdown
-<!--
-Second-brain metadata
-
-Status: Draft
-Version: 0.1
-Last updated: YYYY-MM-DD
-Canonical: Yes
-Primary source: source-file.md
-
-Provenance notes:
-- Distinguish source-derived ideas from later synthesis here.
--->
-```
-
-Use visible front matter only when explicitly requested. When revising, update the existing note, increment its version, preserve stable terminology, and identify stale downstream assets.
+- the note has 5–8 non-empty sections;
+- all visible words, including title and headings, total 300 or fewer;
+- the Core Idea and approved guiding principles are intact;
+- practices follow from the principles;
+- examples are concrete and constraints are meaningful;
+- related ideas are relevant rather than decorative;
+- unsupported claims, contradictions, and uncertainty are removed or marked;
+- the note stands alone without the source or process history.
 

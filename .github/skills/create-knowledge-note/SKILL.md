@@ -1,64 +1,70 @@
 ---
 name: create-knowledge-note
-description: Interactively harvest transcripts, notes, research, examples, and existing IP into a canonical knowledge note for a second brain. First analyze candidate concepts, let the user select what belongs, and refine the Guiding Principles before writing. The approved note becomes the source of truth for downstream Marp decks and facilitator guides.
-compatibility: Produces self-contained Markdown. No external tools are required.
+description: "Create or revise a concise second-brain knowledge note from transcripts, notes, research, or existing IP. Use when: harvesting ideas into a self-contained Markdown note of 300 words or fewer with 5–8 clear sections, including Core Idea, Guiding Principles, Practices, Examples, Constraints, and Related Ideas."
+compatibility: Produces self-contained Markdown of 300 words or fewer. No external tools are required.
 ---
 
 # Create Knowledge Note
 
-Capture detailed thought-leadership IP: why, what, how, constraints, influences, examples, practices, and glossary terms.
+Turn source material into a compact, reusable second-brain note. Preserve the idea's meaning while removing meeting narrative, repetition, and production commentary.
 
-## Input and source rules
+## Source and output gate
 
-Require source material. A brief may be supplied or developed interactively.
+Before analysis, confirm:
 
-Treat sources in this order: existing canonical note, approved IP, transcript/notes, then clearly identified synthesis. Source precedence determines which ideas carry authority; it never grants permission to modify a source. Only the approved artifact manifest grants write authority.
+- the source material and its authority;
+- whether to create or revise;
+- the exact output path;
+- which files may change.
 
-Preserve exact terminology; separate evidence, opinion, interpretation, recommendation, and hypothesis; acknowledge influences; never fabricate quotes or certainty.
+Treat source files as read-only unless the user explicitly approves one as the output. Prefer an existing canonical note over approved IP, then transcript or notes, then clearly identified synthesis. Preserve distinctive terminology and never invent quotes, evidence, or certainty.
 
-Read [references/authoring-guide.md](references/authoring-guide.md) for the deterministic analysis, option matrices, contract fields, writing rules, extraction map, and metadata format.
+Read [references/authoring-guide.md](references/authoring-guide.md) for selection, writing, and validation rules.
 
-## Artifact-routing gate
+## Interaction flow
 
-**Before analysis, present and confirm an artifact manifest.** Include:
+Do not write or modify the note immediately after reading the source.
 
-- source files and their authority;
-- files that remain read-only;
-- create or revise mode;
-- canonical note output path;
-- exact files permitted to change.
+1. Extract the strongest candidate ideas and group duplicates.
+2. Present a concise candidate list with a one-line explanation for each idea.
+3. Ask the user what to keep, drop, merge, or reframe. Accept a multi-part answer.
+4. Propose two to five short, directional guiding principles.
+5. Confirm the selected ideas, guiding principles, title, and output path in one approval request.
+6. Write only after explicit approval.
 
-Never infer that an existing source is the output target. Do not treat source precedence as write permission.
+Ask one focused question at a time only when ambiguity would materially change the note. Do not require repeated approval for unchanged decisions.
 
-## Mandatory interaction gate
+## Note contract
 
-**Do not draft or modify the note immediately after reading the source.**
+Use [assets/knowledge-note-template.md](assets/knowledge-note-template.md) as the default structure.
 
-1. Read all sources and build the IP inventory.
-2. Present the candidate concept map.
-3. Dynamically list every candidate concept for selection. Allow any combination, plus free-form instructions to keep, drop, park, merge, or reanalyse concepts.
-4. Refine one focused question at a time.
-5. Present the knowledge-note contract.
-6. Obtain explicit approval. Approval of concepts alone is not approval to write.
+- The complete visible note, including title and headings, must contain **300 words or fewer**.
+- Use **5–8 sections** with descriptive Markdown headings.
+- Default to: **Core Idea, Guiding Principles, Practices, Examples, Constraints, Related Ideas**.
+- Omit a default section only when the source has no useful content for it; never add filler.
+- Add at most two sections only when they materially improve retrieval, such as **Questions**, **Terms**, or **Implications**.
+- Keep each section focused: a short paragraph or a compact list.
+- Make the note understandable without reopening the source.
+- Distinguish source claims from synthesis with brief wording when the difference matters.
+- Cite or link sources only when supplied or verifiable.
 
-Let the user correct multiple contract fields in one response. After a correction, show only the changed fields and ask once for final write authorization; do not repeat approvals for unchanged decisions.
+Do not add an extraction map, conclusion, objectives section, glossary, front matter, or metadata unless the user requests it and the result still fits the word limit.
 
-## Authoring
+## Write and validate
 
 After approval:
 
-1. Establish the canonical objectives, Guiding Principles, Rationale, practices, examples, constraints, influences, and Glossary.
-2. Run the integrity checks in the authoring guide.
-3. Write from [assets/knowledge-note-template.md](assets/knowledge-note-template.md).
-4. Write ideas directly for a private knowledge base—never as a workshop report or document-production narrative. Use a human, experiential, light, concise voice with plain language, short paragraphs, and concrete examples.
-5. Add the downstream extraction map and invisible metadata footer.
-6. Run the post-write contract audit in the authoring guide before presenting the note as complete.
+1. Draft the note in a human, direct, low-jargon voice.
+2. Count all visible words, including the title and headings.
+3. Tighten the note until it is at most 300 words without losing the Core Idea, Principles, or critical Constraints.
+4. Run the checks in the authoring guide.
+5. Write only to the approved output path.
 
-When revising, update rather than duplicate the note, increment its version, preserve stable terminology, and identify stale downstream assets.
+When revising, update the existing note rather than duplicating it. Preserve stable terminology and mention any downstream asset that may now be stale.
 
 ## Optional downstream assets
 
-After the canonical note passes its post-write audit, ask whether the user wants a facilitator guide, a Marp deck, both, or neither.
+After the note passes validation, ask whether the user wants a facilitator guide, a Marp deck, both, or neither.
 
 Delegate only after explicit consent:
 
@@ -70,5 +76,5 @@ Do not create or update downstream assets silently or automatically.
 
 ## Completion
 
-The task is complete only when the user has approved the concepts and Guiding Principles, the note is understandable without the source material, observation and synthesis are distinguishable, the Glossary is consistent, constraints are explicit, the post-write contract audit passes, and downstream assets can reuse the IP without redefining it.
+The task is complete when the approved note has 5–8 useful sections, contains no more than 300 visible words, stands on its own, preserves the selected ideas and guiding principles, states meaningful constraints, and changes only approved files.
 
