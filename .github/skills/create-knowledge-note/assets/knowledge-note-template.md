@@ -2,43 +2,43 @@
 
 ## Core idea
 
-State the problem, central thesis, proposed model, and practical implication.
+Introduce the problem, Guiding Principles, and practical implication in a human, concise voice.
+
+## Objectives
+
+State what the note should help the reader understand, decide, or do.
 
 ## The problem
 
 Define who experiences the problem, what happens, and why it matters.
 
-## Observations and context
+## Guiding Principles
 
-Separate source observations from interpretation.
+Give the note a small set of memorable directional statements.
 
-## Central thesis
+## Rationale
 
-State the canonical position precisely.
-
-## Framework
-
-Define each component, its purpose, its relationship to the others, and when it applies.
-
-## Principles
-
-Explain the durable principles that guide judgment.
+Explain why the Guiding Principles matter and what follows from them. Use short paragraphs or a small list, not academic argumentation.
 
 ## Practices
 
-Translate the framework into repeatable actions and decision rules.
+Describe best practices and emerging industry applications of the Guiding Principles.
 
 ## Examples
 
 Use grounded incidents, demonstrations, analogies, and counterexamples.
 
-## Risks, boundaries, and anti-patterns
+## Constraints
 
-State where the approach fails, what it does not claim, and how it can be misused.
+State which limits, risks, exceptions, or failure conditions matter.
 
-## Evidence, lineage, and open questions
+## Influences and open questions
 
-Identify support, related disciplines, prior art, assumptions, and unresolved questions.
+Identify related ideas and unresolved questions without turning the note into an academic review.
+
+## Glossary
+
+Define canonical terms and memorable phrases, and identify deprecated alternatives.
 
 ## Implications and recommended actions
 
@@ -46,22 +46,21 @@ Explain what individuals, teams, or organizations should change.
 
 ## Conclusion
 
-Reinforce the thesis without introducing new claims.
+Return to the Guiding Principles and practical implication without introducing new ideas.
 
 ## Downstream extraction map
 
 | Field | Canonical content |
 |---|---|
-| Central thesis | |
+| Objectives | |
+| Guiding Principles | |
+| Rationale | |
 | Audience problem | |
-| Framework | |
-| Key principles | |
 | Practices | |
 | Example/demo | |
-| Boundaries | |
-| Terminology | |
-| Evidence/lineage | |
-| Desired transfer | |
+| Constraints | |
+| Glossary | |
+| Influences | |
 
 <!--
 Second-brain metadata
