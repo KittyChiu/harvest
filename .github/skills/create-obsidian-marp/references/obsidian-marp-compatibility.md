@@ -22,14 +22,14 @@ References:
 ```yaml
 ---
 marp: true
-theme: gaia
-class: invert
+theme: default
 paginate: true
 size: 16:9
 ---
 ```
 
-- Prefer built-in themes: `default`, `gaia`, or `uncover`.
+- Use the built-in `default` theme unless the user confirms another installed or built-in theme.
+- Use the selected theme's standard styling; do not add custom CSS by default.
 - Use standard Markdown for all visible slide content.
 - Use Markdown image syntax rather than HTML image tags.
 - Keep images local when portability or offline presenting matters.
@@ -74,4 +74,3 @@ Treat these as warnings, not rigid limits:
 - one primary claim per slide.
 
 Split content when the audience would need to read rather than listen.
-

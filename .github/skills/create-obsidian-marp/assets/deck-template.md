@@ -1,60 +1,57 @@
 ---
 marp: true
-theme: gaia
-class: invert
+theme: default
 paginate: true
 size: 16:9
 title: Presentation title
 description: Presentation purpose
 ---
 
-<!-- _class: lead invert -->
-
 # Presentation title
 
 *One-line promise to the audience*
 
 <!--
-Open with the transcript's strongest relevant hook.
+Open with the strongest relevant hook from the chosen narrative spine.
 
 Establish why this matters to this audience now.
 -->
 
 ---
 
-## Tension
+## Next story beat
 
-# State the problem as a claim
+# Advance the central tension
 
 - Keep visible content concise.
-- Use transcript evidence rather than generic filler.
-- Put the narrative in the notes.
+- Use source evidence rather than generic filler.
+- Keep the same narrative thread.
 
 <!--
-Tell the incident, analogy, or observation that makes the tension concrete.
+Continue the opening situation, case, contrast, or question.
 
-Transition: explain what the workshop discovered.
+Transition: create the need for the turning point.
 -->
 
 ---
 
-## Discovery
+## Turning point
 
-# State the workshop's central insight
+# Reveal the insight that changes the story
 
 > A short, evidence-grounded line the audience can remember.
 
 <!--
-Explain how the group reached this insight.
+Show why this insight follows from the earlier tension.
 
 Clarify whether the line is a direct quote, paraphrase, or synthesis.
 -->
 
 ---
 
-## Practice
+## Application
 
-# Turn the insight into action
+# Demonstrate how the insight changes action
 
 | Step | What to do |
 |---|---|
@@ -63,14 +60,12 @@ Clarify whether the line is a direct quote, paraphrase, or synthesis.
 | 3 | Third concrete action |
 
 <!--
-Walk through a realistic example.
+Apply the insight to the same case or a directly connected example.
 
 Ask the audience how this maps to their work.
 -->
 
 ---
-
-<!-- _class: lead invert -->
 
 # Close with the change to make
 
@@ -79,6 +74,5 @@ Ask the audience how this maps to their work.
 <!--
 Reconnect to the opening hook.
 
-End with the decision or action the audience should carry forward.
+Resolve the opening tension and end with the decision or action the audience should carry forward.
 -->
-

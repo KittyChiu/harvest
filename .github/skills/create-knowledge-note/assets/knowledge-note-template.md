@@ -1,18 +1,6 @@
----
-title: Whitepaper title
-status: draft
-version: 0.1
-last_updated: YYYY-MM-DD
-canonical: true
-audience:
-  - Primary audience
-source_material:
-  - source-file.md
----
+# Canonical knowledge note title
 
-# Whitepaper title
-
-## Executive abstract
+## Core idea
 
 State the problem, central thesis, proposed model, and practical implication.
 
@@ -75,3 +63,16 @@ Reinforce the thesis without introducing new claims.
 | Evidence/lineage | |
 | Desired transfer | |
 
+<!--
+Second-brain metadata
+
+Status: Draft
+Version: 0.1
+Last updated: YYYY-MM-DD
+Canonical: Yes
+Audience: Primary audience
+Primary source: source-file.md
+
+Provenance notes:
+- Record source-derived ideas, later synthesis, uncertainties, and publication cautions here.
+-->

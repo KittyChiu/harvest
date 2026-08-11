@@ -100,4 +100,3 @@ Connect participant observations back to the canonical framework and its boundar
 ## Follow-up and transfer
 
 State what participants should reuse, who owns it, and how learning continues after the session.
-
