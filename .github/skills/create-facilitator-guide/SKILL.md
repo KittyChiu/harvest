@@ -6,13 +6,15 @@ compatibility: Produces self-contained Markdown. No external tools are required.
 
 # Create Facilitator Guide
 
-Create a guide another facilitator can run reliably. Teach canonical **what** and practical **how**.
+Create a guide another facilitator can run reliably. Expand the source's canonical **what** into a practical **how** without changing its meaning.
 
 ## Input and source rules
 
-Require an IP source. Develop audience, duration, format, constraints, and output path through the takeaway conversation when absent.
+Require an IP source. Before analysis, confirm the source files and their authority, files that remain read-only, create or revise mode, the exact output path, and the exact files permitted to change. Develop audience, duration, format, and constraints through the takeaway conversation when absent.
 
-Use source precedence: canonical knowledge note, approved IP, transcript/notes, then clearly separated facilitation design. Preserve canonical thesis, framework, terminology, practices, and boundaries.
+Use source precedence: canonical knowledge note, approved IP, transcript/notes, then clearly separated facilitation design. When a knowledge note is supplied, map its available sections, typically Core Idea, Guiding Principles, Practices, Examples, Constraints, and Related Ideas, before deriving workshop content. Preserve its terminology and claims. Treat a framework, audience problem, learning objectives, and assessment criteria as facilitation design unless the source states them explicitly.
+
+Do not expect the knowledge note to contain separate objectives, rationale, glossary, metadata, provenance, or an extraction map. Do not reopen its original sources merely to reconstruct omitted detail unless the user approves those sources for this task.
 
 Read [references/workshop-design-guide.md](references/workshop-design-guide.md) for takeaway formatting, contract fields, learning design, activity requirements, assessment, and alignment checks.
 
@@ -26,20 +28,21 @@ Read [references/workshop-design-guide.md](references/workshop-design-guide.md) 
 4. Ask what to keep, change, replace, or combine. Offer **No opinion — recommend**, **All three**, and **None — reanalyse**.
 5. Refine one focused question at a time: audience, desired change, takeaway wording, duration, mode, group size, tools, exclusions, and intended depth.
 6. Surface scope/time trade-offs rather than silently compressing practice.
-7. Present the workshop contract and obtain explicit approval.
+7. Present the workshop contract, including write authority, and obtain explicit approval.
 
 ## Design and authoring
 
 After approval:
 
 1. Derive observable learning objectives and evidence from the takeaways.
-2. Design the experience → explain → demonstrate → practise → critique → transfer journey.
-3. Build a realistic agenda whose timings add up.
-4. Fully specify every activity, facilitator talk track, fallback, debrief, application, and assessment.
-5. Write from [assets/facilitator-guide-template.md](assets/facilitator-guide-template.md).
-6. Run the alignment checklist in the workshop-design guide.
+2. Map each approved takeaway through a relatable experience, teaching with or without demonstration, practise, and debrief with a call to action.
+3. Design the experience → explain → demonstrate → practise → critique → transfer journey.
+4. Build a realistic agenda whose timings add up.
+5. Fully specify every activity, facilitator talk track, fallback, debrief, application, and assessment.
+6. Write from [assets/facilitator-guide-template.md](assets/facilitator-guide-template.md).
+7. Run the alignment checklist in the workshop-design guide.
 
 ## Completion
 
-The task is complete only when the user approved the takeaways and contract, another facilitator can run the guide without reconstructing intent, participants actively apply the idea, learning is observable, canonical IP is preserved, and participants leave with a reusable output or next action.
+The task is complete only when the user approved the takeaways and contract, every approved takeaway moves from a relatable experience through teaching, practise, and debrief to a call to action, another facilitator can run the guide without reconstructing intent, participants actively apply the idea, learning is observable, canonical IP is preserved, and participants leave with a reusable output or next action.
 

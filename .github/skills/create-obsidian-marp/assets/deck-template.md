@@ -9,7 +9,7 @@ description: Presentation purpose
 
 # Presentation title
 
-*One-line promise to the audience*
+*One-line presentation primary takeaway*
 
 <!--
 Open with the strongest relevant hook from the chosen narrative spine.

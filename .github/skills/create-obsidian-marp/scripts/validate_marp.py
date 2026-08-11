@@ -9,15 +9,32 @@ from pathlib import Path
 
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
-SLIDE_SEPARATOR = re.compile(r"(?m)^---\s*$")
+SLIDE_SEPARATOR = re.compile(r"(?m)^(?:---|===)\s*$")
 COMMENT = re.compile(r"<!--(.*?)-->", re.DOTALL)
 FENCED_CODE = re.compile(r"```.*?```|~~~.*?~~~", re.DOTALL)
 RAW_HTML = re.compile(r"<\s*/?\s*[a-zA-Z][^>]*>")
-DIRECTIVE = re.compile(r"^\s*[_$]?[a-zA-Z][\w-]*\s*:")
+DIRECTIVE = re.compile(
+    r"^\s*(?:"
+    r"(?:_?class|_?backgroundColor|_?backgroundImage|_?backgroundPosition|"
+    r"_?backgroundRepeat|_?backgroundSize|_?color|_?footer|_?header|"
+    r"_?paginate|_?style|_?theme)\s*:|"
+    r"\$[a-zA-Z][\w-]*\s*:"
+    r")"
+)
+METADATA_LINE = re.compile(r"^([a-zA-Z][\w-]*)\s*:\s*(.*?)\s*$")
 
 
 def fail(message: str) -> None:
     print(f"ERROR: {message}")
+
+
+def parse_metadata(metadata: str) -> dict[str, str]:
+    parsed: dict[str, str] = {}
+    for line in metadata.splitlines():
+        match = METADATA_LINE.match(line)
+        if match:
+            parsed[match.group(1)] = match.group(2).strip("'\"")
+    return parsed
 
 
 def main() -> int:
@@ -36,9 +53,7 @@ def main() -> int:
         fail("Missing or malformed YAML front matter.")
         return 1
 
-    metadata = front.group(1)
-    required = ("marp: true", "theme:", "size:")
-    missing = [item for item in required if item not in metadata]
+    metadata = parse_metadata(front.group(1))
 
     body = text[front.end() :]
     slides = SLIDE_SEPARATOR.split(body)
@@ -47,18 +62,17 @@ def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
 
-    if missing:
-        errors.append("Front matter is missing: " + ", ".join(missing))
+    if metadata.get("marp", "").lower() != "true":
+        errors.append("Front matter must set marp: true.")
+    for key in ("theme", "size"):
+        if not metadata.get(key):
+            errors.append(f"Front matter must set a non-empty {key} value.")
     if not slides:
         errors.append("No slides found.")
 
     for index, slide in enumerate(slides, start=1):
         comments = COMMENT.findall(slide)
-        notes = [
-            comment
-            for comment in comments
-            if comment.strip() and not DIRECTIVE.match(comment.strip())
-        ]
+        notes = [comment for comment in comments if not DIRECTIVE.match(comment)]
         if not notes:
             errors.append(f"Slide {index} has no speaker-note comment.")
 

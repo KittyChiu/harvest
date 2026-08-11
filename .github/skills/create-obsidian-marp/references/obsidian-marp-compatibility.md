@@ -34,7 +34,7 @@ size: 16:9
 - Use Markdown image syntax rather than HTML image tags.
 - Keep images local when portability or offline presenting matters.
 - Use Marp directives only in HTML comments.
-- Use HTML comments for speaker notes because the plugin's export implementation delegates to Marp CLI, which recognizes this form.
+- Use HTML comments for speaker notes because the plugin's export implementation delegates to Marp CLI, which recognizes this form. Speaker-note comments are an explicit exception to the raw HTML restriction and may be empty.
 
 ## Do not use by default
 
@@ -61,6 +61,12 @@ Presenter-only narrative.
 ```
 
 This is not arbitrary slide-body HTML. The compatibility restriction targets rendered HTML layout elements such as `<div>`, not Marp's comment-based directives or notes.
+
+An empty speaker-note block is valid:
+
+```markdown
+<!---->
+```
 
 ## Density guardrails
 

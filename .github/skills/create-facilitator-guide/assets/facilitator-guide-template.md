@@ -3,7 +3,6 @@
 ## Facilitator guide
 
 **Purpose:**  
-**Workshop promise:**  
 **Source of truth:**  
 **Audience:**  
 **Duration:**  
@@ -13,11 +12,25 @@
 **Materials and tools:**  
 **Participant output:**  
 
+## Key takeaways
+
+1. First approved takeaway
+2. Second approved takeaway
+3. Third approved takeaway
+
 ## Learning outcomes
 
 | Participants will be able to | Evidence |
 |---|---|
 | Observable capability | Artifact, behaviour, or assessment |
+
+## Takeaway journey
+
+| Approved takeaway | Relatable experience | Teaching with or without demonstration | Practise | Debrief & call to action |
+|---|---|---|---|---|
+| Takeaway 1 | | | | |
+| Takeaway 2 | | | | |
+| Takeaway 3 | | | | |
 
 ## Agenda
 
@@ -42,9 +55,9 @@
 
 ### Transition
 
-## Teach the core model
+## Teach the core idea
 
-### Canonical concept
+### Source concept or model
 
 ### Explanation
 
@@ -81,7 +94,7 @@
 
 ## Debrief synthesis
 
-Connect participant observations back to the canonical framework and its boundaries.
+Connect participant observations back to the guiding principles and constraints. Use a source model or framework only when one exists.
 
 ## Success criteria
 
