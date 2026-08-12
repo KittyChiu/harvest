@@ -1,4 +1,4 @@
-# Harvest Dialogue
+# Harvest
 
 A GitHub Copilot CLI plugin marketplace for turning source material into reusable knowledge and learning experiences.
 
@@ -15,8 +15,8 @@ The skills include Python validators, so Python 3 is required when generating or
 ## Add the marketplace
 
 ```bash
-copilot plugin marketplace add KittyChiu/harvest-dialogue
-copilot plugin marketplace browse harvest-dialogue
+copilot plugin marketplace add KittyChiu/harvest
+copilot plugin marketplace browse harvest
 ```
 
 ## Install a plugin
@@ -24,9 +24,9 @@ copilot plugin marketplace browse harvest-dialogue
 Install only the capabilities you need:
 
 ```bash
-copilot plugin install create-knowledge-note@harvest-dialogue
-copilot plugin install create-learning-module@harvest-dialogue
-copilot plugin install create-obsidian-marp@harvest-dialogue
+copilot plugin install create-knowledge-note@harvest
+copilot plugin install create-learning-module@harvest
+copilot plugin install create-obsidian-marp@harvest
 ```
 
 Restart an active Copilot CLI session after installation, then use `/skills list` to verify that the installed skill is available.
@@ -34,7 +34,7 @@ Restart an active Copilot CLI session after installation, then use `/skills list
 ## Update
 
 ```bash
-copilot plugin marketplace update harvest-dialogue
+copilot plugin marketplace update harvest
 copilot plugin update create-knowledge-note
 ```
 
