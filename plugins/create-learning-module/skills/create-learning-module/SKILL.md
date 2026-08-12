@@ -46,10 +46,11 @@ After approval:
 6. Validate the pair:
 
 ```bash
-python3 .github/skills/create-learning-module/scripts/validate_module.py "<module>.participant.guide.md" "<module>.coach.guide.md"
+python3 "<skill-directory>/scripts/validate_module.py" "<module>.participant.guide.md" "<module>.coach.guide.md"
 ```
+
+Resolve `<skill-directory>` from this `SKILL.md`; do not assume the plugin is installed in the current project.
 
 ## Completion
 
 Complete only when both guides share a module stem and are written directly in the approved destination directory; no directory or subfolder was created; every source item has exactly one disposition; participant and coach content are separated; the participant can complete the module alone; the coach guide reinforces rather than duplicates; the module has one reusable output and no hidden dependency on another module; approved meaning is preserved; and the validator reports zero errors.
-

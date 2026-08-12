@@ -63,7 +63,9 @@ Put learner-facing markers beside participant content. Put coach-only, optional,
 Confirm that the scenario gives participants something meaningful to notice, the exercise reveals the core ideas through action, the open question connects them to real work, and the final reflection leads to one specific action. Review both guides for semantic fidelity and duplication, then run:
 
 ```bash
-python3 .github/skills/create-learning-module/scripts/validate_module.py "<module>.participant.guide.md" "<module>.coach.guide.md"
+python3 "<skill-directory>/scripts/validate_module.py" "<module>.participant.guide.md" "<module>.coach.guide.md"
 ```
+
+Resolve `<skill-directory>` from the skill's `SKILL.md`; do not assume the plugin is installed in the current project.
 
 The validator checks paired filenames, matching module stems, a shared parent directory, audience separation, and source coverage. It cannot judge whether the directory was user-approved or newly created, nor can it judge learning quality, conciseness, modularity, or semantic fidelity.

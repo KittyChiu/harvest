@@ -58,7 +58,7 @@ After approval:
 
 1. Draft the note in a human, direct, low-jargon voice.
 2. Write only to the approved output path.
-3. Run `python3 .github/skills/create-knowledge-note/scripts/validate_note.py <output-path>`. Add `--allow-front-matter` only when the user explicitly requested front matter.
+3. Resolve `scripts/validate_note.py` relative to this `SKILL.md`, then run `python3 "<resolved-validator-path>" <output-path>`. Add `--allow-front-matter` only when the user explicitly requested front matter.
 4. Tighten the note until the validator passes without losing the Core Idea, Principles, or critical Constraints.
 5. Run the qualitative checks in the authoring guide.
 

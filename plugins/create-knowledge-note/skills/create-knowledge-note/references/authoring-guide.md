@@ -74,7 +74,7 @@ If the draft is too long, tighten in this order:
 
 ## Final checks
 
-Before completion, run `python3 .github/skills/create-knowledge-note/scripts/validate_note.py <output-path>`. Add `--allow-front-matter` only when the user explicitly requested front matter. The validator checks the 300-word limit, 5–8 non-empty level-two sections, and the default prohibition on front matter.
+Before completion, resolve `scripts/validate_note.py` relative to the skill's `SKILL.md`, then run `python3 "<resolved-validator-path>" <output-path>`. Add `--allow-front-matter` only when the user explicitly requested front matter. The validator checks the 300-word limit, 5–8 non-empty level-two sections, and the default prohibition on front matter.
 
 Then verify:
 
