@@ -74,7 +74,9 @@ If the draft is too long, tighten in this order:
 
 ## Final checks
 
-Before completion, verify:
+Before completion, run `python3 .github/skills/create-knowledge-note/scripts/validate_note.py <output-path>`. Add `--allow-front-matter` only when the user explicitly requested front matter. The validator checks the 300-word limit, 5–8 non-empty level-two sections, and the default prohibition on front matter.
+
+Then verify:
 
 - the file was written only to the approved output path;
 - the file is directly inside the approved destination directory and no directory or subfolder was created;
@@ -87,4 +89,3 @@ Before completion, verify:
 - related ideas are relevant rather than decorative;
 - unsupported claims, contradictions, and uncertainty are removed or marked;
 - the note stands alone without the source or process history.
-

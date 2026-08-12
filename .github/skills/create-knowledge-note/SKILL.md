@@ -1,7 +1,7 @@
 ---
 name: create-knowledge-note
 description: "Create or revise a concise second-brain knowledge note from transcripts, notes, research, or existing IP. Use when: harvesting ideas into a self-contained Markdown note of 300 words or fewer with 5–8 clear sections, including Core Idea, Guiding Principles, Practices, Examples, Constraints, and Related Ideas."
-compatibility: Produces self-contained Markdown of 300 words or fewer. No external tools are required.
+compatibility: Produces self-contained Markdown of 300 words or fewer. Python 3 is required for validation.
 ---
 
 # Create Knowledge Note
@@ -57,10 +57,10 @@ Do not add an extraction map, conclusion, objectives section, glossary, front ma
 After approval:
 
 1. Draft the note in a human, direct, low-jargon voice.
-2. Count all visible words, including the title and headings.
-3. Tighten the note until it is at most 300 words without losing the Core Idea, Principles, or critical Constraints.
-4. Run the checks in the authoring guide.
-5. Write only to the approved output path.
+2. Write only to the approved output path.
+3. Run `python3 .github/skills/create-knowledge-note/scripts/validate_note.py <output-path>`. Add `--allow-front-matter` only when the user explicitly requested front matter.
+4. Tighten the note until the validator passes without losing the Core Idea, Principles, or critical Constraints.
+5. Run the qualitative checks in the authoring guide.
 
 When revising, update the existing note rather than duplicating it. Preserve stable terminology and mention any downstream asset that may now be stale.
 
@@ -82,4 +82,3 @@ Do not create or update downstream assets silently or automatically.
 ## Completion
 
 The task is complete when the approved note is written directly in the approved destination directory; has 5–8 useful sections; contains no more than 300 visible words; stands on its own; preserves the selected ideas and guiding principles; states meaningful constraints; creates no directory or subfolder; and changes only approved files.
-
