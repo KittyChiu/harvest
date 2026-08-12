@@ -8,12 +8,14 @@ applyTo: ".github/skills/**, .github/plugins/**, .agents/skills/**, .claude/skil
 - Keep each skill or plugin atomic and independently usable.
 - Collaborate through explicit capability and data contracts. Do not depend on another customization's name, caller identity, directory, or internal schema.
 - Make delegation optional. Preserve a standalone path when the capability can operate directly.
-- Keep deterministic behavior in scripts with focused tests: parsing, validation, transformations, naming, and repeatable checks.
+- Keep deterministic behavior in scripts with focused tests: parsing, validation, transformations, naming, and repeatable checks. Cover both compliant artifacts and representative violations.
 - Keep stable domain guidance in references and reusable scaffolding in assets. Keep `SKILL.md` focused on decisions, interaction gates, and workflow orchestration.
 - When changing a contract or taxonomy, update `SKILL.md`, references, assets, scripts, and tests together. Search for stale terms, casing, and removed fields.
 - Reference an existing source of truth instead of copying it. Introduce a shared dependency only when its contract and availability are intentional.
 - Prefer small structured contracts over inferred conventions or prose-based coupling.
-- Before writing, confirm source authority, read-only inputs, exact output path and filename, and permitted files. Do not infer artifact locations.
+- Before writing, confirm source authority, read-only inputs, create-or-revise mode, exact output filenames, and permitted files.
+- When delegating, pass the continuation context while preserving the delegated customization's approval gates.
 - Preserve backward compatibility only when it is cheap and explicit; mark legacy aliases clearly.
 - Validate representative generated output against the approved source and intent. Structural checks passing is not sufficient.
+- Run bundled Python tests with `python3 -m unittest discover -s <customization>/scripts -p 'test_*.py'`. For one test, run `python3 -m unittest <module>.<TestCase>.<test_method>` from its `scripts/` directory. Do not rely on a generic editor test runner when it reports no tests for these `unittest` files.
 - Optimize for maintainability: concise instructions, minimal duplication, narrow edits, and executable validation.
