@@ -34,6 +34,8 @@ Recommend one, then offer:
 
 Use one central tension, case, analogy, question, or transformation. Supporting examples must connect to it. Revisit the opening thread and resolve it in the close.
 
+The spine must carry every item marked required visible in the confirmed coverage contract. It may sequence, combine, or illustrate those items, but it may not narrow the source until principles or practices disappear. If an approach cannot accommodate all required content naturally, reject that approach or propose a longer deck.
+
 | Beat | Audience question | Function |
 |---|---|---|
 | Setup | Where are we, and why care? | Establish shared situation |
@@ -55,5 +57,6 @@ Notes should carry forward prior learning, show causality with “but,” “bec
 2. Confirm every slide follows logically.
 3. Confirm supporting stories illuminate the same tension.
 4. Confirm the close resolves the opening.
-5. Remove slides whose absence makes the story clearer.
+5. Confirm every approved source item classified as visible remains visibly and faithfully conveyed.
+6. Remove slides whose absence makes the story clearer without breaking required coverage.
 

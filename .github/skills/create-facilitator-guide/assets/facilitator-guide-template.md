@@ -12,6 +12,14 @@
 **Materials and tools:**  
 **Participant output:**  
 
+## Source coverage contract
+
+| Source ID | Approved disposition | Guide destination or approved reason |
+|---|---|---|
+| Source item ID | Participant-facing, facilitator-only, optional, or excluded | Section name or reason |
+
+Embed the complete `source-contract`, then place source coverage markers near their mapped destinations. The table records the approved scope; markers make the completed guide verifiable.
+
 ## Key takeaways
 
 1. First approved takeaway
@@ -55,7 +63,7 @@
 
 ### Transition
 
-## Teach the core idea
+## Teach the approved content
 
 ### Source concept or model
 
@@ -94,7 +102,7 @@
 
 ## Debrief synthesis
 
-Connect participant observations back to the guiding principles and constraints. Use a source model or framework only when one exists.
+Connect participant observations back to the confirmed participant-facing content and facilitator boundaries. Use a source model or framework only when one exists.
 
 ## Success criteria
 

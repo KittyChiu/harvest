@@ -2,16 +2,47 @@
 
 ## Teachable-core extraction
 
-When the source is a concise knowledge note, begin with its available sections:
+Discover the approved source's actual structure without assuming section names, order, or heading level. Extract a concise set of candidate content items. Group repetition and omit meeting logistics or production chatter. Assign stable descriptive IDs, present the extracted items for approval, and treat that approved list as the task-local source contract.
 
-| Knowledge-note section | Workshop use |
-|---|---|
-| Core Idea | Primary source for the workshop's key takeaways |
-| Guiding Principles | Refine the key takeaways and decision criteria |
-| Practices | Demonstration and participant practice |
-| Examples | Opening case, analogy, or worked example |
-| Constraints | Boundaries, risks, and critique criteria |
-| Related Ideas | Optional connections, not automatic scope |
+## Source coverage contract
+
+Before takeaway selection, inventory the source in this form:
+
+| Source ID | Source item | Proposed disposition | Approved disposition | Workshop destination or reason |
+|---|---|---|---|---|
+| `why-this-matters-1` | First item under `Why This Matters` | Participant-facing | Participant-facing | Takeaway 1 teaching and practice |
+| `facilitation-risks-1` | First item under `Facilitation Risks` | Facilitator-only | Facilitator-only | Watch-out in Activity 2 |
+| `further-reading-*` | Entire `Further Reading` section | Excluded | Excluded | Outside this workshop's purpose |
+
+Create stable source IDs from the source's own labels where useful, or from concise descriptive item labels. Use `<group-slug>-*` to classify a whole approved group as optional or excluded. Every item begins unclassified. Propose dispositions from the workshop purpose, audience, time, and desired behaviour change, explain the choices, and obtain explicit user confirmation.
+
+Use these dispositions:
+
+- **Participant-facing** — participants encounter and apply the item in teaching, demonstration, practice, debrief, or assessment.
+- **Facilitator-only** — the facilitator needs the item as preparation, a boundary, a watch-out, or a fallback, but participants do not need it as a learning outcome.
+- **Optional** — suitable only if time, audience, or format permits; record the approved reason.
+- **Excluded** — deliberately outside this workshop; record the approved reason.
+
+After approval, create a source-to-guide map and record each disposition near its destination:
+
+```markdown
+<!-- source: ways-of-working-1 -->
+<!-- source-facilitator: caveats-1 -->
+<!-- source-optional: related-topics-1 | reason: Only for advanced groups -->
+<!-- source-excluded: further-reading-* | reason: Outside this workshop's purpose -->
+```
+
+`source` means participant-facing and may also be written as `source-participant`. The legacy `canonical` forms are accepted. Multiple comma-separated IDs may share one marker. Add participant-facing or facilitator-only markers only where the item is conveyed. Optional and excluded markers require a reason confirmed by the user. Whole-group `-*` selectors are allowed only for optional and excluded dispositions.
+
+Embed the complete approved task-local item list once in every guide:
+
+```markdown
+<!-- source-contract: outcome-focus, persist-learning, checkpoint-choice -->
+```
+
+This declares the approved source boundary for validation, independently of the source's file type or structure.
+
+## Teachable-core design
 
 Then derive only what the workshop needs:
 
@@ -25,7 +56,7 @@ Then derive only what the workshop needs:
 - observable evidence;
 - durable participant artifact.
 
-Label audience framing, learning objectives, activities, assessment, and any new model as facilitation design rather than canonical source content. Exclude detail that does not support learning or application. Do not treat Related Ideas as required workshop content.
+Label audience framing, learning objectives, activities, assessment, and any new model as facilitation design rather than approved source content. The confirmed coverage contract, not a section heading, decides what is participant-facing, facilitator-only, optional, or excluded.
 
 ## Three-takeaway menu
 
@@ -34,7 +65,7 @@ Present:
 | Key takeaway | Core message | Why it matters | How it changes practice | Example or application |
 |---|---|---|---|---|
 
-Derive takeaways from the core idea, guiding principles, practices, constraints, audience needs, available time, and desired behavior change. Use a source framework only when one is explicitly present.
+Derive takeaways from all content classified as participant-facing, plus audience needs, available time, and desired behavior change. The takeaways must collectively organize all participant-facing items. Use a source framework only when one is explicitly present.
 
 Offer:
 
@@ -49,6 +80,7 @@ If three takeaways exceed the available duration, ask the user to reduce scope, 
 Confirm:
 
 - audience and starting point;
+- confirmed source coverage contract;
 - three key takeaways;
 - duration and format;
 - constraints, tools, and prerequisites;
@@ -103,6 +135,9 @@ Prefer authentic work over trivia. Define baseline, constraints, steps, measures
 
 ## Alignment checklist
 
+- Every approved source item has exactly one confirmed disposition.
+- Every participant-facing and facilitator-only item appears in its mapped destination.
+- Every optional or excluded item has an approved reason.
 - Every approved takeaway follows this participant journey: relatable experience → teaching with or without demonstration → practise → debrief and call to action.
 - Every objective appears in the agenda.
 - Every objective has practice or evidence.
@@ -111,4 +146,12 @@ Prefer authentic work over trivia. Define baseline, constraints, steps, measures
 - Risks are taught where misuse is possible.
 - The guide stands alone without slides.
 - Optional slide references are not dependencies.
+
+Run the validator:
+
+```bash
+python3 .github/skills/create-facilitator-guide/scripts/validate_guide.py "<guide.md>"
+```
+
+The validator checks contract completeness, conflicting dispositions, reasons, and whole-group selectors. It cannot judge approval or semantic fidelity. Perform a reverse coverage review against the confirmed contract: inspect each participant-facing and facilitator-only destination and confirm that it preserves the source item's complete meaning and terminology.
 

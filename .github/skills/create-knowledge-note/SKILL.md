@@ -66,11 +66,14 @@ When revising, update the existing note rather than duplicating it. Preserve sta
 
 After the note passes validation, ask whether the user wants a facilitator guide, a Marp deck, both, or neither.
 
+When the invocation context identifies this as a delegated upstream step and names a workflow to resume, return to that workflow after the note is approved and complete. Do not ask the downstream-assets question again; the requested continuation is already known. Otherwise, use the optional downstream-assets flow below.
+
 Delegate only after explicit consent:
 
-- use `create-facilitator-guide` for a facilitator guide;
-- use `create-obsidian-marp` for a Marp deck;
-- preserve each specialist skill's interaction and approval gates.
+- discover the available specialist skill whose description matches each selected asset type;
+- invoke that specialist with the approved knowledge note and the user's requested continuation;
+- preserve the specialist's interaction and approval gates;
+- if no matching specialist is available, report that limitation instead of generating the asset within this skill.
 
 Do not create or update downstream assets silently or automatically.
 
