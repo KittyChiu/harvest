@@ -27,7 +27,7 @@ Before writing, confirm in one compact message:
 - selected ideas;
 - guiding principles;
 - create or revise mode;
-- exact output path and files allowed to change.
+- approved existing destination directory, exact output filename, and files allowed to change.
 
 Explicit approval is required before writing. If the user changes several fields, accept them together and reconfirm only what changed.
 
@@ -77,6 +77,7 @@ If the draft is too long, tighten in this order:
 Before completion, verify:
 
 - the file was written only to the approved output path;
+- the file is directly inside the approved destination directory and no directory or subfolder was created;
 - no read-only source or unapproved asset changed;
 - the note has 5–8 non-empty sections;
 - all visible words, including title and headings, total 300 or fewer;

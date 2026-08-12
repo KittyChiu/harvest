@@ -1,5 +1,9 @@
 # Marp authoring checklist
 
+## Output routing
+
+Reuse the approved existing destination directory from the invocation or continuation context. If absent, ask the user to identify one. Write the `.marp.md` file directly inside it. Do not infer a directory name or create a directory or artifact-specific subfolder.
+
 ## Source extraction
 
 Discover the approved source's actual structure without assuming section names, order, or heading level. Extract a concise set of candidate content items. Group repetition and omit meeting logistics or production chatter. Assign stable descriptive IDs, present the extracted items for approval, and treat that approved list as the task-local source contract.
@@ -83,4 +87,6 @@ python3 .github/skills/create-obsidian-marp/scripts/validate_marp.py "<deck.marp
 The validator checks that every approved source item has exactly one disposition, optional and excluded dispositions have reasons, and whole-group selectors resolve to source items. It cannot judge approval or semantic fidelity. Perform a reverse coverage review against the confirmed contract: inspect each visible item without speaker notes and each notes-only item in its notes, then confirm that the destination preserves the complete meaning and approved terminology.
 
 Also inspect slide count, notes, raw HTML, front matter, density, dependencies, claims, confirmed configuration, and narrative coherence. Report any approved notes-only or excluded items at completion.
+
+Confirm that the deck is directly inside the approved destination directory and no directory or subfolder was created.
 

@@ -17,10 +17,15 @@ def run_validator(
     coach: str,
     participant_name: str = "focus.participant.guide.md",
     coach_name: str = "focus.coach.guide.md",
+    coach_subdirectory: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     with tempfile.TemporaryDirectory() as directory:
         participant_path = Path(directory) / participant_name
-        coach_path = Path(directory) / coach_name
+        coach_directory = Path(directory)
+        if coach_subdirectory:
+            coach_directory /= coach_subdirectory
+            coach_directory.mkdir()
+        coach_path = coach_directory / coach_name
         participant_path.write_text(participant, encoding="utf-8")
         coach_path.write_text(coach, encoding="utf-8")
         return subprocess.run(
@@ -118,6 +123,16 @@ class ValidateModuleTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1)
         self.assertIn("matching module stems", result.stdout)
+
+    def test_requires_same_output_directory(self) -> None:
+        result = run_validator(
+            PARTICIPANT,
+            COACH,
+            coach_subdirectory="coach",
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("same output directory", result.stdout)
 
     def test_rejects_contract_in_participant_guide(self) -> None:
         result = run_validator(

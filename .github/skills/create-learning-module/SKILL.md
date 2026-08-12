@@ -10,10 +10,12 @@ Create one self-contained self-paced module with two complementary guides. The p
 
 ## Source and module contract
 
-Before analysis, confirm source authority, read-only inputs, create or revise mode, and the exact two output paths and permitted files. Both filenames use the same module stem:
+Before analysis, confirm source authority, read-only inputs, create or revise mode, the approved existing destination directory, the exact two output filenames, and permitted files. Both filenames use the same module stem:
 
 - `<module>.participant.guide.md`
 - `<module>.coach.guide.md`
+
+Reuse the destination directory supplied in the invocation or continuation context. If none is supplied, ask the user to identify an existing directory. Write both guides directly into that directory. Do not infer the directory name, create a directory or subfolder, or group the guides by artifact type. When delegating knowledge-note creation, pass the same destination directory in the continuation context.
 
 Use an approved knowledge note when supplied. If none is available, offer three explicit choices: create one first through an available specialist (recommended), continue directly from approved raw sources, or choose an existing note. Never invoke another skill automatically or treat a knowledge note as a prerequisite.
 
@@ -29,7 +31,7 @@ Before writing:
 
 1. Confirm the approved source contract and dispositions.
 2. Propose up to three key learning points, one realistic opening scenario, a short exercise that reveals the core ideas, and an open question connecting them to the learner's own work.
-3. Confirm learner, desired change, prerequisites, available time, depth, tools, exclusions, reusable output, paired paths, and write authority.
+3. Confirm learner, desired change, prerequisites, available time, depth, tools, exclusions, reusable output, destination directory, paired filenames, and write authority.
 4. Surface time or scope trade-offs and obtain approval.
 
 ## Authoring
@@ -49,5 +51,5 @@ python3 .github/skills/create-learning-module/scripts/validate_module.py "<modul
 
 ## Completion
 
-Complete only when both guides share a module stem; every source item has exactly one disposition; participant and coach content are separated; the participant can complete the module alone; the coach guide reinforces rather than duplicates; the module has one reusable output and no hidden dependency on another module; approved meaning is preserved; and the validator reports zero errors.
+Complete only when both guides share a module stem and are written directly in the approved destination directory; no directory or subfolder was created; every source item has exactly one disposition; participant and coach content are separated; the participant can complete the module alone; the coach guide reinforces rather than duplicates; the module has one reusable output and no hidden dependency on another module; approved meaning is preserved; and the validator reports zero errors.
 

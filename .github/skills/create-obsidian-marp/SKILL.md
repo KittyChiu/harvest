@@ -6,11 +6,13 @@ compatibility: Produces Obsidian-compatible Marp Markdown. Python 3 is used only
 
 # Create Obsidian Marp
 
-Present **why**, **what**, and one example or demonstration of **how**. Leave comprehensive workshop instruction to the facilitator guide, but preserve every approved source message classified as visible in the confirmed coverage contract.
+Present **why**, **what**, and one example or demonstration of **how**. Leave hands-on practice and reflection to a learning module, but preserve every approved source message classified as visible in the confirmed coverage contract.
 
 ## Input and source rules
 
-Require an IP source and deck brief. Before analysis, confirm the source files and their authority, files that remain read-only, create or revise mode, the exact output path ending in `.marp.md`, and the exact files permitted to change. If the proposed filename uses another extension, propose the corrected `.marp.md` path and confirm it before writing. The brief defines audience, objective, required messages, duration/slide count, tone, and optional story/demo.
+Require an IP source and deck brief. Before analysis, confirm the source files and their authority, files that remain read-only, create or revise mode, the approved existing destination directory, the exact output filename ending in `.marp.md`, and the exact files permitted to change. If the proposed filename uses another extension, propose the corrected `.marp.md` filename and confirm it before writing. The brief defines audience, objective, required messages, duration/slide count, tone, and optional story/demo.
+
+Reuse the destination directory supplied in the invocation or continuation context. If none is supplied, ask the user to identify an existing directory. Write the deck directly into that directory. Do not infer the directory name, create a directory or subfolder, or group the output by artifact type. When delegating knowledge-note creation, pass the same destination directory in the continuation context.
 
 Check whether the user supplied or identified an approved knowledge note. Use user-provided paths and project conventions discovered from local documentation; do not assume a storage directory. Confirm authority before using a discovered file; a matching filename alone does not make it authoritative. If no approved note is available, ask which path to use:
 
@@ -52,6 +54,7 @@ Read these references when their phase begins:
 
 - One primary idea and story beat per slide.
 - The output filename ends in `.marp.md`.
+- The deck is directly inside the approved destination directory; no directory or subfolder is created.
 - Every approved source item has exactly one confirmed disposition.
 - Every item classified as visible appears in visible slide content.
 - Every slide includes an HTML-comment speaker-note block; the block may be empty.
@@ -64,5 +67,5 @@ Read these references when their phase begins:
 
 ## Completion
 
-The task is complete only when the source-to-slide map has been checked against the final deck; every approved source item has exactly one confirmed disposition; every visible and notes-only item is faithfully conveyed in its destination; every optional or excluded item has an approved reason; the bundled validator exits with code `0` and reports zero errors; the brief, selected storytelling approach, and confirmed Marp configuration are honored; the narrative is coherent; source and synthesis are distinct; the deck is portable; and a presenter can deliver it without reconstructing missing context.
+The task is complete only when the deck is written directly in the approved destination directory without creating a directory or subfolder; the source-to-slide map has been checked against the final deck; every approved source item has exactly one confirmed disposition; every visible and notes-only item is faithfully conveyed in its destination; every optional or excluded item has an approved reason; the bundled validator exits with code `0` and reports zero errors; the brief, selected storytelling approach, and confirmed Marp configuration are honored; the narrative is coherent; source and synthesis are distinct; the deck is portable; and a presenter can deliver it without reconstructing missing context.
 

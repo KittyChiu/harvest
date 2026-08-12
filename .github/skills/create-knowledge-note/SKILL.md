@@ -14,8 +14,10 @@ Before analysis, confirm:
 
 - the source material and its authority;
 - whether to create or revise;
-- the exact output path;
+- the approved existing destination directory and exact output filename;
 - which files may change.
+
+Reuse the destination directory supplied in the invocation or continuation context. If none is supplied, ask the user to identify an existing directory. Write the note directly into that directory. Do not infer the directory name, create a directory or subfolder, or group the output by artifact type.
 
 Treat source files as read-only unless the user explicitly approves one as the output. Prefer an existing canonical note over approved IP, then transcript or notes, then clearly identified synthesis. Preserve distinctive terminology and never invent quotes, evidence, or certainty.
 
@@ -64,14 +66,14 @@ When revising, update the existing note rather than duplicating it. Preserve sta
 
 ## Optional downstream assets
 
-After the note passes validation, ask whether the user wants a facilitator guide, a Marp deck, both, or neither.
+After the note passes validation, ask whether the user wants a learning module, a Marp deck, both, or neither.
 
 When the invocation context identifies this as a delegated upstream step and names a workflow to resume, return to that workflow after the note is approved and complete. Do not ask the downstream-assets question again; the requested continuation is already known. Otherwise, use the optional downstream-assets flow below.
 
 Delegate only after explicit consent:
 
 - discover the available specialist skill whose description matches each selected asset type;
-- invoke that specialist with the approved knowledge note and the user's requested continuation;
+- invoke that specialist with the approved knowledge note, the same approved destination directory, and the user's requested continuation;
 - preserve the specialist's interaction and approval gates;
 - if no matching specialist is available, report that limitation instead of generating the asset within this skill.
 
@@ -79,5 +81,5 @@ Do not create or update downstream assets silently or automatically.
 
 ## Completion
 
-The task is complete when the approved note has 5–8 useful sections, contains no more than 300 visible words, stands on its own, preserves the selected ideas and guiding principles, states meaningful constraints, and changes only approved files.
+The task is complete when the approved note is written directly in the approved destination directory; has 5–8 useful sections; contains no more than 300 visible words; stands on its own; preserves the selected ideas and guiding principles; states meaningful constraints; creates no directory or subfolder; and changes only approved files.
 

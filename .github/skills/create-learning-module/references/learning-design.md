@@ -25,6 +25,10 @@ The coach guide uses the same four headings, numbered from `### 1. Scenario` thr
 - Do not rely on another module's terminology or hidden context.
 - Keep each module independently usable so modules can later be ordered or combined.
 
+## Output routing
+
+Use the approved existing destination directory from the invocation or continuation context. If absent, ask the user to identify one. Write both guide files directly inside it. Do not infer a directory name or create a directory or artifact-specific subfolder. The paired filenames, not a folder hierarchy, identify the module.
+
 ## Source coverage
 
 Discover the source structure without assuming headings. Extract concise candidate items, group repetition, assign stable IDs, and confirm one disposition per item:
@@ -62,4 +66,4 @@ Confirm that the scenario gives participants something meaningful to notice, the
 python3 .github/skills/create-learning-module/scripts/validate_module.py "<module>.participant.guide.md" "<module>.coach.guide.md"
 ```
 
-The validator checks paired filenames, matching module stems, audience separation, and source coverage. It cannot judge learning quality, conciseness, modularity, or semantic fidelity.
+The validator checks paired filenames, matching module stems, a shared parent directory, audience separation, and source coverage. It cannot judge whether the directory was user-approved or newly created, nor can it judge learning quality, conciseness, modularity, or semantic fidelity.

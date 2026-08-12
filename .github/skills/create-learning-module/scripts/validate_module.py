@@ -124,6 +124,10 @@ def main() -> int:
         != args.coach.name[: -len(coach_suffix)]
     ):
         errors.append("Participant and coach guides require matching module stems.")
+    if args.participant.parent.resolve() != args.coach.parent.resolve():
+        errors.append(
+            "Participant and coach guides require the same output directory."
+        )
 
     participant_contract, participant_markers = parse_comments(participant, errors)
     coach_contract, coach_markers = parse_comments(coach, errors)
