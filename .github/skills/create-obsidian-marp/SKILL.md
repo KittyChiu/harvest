@@ -10,7 +10,7 @@ Present **why**, **what**, and one example or demonstration of **how**. Leave co
 
 ## Input and source rules
 
-Require an IP source and deck brief. Before analysis, confirm the source files and their authority, files that remain read-only, create or revise mode, the exact output path, and the exact files permitted to change. The brief defines audience, objective, required messages, duration/slide count, tone, and optional story/demo.
+Require an IP source and deck brief. Before analysis, confirm the source files and their authority, files that remain read-only, create or revise mode, the exact output path ending in `.marp.md`, and the exact files permitted to change. If the proposed filename uses another extension, propose the corrected `.marp.md` path and confirm it before writing. The brief defines audience, objective, required messages, duration/slide count, tone, and optional story/demo.
 
 Check whether the user supplied or identified an approved knowledge note. Use user-provided paths and project conventions discovered from local documentation; do not assume a storage directory. Confirm authority before using a discovered file; a matching filename alone does not make it authoritative. If no approved note is available, ask which path to use:
 
@@ -51,6 +51,7 @@ Read these references when their phase begins:
 ## Non-negotiables
 
 - One primary idea and story beat per slide.
+- The output filename ends in `.marp.md`.
 - Every approved source item has exactly one confirmed disposition.
 - Every item classified as visible appears in visible slide content.
 - Every slide includes an HTML-comment speaker-note block; the block may be empty.

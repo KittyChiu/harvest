@@ -14,7 +14,7 @@ VALIDATOR = Path(__file__).with_name("validate_marp.py")
 
 def run_validator(deck: str) -> subprocess.CompletedProcess[str]:
     with tempfile.TemporaryDirectory() as directory:
-        deck_path = Path(directory) / "deck.md"
+        deck_path = Path(directory) / "deck.marp.md"
         deck_path.write_text(deck, encoding="utf-8")
         command = ["python3", str(VALIDATOR), str(deck_path)]
         return subprocess.run(
@@ -26,6 +26,20 @@ def run_validator(deck: str) -> subprocess.CompletedProcess[str]:
 
 
 class ValidateMarpTests(unittest.TestCase):
+    def test_rejects_plain_markdown_extension(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            deck_path = Path(directory) / "deck.md"
+            deck_path.write_text("# Deck\n", encoding="utf-8")
+            result = subprocess.run(
+                ["python3", str(VALIDATOR), str(deck_path)],
+                capture_output=True,
+                check=False,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must end in .marp.md", result.stdout)
+
     def test_accepts_both_separators_and_empty_notes(self) -> None:
         result = run_validator(
             """---

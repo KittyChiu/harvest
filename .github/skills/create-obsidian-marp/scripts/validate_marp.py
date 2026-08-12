@@ -61,6 +61,11 @@ def main() -> int:
     if not path.is_file():
         fail(f"File not found: {path}")
         return 2
+
+    if not path.name.endswith(".marp.md"):
+        fail("Deck filename must end in .marp.md.")
+        return 1
+
     text = path.read_text(encoding="utf-8")
     front = FRONT_MATTER.match(text)
     if not front:
