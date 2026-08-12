@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate source coverage dispositions in a self-paced learning guide."""
+"""Validate a participant and coach guide as one self-paced learning module."""
 
 from __future__ import annotations
 
@@ -25,25 +25,19 @@ def fail(message: str) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate source coverage in a self-paced learning guide."
+        description="Validate a paired participant and coach learning module."
     )
-    parser.add_argument("guide", type=Path)
+    parser.add_argument("participant", type=Path)
+    parser.add_argument("coach", type=Path)
     return parser.parse_args()
 
 
-def main() -> int:
-    args = parse_args()
-    if not args.guide.is_file():
-        fail(f"File not found: {args.guide}")
-        return 2
-    guide = args.guide.read_text(encoding="utf-8")
-    errors: list[str] = []
-    if not args.guide.name.endswith(".guide.md"):
-        errors.append("Learning-guide filename must end with .guide.md.")
-    markers: list[tuple[str, list[str]]] = []
+def parse_comments(
+    text: str, errors: list[str]
+) -> tuple[set[str], list[tuple[str, list[str]]]]:
     contract_ids: set[str] = set()
-
-    for comment in COMMENT.findall(guide):
+    markers: list[tuple[str, list[str]]] = []
+    for comment in COMMENT.findall(text):
         contract = SOURCE_CONTRACT_COMMENT.match(comment)
         if contract:
             contract_ids.update(
@@ -80,10 +74,59 @@ def main() -> int:
         if disposition in {"optional", "excluded"} and not reason:
             errors.append(f"Guide has {disposition} source content without a reason.")
         markers.append((disposition, selectors))
+    return contract_ids, markers
+
+
+def main() -> int:
+    args = parse_args()
+    missing = [path for path in (args.participant, args.coach) if not path.is_file()]
+    if missing:
+        for path in missing:
+            fail(f"File not found: {path}")
+        return 2
+
+    participant = args.participant.read_text(encoding="utf-8")
+    coach = args.coach.read_text(encoding="utf-8")
+    errors: list[str] = []
+    participant_suffix = ".participant.guide.md"
+    coach_suffix = ".coach.guide.md"
+
+    if not args.participant.name.endswith(participant_suffix):
+        errors.append(
+            "Participant-guide filename must end with .participant.guide.md."
+        )
+    if not args.coach.name.endswith(coach_suffix):
+        errors.append("Coach-guide filename must end with .coach.guide.md.")
+    if (
+        args.participant.name.endswith(participant_suffix)
+        and args.coach.name.endswith(coach_suffix)
+        and args.participant.name[: -len(participant_suffix)]
+        != args.coach.name[: -len(coach_suffix)]
+    ):
+        errors.append("Participant and coach guides require matching module stems.")
+
+    participant_contract, participant_markers = parse_comments(participant, errors)
+    coach_contract, coach_markers = parse_comments(coach, errors)
+    if participant_contract:
+        errors.append("Participant guide must not contain a source-contract marker.")
+    if any(disposition == "coach" for disposition, _ in participant_markers):
+        errors.append("Participant guide must not contain coach source markers.")
+    if any(
+        disposition in {"optional", "excluded"}
+        for disposition, _ in participant_markers
+    ):
+        errors.append(
+            "Participant guide must not contain optional or excluded source markers."
+        )
+    if any(disposition == "learner" for disposition, _ in coach_markers):
+        errors.append("Coach guide must not contain learner source markers.")
+
+    contract_ids = coach_contract
+    markers = participant_markers + coach_markers
 
     source_items = {item: "" for item in contract_ids}
     if not source_items:
-        errors.append("Guide requires a non-empty source-contract marker.")
+        errors.append("Coach guide requires a non-empty source-contract marker.")
 
     dispositions: dict[str, set[str]] = {}
     for disposition, selectors in markers:

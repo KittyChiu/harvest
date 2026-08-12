@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for the facilitator-guide validator."""
+"""Regression tests for the self-paced learning-guide validator."""
 
 from __future__ import annotations
 
@@ -12,9 +12,11 @@ from pathlib import Path
 VALIDATOR = Path(__file__).with_name("validate_guide.py")
 
 
-def run_validator(guide: str) -> subprocess.CompletedProcess[str]:
+def run_validator(
+    guide: str, filename: str = "learning.guide.md"
+) -> subprocess.CompletedProcess[str]:
     with tempfile.TemporaryDirectory() as directory:
-        guide_path = Path(directory) / "guide.md"
+        guide_path = Path(directory) / filename
         guide_path.write_text(guide, encoding="utf-8")
         command = ["python3", str(VALIDATOR), str(guide_path)]
         return subprocess.run(
@@ -26,6 +28,31 @@ def run_validator(guide: str) -> subprocess.CompletedProcess[str]:
 
 
 class ValidateGuideTests(unittest.TestCase):
+    def test_requires_guide_markdown_extension(self) -> None:
+        result = run_validator(
+            """# Guide
+
+<!-- source-contract: tension -->
+<!-- source: tension -->
+""",
+            filename="learning.md",
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(".guide.md", result.stdout)
+
+    def test_accepts_coach_note_marker(self) -> None:
+        result = run_validator(
+            """# Guide
+
+<!-- source-contract: tension, caveat -->
+<!-- source: tension -->
+<!-- source-coach: caveat -->
+""",
+        )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_accepts_legacy_canonical_disposition_markers(self) -> None:
         result = run_validator(
             """# Guide
