@@ -1,5 +1,8 @@
 # Harvest
 
+[![CI](https://github.com/KittyChiu/harvest/actions/workflows/ci.yml/badge.svg)](https://github.com/KittyChiu/harvest/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A GitHub Copilot CLI plugin marketplace for turning source material into reusable knowledge and learning experiences.
 
 ## Available plugins
@@ -10,7 +13,7 @@ A GitHub Copilot CLI plugin marketplace for turning source material into reusabl
 | `create-learning-module` | Create paired participant and coach guides for a self-paced module. |
 | `create-obsidian-marp` | Create a narrative Marp deck for the Obsidian Marp Slides plugin. |
 
-The skills include Python validators, so Python 3 is required when generating or validating an artifact.
+The skills include Python validators, so Python 3.10 or later is required when generating or validating an artifact.
 
 ## Add the marketplace
 
@@ -55,3 +58,17 @@ Run the marketplace contract tests after changing a plugin manifest, skill path,
 ```bash
 python3 -m unittest discover -s .github/plugin/scripts -p 'test_*.py'
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development and pull
+request workflow.
+
+## Community and security
+
+- Use [GitHub Issues](https://github.com/KittyChiu/harvest/issues) for bugs and feature requests.
+- Read [SUPPORT.md](SUPPORT.md) before requesting help.
+- Report vulnerabilities privately by following [SECURITY.md](SECURITY.md).
+- Participation is governed by [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+## License
+
+Harvest is available under the [MIT License](LICENSE).

@@ -1,6 +1,7 @@
 ---
 name: create-knowledge-note
 description: "Create or revise a concise second-brain knowledge note from transcripts, notes, research, or existing IP. Use when: harvesting ideas into a self-contained Markdown note of 300 words or fewer with 5–8 clear sections, including Core Idea, Guiding Principles, Practices, Examples, Constraints, and Related Ideas."
+license: MIT
 compatibility: Produces self-contained Markdown of 300 words or fewer. Python 3 is required for validation.
 ---
 

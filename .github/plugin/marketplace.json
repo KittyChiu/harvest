@@ -12,18 +12,21 @@
       "name": "create-knowledge-note",
       "description": "Create or revise a concise, self-contained second-brain knowledge note from transcripts, notes, research, or existing thought-leadership material.",
       "version": "1.0.0",
+      "license": "MIT",
       "source": "./plugins/create-knowledge-note"
     },
     {
       "name": "create-learning-module",
       "description": "Create a modular self-paced learning experience with complementary participant and coach guides.",
       "version": "1.0.0",
+      "license": "MIT",
       "source": "./plugins/create-learning-module"
     },
     {
       "name": "create-obsidian-marp",
       "description": "Create a narrative Marp presentation with speaker notes for the Obsidian Marp Slides plugin.",
       "version": "1.0.0",
+      "license": "MIT",
       "source": "./plugins/create-obsidian-marp"
     }
   ]

@@ -44,6 +44,7 @@ class MarketplaceContractTests(unittest.TestCase):
         self.assertRegex(self.marketplace["name"], KEBAB_CASE)
         self.assertTrue(self.marketplace["owner"]["name"].strip())
         self.assertEqual(len(self.entries), len({entry["name"] for entry in self.entries}))
+        self.assertTrue((REPOSITORY_ROOT / "LICENSE").is_file())
 
     def test_catalog_matches_plugin_directories(self):
         catalog_names = {entry["name"] for entry in self.entries}
@@ -68,7 +69,7 @@ class MarketplaceContractTests(unittest.TestCase):
                 self.assertTrue(plugin_root.is_dir())
 
                 manifest = load_json(plugin_root / "plugin.json")
-                for field in ("name", "description", "version"):
+                for field in ("name", "description", "version", "license"):
                     self.assertEqual(entry[field], manifest[field])
 
                 skill_paths = manifest.get("skills", "skills/")
@@ -88,6 +89,7 @@ class MarketplaceContractTests(unittest.TestCase):
                         self.assertRegex(skill_name, KEBAB_CASE)
                         self.assertEqual(skill_name, skill_file.parent.name)
                         self.assertTrue(frontmatter.get("description", "").strip())
+                        self.assertEqual(manifest["license"], frontmatter.get("license"))
                         self.assertNotIn(skill_name, skill_names)
                         skill_names.add(skill_name)
 

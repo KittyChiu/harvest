@@ -1,6 +1,7 @@
 ---
 name: create-obsidian-marp
 description: Turn a canonical knowledge note, existing thought-leadership IP, raw notes, or a transcript into a narrative Marp deck with speaker notes for the Obsidian Marp Slides plugin. Recommend creating a knowledge note when none exists, while allowing direct use of approved raw sources. Interactively select a storytelling approach and confirm Marp configuration.
+license: MIT
 compatibility: Produces Obsidian-compatible Marp Markdown. Python 3 is used only by the bundled validator.
 ---
 
@@ -68,4 +69,3 @@ Read these references when their phase begins:
 ## Completion
 
 The task is complete only when the deck is written directly in the approved destination directory without creating a directory or subfolder; the source-to-slide map has been checked against the final deck; every approved source item has exactly one confirmed disposition; every visible and notes-only item is faithfully conveyed in its destination; every optional or excluded item has an approved reason; the bundled validator exits with code `0` and reports zero errors; the brief, selected storytelling approach, and confirmed Marp configuration are honored; the narrative is coherent; source and synthesis are distinct; the deck is portable; and a presenter can deliver it without reconstructing missing context.
-

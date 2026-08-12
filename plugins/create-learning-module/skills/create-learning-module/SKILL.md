@@ -1,6 +1,7 @@
 ---
 name: create-learning-module
 description: Interactively create a modular self-paced learning experience from a knowledge note, existing thought-leadership IP, raw notes, or a transcript. Produces separate participant and coach guides. Recommend creating a knowledge note when none exists while allowing direct use of approved raw sources. Confirm source coverage and key learning points, then design a concise experiential journey.
+license: MIT
 compatibility: Produces paired Markdown files ending in .participant.guide.md and .coach.guide.md. Python 3 is used only by the bundled validator.
 ---
 

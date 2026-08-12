@@ -8,6 +8,7 @@
   },
   "homepage": "https://github.com/KittyChiu/harvest",
   "repository": "https://github.com/KittyChiu/harvest",
+  "license": "MIT",
   "keywords": [
     "knowledge-management",
     "notes",
