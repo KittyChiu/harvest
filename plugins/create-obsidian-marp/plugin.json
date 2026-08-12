@@ -1,0 +1,18 @@
+{
+  "name": "create-obsidian-marp",
+  "description": "Create a narrative Marp presentation with speaker notes for the Obsidian Marp Slides plugin.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Kitty Chiu",
+    "url": "https://github.com/KittyChiu"
+  },
+  "homepage": "https://github.com/KittyChiu/harvest",
+  "repository": "https://github.com/KittyChiu/harvest",
+  "license": "MIT",
+  "keywords": [
+    "marp",
+    "obsidian",
+    "presentations"
+  ],
+  "skills": "skills/"
+}
