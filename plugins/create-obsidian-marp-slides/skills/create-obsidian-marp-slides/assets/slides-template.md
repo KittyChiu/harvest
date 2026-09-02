@@ -14,6 +14,7 @@ INPUTS
 
 Use:
 - The domain MOC
+- The MOC Pattern map and Domain workflow as the authoritative system view
 - Atomic pattern notes
 - Coaching companions
 
@@ -52,6 +53,8 @@ Speaker notes:
   evidence qualifiers, and remaining constraints into speaker notes.
 
 Relationships:
+- Preserve the MOC Pattern map topology in both deck maps.
+- Preserve the MOC Domain workflow topology in the combined scenario.
 - Show only relationships supported by source notes.
 - Use:
   enables
@@ -118,7 +121,7 @@ Source:
 # Pattern map
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph C1["[Cluster 1]"]
         A["[Pattern name]"]
         B["[Pattern name]"]
@@ -233,7 +236,7 @@ Source:
 ## Scenario: [Realistic situation]
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["[Observed signal]"]
     A["[Pattern name]"]
     B["[Pattern name]"]
@@ -304,7 +307,7 @@ Source:
 # Pattern map revisited
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph C1["[Cluster 1]"]
         A["[Pattern name]"]
         B["[Pattern name]"]

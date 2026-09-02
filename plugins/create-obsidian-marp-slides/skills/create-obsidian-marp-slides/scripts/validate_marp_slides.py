@@ -74,8 +74,7 @@ ATOMIC_RELATIONSHIP_LINE = re.compile(
     re.IGNORECASE,
 )
 MERMAID_NODE = re.compile(
-    r'^\s*([A-Za-z][A-Za-z0-9_-]*)\s*\[\s*"([^"]+)"\s*\]\s*$',
-    re.MULTILINE,
+    r'\b([A-Za-z][A-Za-z0-9_-]*)\s*\[\s*"([^"]+)"\s*\]',
 )
 MERMAID_ID_TOKEN = re.compile(r"\b([A-Za-z][A-Za-z0-9_-]*)\b")
 MERMAID_PIPE_LABEL = re.compile(r"\|\s*\"?([^\"|]+?)\"?\s*\|")
@@ -420,9 +419,95 @@ def allowed_deck_relationships(
 
 
 def mermaid_node_labels(text: str) -> dict[str, str]:
+    nodes: dict[str, str] = {}
+    for line in text.splitlines():
+        if line.lstrip().startswith("subgraph "):
+            continue
+        nodes.update(
+            {
+                match.group(1): match.group(2).strip()
+                for match in MERMAID_NODE.finditer(line)
+            }
+        )
+    return nodes
+
+
+def named_mermaid_relationships(text: str) -> set[tuple[str, str, str]]:
+    nodes = mermaid_node_labels(text)
+    relationships: set[tuple[str, str, str]] = set()
+    for line in text.splitlines():
+        node_tokens = [
+            token
+            for token in MERMAID_ID_TOKEN.finditer(line)
+            if token.group(1) in nodes
+        ]
+        for source_token, target_token in zip(node_tokens, node_tokens[1:]):
+            connector = line[source_token.end() : target_token.start()]
+            if not re.search(r"[-=.~]{2}", connector):
+                continue
+            pipe_label = MERMAID_PIPE_LABEL.search(connector)
+            inline_label = MERMAID_INLINE_LABEL.search(connector)
+            label_text = (
+                pipe_label.group(1)
+                if pipe_label is not None
+                else next(
+                    (
+                        group
+                        for group in (inline_label.groups() if inline_label else ())
+                        if group is not None
+                    ),
+                    None,
+                )
+            )
+            pairs = [(source_token, target_token)]
+            if connector.lstrip().startswith("<"):
+                pairs = [(target_token, source_token)]
+                if ">" in connector:
+                    pairs.append((source_token, target_token))
+            for directed_source, directed_target in pairs:
+                relationships.add(
+                    (
+                        nodes[directed_source.group(1)].strip().lower(),
+                        " ".join(label_text.lower().split()) if label_text else "",
+                        nodes[directed_target.group(1)].strip().lower(),
+                    )
+                )
+    return relationships
+
+
+def one_mermaid(text: str | None) -> str | None:
+    diagrams = [
+        content
+        for language, content in fenced_blocks(text or "")
+        if language == "mermaid"
+    ]
+    return diagrams[0] if len(diagrams) == 1 else None
+
+
+def moc_note_names(notes: str) -> dict[str, str]:
+    names: dict[str, str] = {}
+    for line in notes.splitlines():
+        markdown_names = MARKDOWN_LINK_DISPLAY.findall(line)
+        wiki_names = WIKI_LINK_DISPLAY.findall(line)
+        targets = local_markdown_target_list(line)
+        if len(targets) != 1:
+            continue
+        if len(markdown_names) == 1:
+            names[markdown_names[0].strip().lower()] = targets[0]
+        elif len(wiki_names) == 1:
+            target, alias = wiki_names[0]
+            names[(alias or target).strip().lower()] = targets[0]
+    return names
+
+
+def source_relationships(
+    diagram: str | None,
+    name_to_source: dict[str, str],
+) -> set[tuple[str, str, str]]:
     return {
-        match.group(1): match.group(2).strip()
-        for match in MERMAID_NODE.finditer(text)
+        (name_to_source[source], label, name_to_source[target])
+        for source, label, target in named_mermaid_relationships(diagram or "")
+        if source in name_to_source and target in name_to_source
     }
 
 
@@ -480,10 +565,11 @@ def relationship_claims(
                 connector = line[source_token.end() : target_token.start()]
                 if not re.search(r"[-=.~]{2}", connector):
                     continue
-                source_name = nodes[source_token.group(1)].lower()
-                target_name = nodes[target_token.group(1)].lower()
-                source = name_to_source.get(source_name)
-                target = name_to_source.get(target_name)
+                pairs = [(source_token, target_token)]
+                if connector.lstrip().startswith("<"):
+                    pairs = [(target_token, source_token)]
+                    if ">" in connector:
+                        pairs.append((source_token, target_token))
 
                 pipe_label = MERMAID_PIPE_LABEL.search(connector)
                 inline_label = MERMAID_INLINE_LABEL.search(connector)
@@ -501,22 +587,27 @@ def relationship_claims(
                         None,
                     )
                 )
-                if label_text is not None:
-                    label = " ".join(label_text.lower().split())
-                    labels.add(label)
+                for directed_source, directed_target in pairs:
+                    source_name = nodes[directed_source.group(1)].lower()
+                    target_name = nodes[directed_target.group(1)].lower()
+                    source = name_to_source.get(source_name)
+                    target = name_to_source.get(target_name)
+                    if label_text is not None:
+                        label = " ".join(label_text.lower().split())
+                        labels.add(label)
+                        if source is not None and target is not None and source != target:
+                            claims.add((source, label, target))
+                        elif source is not None or target is not None:
+                            errors.append(
+                                "Labeled Mermaid relationship must connect two known "
+                                f"pattern names: {line.strip()}."
+                            )
+                        continue
                     if source is not None and target is not None and source != target:
-                        claims.add((source, label, target))
-                    elif source is not None or target is not None:
                         errors.append(
-                            "Labeled Mermaid relationship must connect two known "
-                            f"pattern names: {line.strip()}."
+                            "Mermaid edges between patterns require a supported "
+                            f"relationship label: {line.strip()}."
                         )
-                    continue
-                if source is not None and target is not None and source != target:
-                    errors.append(
-                        "Mermaid edges between patterns require a supported relationship "
-                        f"label: {line.strip()}."
-                    )
 
     slide_to_pattern = {
         slide_index: pattern_id
@@ -724,6 +815,22 @@ def main() -> int:
         atomic_targets = local_markdown_targets(notes)
         if not atomic_targets:
             errors.append("MOC Notes must link at least one atomic note.")
+
+    moc_names = moc_note_names(notes or "")
+    moc_pattern_map = one_mermaid(section(moc_text, "Pattern map"))
+    if moc_pattern_map is None:
+        errors.append("MOC Pattern map requires exactly one fenced Mermaid diagram.")
+    moc_workflow_body = section(moc_text, "Domain workflow")
+    moc_workflow = one_mermaid(moc_workflow_body)
+    if (
+        moc_workflow is None
+        and (moc_workflow_body or "").strip().lower()
+        != "no supported domain workflow yet."
+    ):
+        errors.append(
+            "MOC Domain workflow requires exactly one fenced Mermaid diagram "
+            "or the supported empty state."
+        )
 
     expected_atomic: set[str] = set()
     expected_coaches: set[str] = set()
@@ -1032,6 +1139,8 @@ def main() -> int:
         for pattern_id, source in pattern_sources.items()
         if pattern_id in pattern_names
     }
+    moc_map_relationships = source_relationships(moc_pattern_map, moc_names)
+    moc_workflow_relationships = source_relationships(moc_workflow, moc_names)
     exact_moc_source_slides = (
         "Challenges & opportunities",
         "Pattern map",
@@ -1149,6 +1258,14 @@ def main() -> int:
             errors.append(
                 f"Pattern map is missing pattern cluster(s): {missing_clusters}."
             )
+        deck_name_to_source = {
+            name.lower(): source for source, name in source_to_name.items()
+        }
+        deck_map_relationships = source_relationships(mermaid[0], deck_name_to_source)
+        if deck_map_relationships != moc_map_relationships:
+            errors.append(
+                f"{map_title} relationship topology must match the MOC Pattern map."
+            )
 
     apply_slide_match = find_slide(slides, "Apply the patterns together")
     if apply_slide_match is not None:
@@ -1187,6 +1304,17 @@ def main() -> int:
                 errors.append(
                     "Apply the patterns together Mermaid flow is missing "
                     f"source-linked pattern name(s): {missing_names}."
+                )
+            deck_name_to_source = {
+                name.lower(): source for source, name in source_to_name.items()
+            }
+            deck_workflow_relationships = source_relationships(
+                mermaid[0], deck_name_to_source
+            )
+            if deck_workflow_relationships != moc_workflow_relationships:
+                errors.append(
+                    "Apply the patterns together relationship topology must match "
+                    "the MOC Domain workflow."
                 )
         for label in ("Start with", "Then", "Watch for"):
             if not re.search(

@@ -2,16 +2,16 @@
 
 ## Build one system narrative
 
-The MOC defines the boundary. Its scope orients the audience; each Notes entry supplies one reusable pattern. The presentation should reveal how those patterns form a useful system rather than concatenate mini-decks.
+The MOC defines the boundary and owns the domain system view. Its scope orients the audience, its Pattern map defines pattern membership and relationship topology, its Domain workflow defines how patterns work together, and each Notes entry supplies one reusable pattern. The presentation should teach that system rather than derive a competing one or concatenate mini-decks.
 
 Move through:
 
 1. **Orient** — promise a domain-level outcome.
 2. **Frame** — name recurring challenges and opportunities.
-3. **Map** — cluster the patterns and show only supported connections.
+3. **Map** — render the MOC's pattern clusters and supported connections.
 4. **Teach** — give each pattern one memorable slide.
 5. **Choose** — compare patterns only when they are alternatives.
-6. **Apply** — combine patterns in one realistic scenario.
+6. **Apply** — place the MOC's domain workflow in one realistic scenario.
 7. **Synthesize** — show directional change and remaining constraints.
 8. **Revisit** — use the map to explain the system.
 9. **Try** — invite one small practice against one visible signal.
@@ -50,7 +50,7 @@ On a pattern slide, put `Related:` in the speaker notes followed by `<target sho
 
 Omit `Related:` when no source-supported relationship exists. Do not use an empty field or a prose placeholder.
 
-Use fenced Mermaid for pattern maps and scenario flows. Mermaid nodes show exact pattern short names, never internal identifiers. If the target setup cannot render Mermaid, stop rather than substituting a text map.
+Use fenced Mermaid for pattern maps and scenario flows. Mermaid nodes show exact pattern short names, never internal identifiers. Preserve the MOC Pattern map's exact relationship labels and directions in both deck maps and every labeled or unlabeled pattern-to-pattern workflow edge in the scenario. Scenario signals, outcomes, and constraints may add context but must not replace, reverse, or extend the authoritative topology. If the target setup cannot render Mermaid, stop rather than substituting a text map.
 
 ## Apply without overstating
 
@@ -90,7 +90,7 @@ When the MOC changes:
 2. preserve IDs for retained patterns;
 3. add or remove pattern slides;
 4. make internal IDs contiguous without adding them to visible titles or diagrams;
-5. revise clusters, maps, scenario, synthesis, and close;
+5. synchronize clusters, maps, and scenario topology with the MOC, then revise synthesis and close;
 6. remove coach links for missing companions and add newly available ones;
 7. preserve confirmed configuration and useful unaffected content.
 
@@ -101,6 +101,7 @@ Confirm:
 - the domain promise and closing experiment resolve the same need;
 - challenges, opportunities, and domain question frame the pattern system;
 - each MOC note has exactly one pattern slide;
+- deck maps and scenario preserve the MOC's pattern and workflow topology;
 - IDs, names, clusters, maps, comparisons, and scenarios agree;
 - patterns and practices remain distinct;
 - every relationship and directional change is supported or identified as synthesis;

@@ -22,6 +22,14 @@ Tags: #ai #moc #draft #private
 
 Reusable ideas about how AI changes engineering work. Product setup belongs elsewhere.
 
+## Pattern map
+
+No pattern map yet.
+
+## Domain workflow
+
+No supported domain workflow yet.
+
 ## Notes
 
 No atomic notes yet.
@@ -35,6 +43,24 @@ Tags: #ai #moc #review #public
 
 Reusable ideas about how AI changes engineering work. Product setup belongs elsewhere.
 
+## Pattern map
+
+The pattern currently stands alone in this domain.
+
+```mermaid
+flowchart TD
+    A["Unit of work changes"]
+```
+
+## Domain workflow
+
+The pattern is the current entry point for the domain workflow.
+
+```mermaid
+flowchart TD
+    A["Unit of work changes"]
+```
+
 ## Notes
 
 - [Unit of work changes](ai-engineering-unit-of-work-changes.md) — How AI changes the unit of engineering work.
@@ -45,13 +71,22 @@ def run_validator(
     moc: str = EMPTY_MOC,
     moc_name: str = "ai-engineering-moc.md",
     linked_files: tuple[str, ...] = (),
+    linked_contents: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         moc_path = root / moc_name
         moc_path.write_text(moc, encoding="utf-8")
         for filename in linked_files:
-            (root / filename).write_text("# Existing note\n", encoding="utf-8")
+            title = (
+                "Unit of work changes"
+                if filename == "ai-engineering-unit-of-work-changes.md"
+                else "Second pattern"
+                if filename == "ai-engineering-second-pattern.md"
+                else "Existing note"
+            )
+            content = (linked_contents or {}).get(filename, f"# {title}\n")
+            (root / filename).write_text(content, encoding="utf-8")
         return subprocess.run(
             ["python3", str(VALIDATOR), str(moc_path)],
             capture_output=True,
@@ -86,6 +121,176 @@ class ValidateMocTests(unittest.TestCase):
             linked_files=("ai-engineering-unit-of-work-changes.md",),
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_requires_empty_map_and_workflow_for_empty_moc(self) -> None:
+        result = run_validator(
+            moc=EMPTY_MOC.replace(
+                "No pattern map yet.",
+                "Patterns will be mapped later.",
+            )
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('must be exactly "No pattern map yet."', result.stdout)
+
+    def test_requires_mermaid_map_for_linked_moc(self) -> None:
+        moc = LINKED_MOC.replace(
+            "```mermaid\nflowchart TD\n    A[\"Unit of work changes\"]\n```",
+            "A prose-only diagram.",
+            1,
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Pattern Map requires exactly one fenced Mermaid diagram", result.stdout)
+
+    def test_accepts_populated_moc_without_supported_workflow(self) -> None:
+        moc = LINKED_MOC.replace(
+            "The pattern is the current entry point for the domain workflow.\n\n"
+            "```mermaid\nflowchart TD\n    A[\"Unit of work changes\"]\n```",
+            "No supported domain workflow yet.",
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_requires_every_note_title_in_both_diagrams(self) -> None:
+        moc = LINKED_MOC.replace(
+            'A["Unit of work changes"]',
+            'A["Different title"]',
+            1,
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "Pattern Map is missing exact atomic-note title(s): Unit of work changes",
+            result.stdout,
+        )
+
+    def test_rejects_partial_pattern_title_match(self) -> None:
+        moc = LINKED_MOC.replace(
+            'A["Unit of work changes"]',
+            'A["Unit of work changes unexpectedly"]',
+            1,
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("missing exact atomic-note title", result.stdout)
+        self.assertIn("not listed in Notes", result.stdout)
+
+    def test_rejects_extra_pattern_node(self) -> None:
+        moc = LINKED_MOC.replace(
+            '    A["Unit of work changes"]\n```',
+            '    A["Unit of work changes"]\n    B["Invented pattern"]\n```',
+            1,
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("not listed in Notes: Invented pattern", result.stdout)
+
+    def test_rejects_note_label_that_differs_from_atomic_title(self) -> None:
+        moc = LINKED_MOC.replace(
+            "[Unit of work changes]",
+            "[Changed display title]",
+        ).replace(
+            'A["Unit of work changes"]',
+            'A["Changed display title"]',
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must match atomic-note title", result.stdout)
+
+    def test_rejects_unsupported_pattern_map_relationship(self) -> None:
+        moc = LINKED_MOC.replace(
+            '    A["Unit of work changes"]\n```',
+            '    A["Unit of work changes"]\n'
+            '    B["Second pattern"]\n'
+            '    A -->|enables| B\n```',
+            1,
+        ).replace(
+            "- [Unit of work changes]",
+            "- [Second pattern](ai-engineering-second-pattern.md) — A second decision.\n"
+            "- [Unit of work changes]",
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=(
+                "ai-engineering-unit-of-work-changes.md",
+                "ai-engineering-second-pattern.md",
+            ),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("not supported by the atomic notes", result.stdout)
+
+    def test_rejects_unsupported_inline_pattern_map_relationship(self) -> None:
+        moc = LINKED_MOC.replace(
+            '    A["Unit of work changes"]',
+            '    A["Unit of work changes"] -->|causes| B["Second pattern"]',
+            1,
+        ).replace(
+            "- [Unit of work changes]",
+            "- [Second pattern](ai-engineering-second-pattern.md) — A second decision.\n"
+            "- [Unit of work changes]",
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=(
+                "ai-engineering-unit-of-work-changes.md",
+                "ai-engineering-second-pattern.md",
+            ),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("unsupported relationship label: causes", result.stdout)
+
+    def test_rejects_backward_pattern_map_relationship(self) -> None:
+        moc = LINKED_MOC.replace(
+            '    A["Unit of work changes"]',
+            '    A["Unit of work changes"]\n'
+            '    B["Second pattern"]\n'
+            '    A <--|enables| B',
+            1,
+        ).replace(
+            "- [Unit of work changes]",
+            "- [Second pattern](ai-engineering-second-pattern.md) — A second decision.\n"
+            "- [Unit of work changes]",
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=(
+                "ai-engineering-unit-of-work-changes.md",
+                "ai-engineering-second-pattern.md",
+            ),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "ai-engineering-second-pattern.md --enables--> "
+            "ai-engineering-unit-of-work-changes.md",
+            result.stdout,
+        )
+
+    def test_rejects_atomic_note_without_exactly_one_title(self) -> None:
+        result = run_validator(
+            moc=LINKED_MOC,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+            linked_contents={"ai-engineering-unit-of-work-changes.md": "No title\n"},
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("requires exactly one level-one title", result.stdout)
 
     def test_accepts_full_marp_markdown_link_outside_notes(self) -> None:
         moc = (
@@ -128,7 +333,7 @@ class ValidateMocTests(unittest.TestCase):
         result = run_validator(
             moc=LINKED_MOC.replace(
                 "[Unit of work changes](ai-engineering-unit-of-work-changes.md)",
-                "[[ai-engineering-unit-of-work-changes]]",
+                "[[ai-engineering-unit-of-work-changes|Unit of work changes]]",
             ),
             linked_files=("ai-engineering-unit-of-work-changes.md",),
         )
@@ -187,15 +392,15 @@ class ValidateMocTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("domain tag", result.stdout)
 
-    def test_requires_scope_and_notes(self) -> None:
+    def test_requires_all_domain_sections(self) -> None:
         result = run_validator(
             moc=EMPTY_MOC.replace("## Scope", "## Purpose").replace(
-                "## Notes", "## Index"
+                "## Pattern map", "## System view"
             )
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("scope", result.stdout)
-        self.assertIn("notes", result.stdout)
+        self.assertIn("pattern map", result.stdout)
 
     def test_rejects_duplicate_required_section(self) -> None:
         moc = EMPTY_MOC.replace(
@@ -218,6 +423,14 @@ No atomic notes yet.
 ## Scope
 
 Reusable ideas about AI engineering. Product setup belongs elsewhere.
+
+## Pattern map
+
+No pattern map yet.
+
+## Domain workflow
+
+No supported domain workflow yet.
 """
         result = run_validator(moc=moc)
         self.assertEqual(result.returncode, 1)

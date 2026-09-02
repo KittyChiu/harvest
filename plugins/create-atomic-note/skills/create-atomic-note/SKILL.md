@@ -45,7 +45,7 @@ If no existing MOC fits, offer an available domain-MOC specialist with the propo
 3. Ask the user to select or reframe one candidate. Handle other patterns in separate runs.
 4. Propose the title, exact filenames, parent MOC, tags, template-aligned content outline, and supported typed relationships.
 5. Obtain explicit approval for the content contract and permitted files.
-6. Create or revise the atomic note, then add or update its one descriptive MOC entry.
+6. Create or revise the atomic note, then update its descriptive MOC entry and synchronize the MOC Pattern map and Domain workflow. Add or rename the pattern node, update supported edges, and use the supported workflow empty state when no defensible workflow exists.
 
 Do not ask for information already supplied. Combine confirmations when the user can approve them safely in one decision.
 
@@ -64,6 +64,8 @@ Do not ask for information already supplied. Combine confirmations when the user
 - Use portable relative Markdown links by default. Wiki-style links are allowed when the selected PKM tool uses them.
 - In `Relationships`, use only supported prerequisite, extension, contrast, or example links and explain each connection. If none exist, state that explicitly.
 - Add the MOC entry as `- [<atomic-note-title>](<atomic-note>.md) — <navigation description>`.
+- Keep the MOC Pattern map complete after adding, revising, or renaming the note. Use the atomic note's exact H1 title as its Mermaid node label and preserve only supported typed relationships.
+- Keep a populated MOC Domain workflow synchronized when the note participates in it. Do not force the note into a sequence; `No supported domain workflow yet.` remains valid when no defensible workflow exists.
 - Do not invent learning, evidence, causality, examples, outcomes, or relationships.
 
 ## Validate
@@ -74,7 +76,7 @@ Run:
 python3 "<skill-directory>/scripts/validate_atomic_note.py" "<atomic-note.md>" "<domain-moc.md>"
 ```
 
-Fix every error. Then confirm qualitatively that the source supports the learning without being named or linked, customer and team identities are obfuscated, the learning supports the pattern, the mechanism explains the recommendation, the signals indicate when to use it, and the constraints prevent overgeneralization.
+Fix every error. Then confirm qualitatively that the source supports the learning without being named or linked, customer and team identities are obfuscated, the learning supports the pattern, the mechanism explains the recommendation, the signals indicate when to use it, the constraints prevent overgeneralization, and the MOC entry, Pattern map, and Domain workflow remain consistent.
 
 ## Companion assets
 
@@ -88,4 +90,4 @@ Offer available coaching or presentation specialists only with explicit consent.
 
 ## Completion
 
-Complete only when the approved atomic note and MOC are the only changed files; the note follows the template with no prompts or placeholders left, has one parent MOC and a descriptive MOC entry, carries all tag categories, contains one source-grounded reusable pattern without source attribution or external source URLs, obfuscates customer and team identities, uses only meaningful and resolvable relationships, and the validator reports zero errors.
+Complete only when the approved atomic note and MOC are the only changed files; the note follows the template with no prompts or placeholders left, has one parent MOC and a descriptive MOC entry, appears under its exact title in the complete MOC Pattern map and any populated Domain workflow, carries all tag categories, contains one source-grounded reusable pattern without source attribution or external source URLs, obfuscates customer and team identities, uses only meaningful and resolvable relationships, and the validator reports zero errors.

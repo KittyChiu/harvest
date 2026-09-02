@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import re
+from collections import Counter
 from pathlib import Path
 
 
@@ -14,6 +15,15 @@ WIKI_LINK = re.compile(r"(?<!!)\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
 TRANSCLUSION = re.compile(r"!\[\[")
 MARKDOWN_LINK = re.compile(
     r"(?<!!)\[[^\]]+\]\(\s*(<?[^)\s>]+>?)\s*(?:[\"'][^)]*[\"'])?\)"
+)
+MARKDOWN_LINK_WITH_LABEL = re.compile(
+    r"(?<!!)\[([^\]]+)\]\(\s*(<?[^)\s>]+>?)\s*(?:[\"'][^)]*[\"'])?\)"
+)
+WIKI_LINK_WITH_LABEL = re.compile(
+    r"(?<!!)\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]"
+)
+MERMAID_NODE_LABEL = re.compile(
+    r"\b[A-Za-z][A-Za-z0-9_-]*\s*\[\s*\"([^\"]+)\"\s*\]"
 )
 TAG = re.compile(r"(?<!\w)#([a-z0-9][a-z0-9-]*)", re.IGNORECASE)
 WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9'-]*")
@@ -35,6 +45,7 @@ INTERNAL_FILENAME = re.compile(
     r"^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.(?:coach|marp))?\.md$"
 )
 EMPTY_MOC = re.compile(r"\bNo atomic notes yet\.", re.IGNORECASE)
+EMPTY_WORKFLOW = "No supported domain workflow yet."
 PATTERN_FORM = re.compile(
     r"^When\b.+,\s*.+,\s*because\b.+[.!?]$", re.IGNORECASE
 )
@@ -190,6 +201,75 @@ def strip_fenced_blocks(text: str) -> str:
     return "\n".join(visible_lines)
 
 
+def fenced_blocks(text: str) -> list[tuple[str, str]]:
+    blocks: list[tuple[str, str]] = []
+    marker: str | None = None
+    length = 0
+    language = ""
+    content: list[str] = []
+    for line in text.splitlines():
+        if marker is not None:
+            if re.fullmatch(rf"\s*{re.escape(marker)}{{{length},}}\s*", line):
+                blocks.append((language, "\n".join(content)))
+                marker = None
+                content = []
+            else:
+                content.append(line)
+            continue
+        match = re.match(r"^\s*(`{3,}|~{3,})(.*)$", line)
+        if match:
+            marker = match.group(1)[0]
+            length = len(match.group(1))
+            language = match.group(2).strip().lower()
+    return blocks
+
+
+def validate_moc_diagram(
+    raw_moc: str,
+    section_name: str,
+    note_titles: list[str],
+    errors: list[str],
+    *,
+    allow_empty: bool = False,
+) -> None:
+    body = section_body(raw_moc, section_name)
+    if body is None:
+        errors.append(f"MOC requires a {section_name.title()} section.")
+        return
+    if allow_empty and body.strip().lower() == EMPTY_WORKFLOW.lower():
+        return
+    diagrams = [
+        content for language, content in fenced_blocks(body) if language == "mermaid"
+    ]
+    if len(diagrams) != 1:
+        errors.append(
+            f"MOC {section_name.title()} requires exactly one fenced Mermaid diagram."
+        )
+        return
+    labels = [
+        label
+        for line in diagrams[0].splitlines()
+        if not line.lstrip().startswith("subgraph ")
+        for label in MERMAID_NODE_LABEL.findall(line)
+    ]
+    expected = Counter(note_titles)
+    actual = Counter(labels)
+    missing = sorted((expected - actual).elements())
+    extra = sorted((actual - expected).elements())
+    if missing:
+        errors.append(
+            f"MOC {section_name.title()} is missing atomic-note title(s): "
+            + ", ".join(missing)
+            + "."
+        )
+    if extra:
+        errors.append(
+            f"MOC {section_name.title()} contains node(s) not listed in Notes: "
+            + ", ".join(extra)
+            + "."
+        )
+
+
 def template_prompts(text: str) -> list[str]:
     lines = {line.strip() for line in text.splitlines() if line.strip()}
     return sorted(lines & TEMPLATE_PROMPTS)
@@ -306,6 +386,7 @@ def main() -> int:
         errors.append("Atomic note requires exactly one level-one title.")
     if len(H1.findall(moc)) != 1:
         errors.append("MOC requires exactly one level-one title.")
+    note_title = H1.findall(note)[0].strip() if len(H1.findall(note)) == 1 else ""
 
     parent = field(note, "Parent")
     parent_links = link_filenames(parent or "")
@@ -416,6 +497,56 @@ def main() -> int:
     if moc_link_lines and EMPTY_MOC.search(moc_notes):
         errors.append(
             'MOC Notes cannot combine "No atomic notes yet." with atomic-note links.'
+        )
+    if moc_link_lines and note_title:
+        current_display_labels: list[str] = []
+        for line in moc_link_lines:
+            markdown = MARKDOWN_LINK_WITH_LABEL.search(line)
+            if markdown:
+                current_display_labels.append(markdown.group(1).strip())
+                continue
+            wiki = WIKI_LINK_WITH_LABEL.search(line)
+            if wiki:
+                current_display_labels.append(
+                    (wiki.group(2) or Path(wiki.group(1)).stem).strip()
+                )
+        if current_display_labels != [note_title]:
+            errors.append("MOC entry title must match the atomic-note title exactly.")
+        all_display_labels: list[str] = []
+        for line in moc_notes.splitlines():
+            markdown = MARKDOWN_LINK_WITH_LABEL.search(line)
+            if markdown and markdown_link_target(markdown.group(2)) is not None:
+                display_label = markdown.group(1).strip()
+                target = normalized_filename(markdown.group(2))
+            else:
+                wiki = WIKI_LINK_WITH_LABEL.search(line)
+                if not wiki:
+                    continue
+                display_label = (wiki.group(2) or Path(wiki.group(1)).stem).strip()
+                target = normalized_filename(wiki.group(1))
+            all_display_labels.append(display_label)
+            target_path = args.moc.parent / target if target is not None else None
+            if target_path is None or not target_path.is_file():
+                continue
+            target_titles = H1.findall(
+                strip_fenced_blocks(target_path.read_text(encoding="utf-8"))
+            )
+            if len(target_titles) != 1:
+                errors.append(
+                    f'MOC atomic note "{target}" requires exactly one level-one title.'
+                )
+            elif display_label != target_titles[0].strip():
+                errors.append(
+                    f'MOC Notes title "{display_label}" must match atomic-note title '
+                    f'"{target_titles[0].strip()}".'
+                )
+        validate_moc_diagram(raw_moc, "pattern map", all_display_labels, errors)
+        validate_moc_diagram(
+            raw_moc,
+            "domain workflow",
+            all_display_labels,
+            errors,
+            allow_empty=True,
         )
     for _raw, target in internal_links(moc_notes):
         filename = normalized_filename(target)

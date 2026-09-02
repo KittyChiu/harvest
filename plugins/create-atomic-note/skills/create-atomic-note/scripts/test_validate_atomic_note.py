@@ -73,6 +73,19 @@ Tags: #platform #moc #draft #private
 
 Reusable patterns for internal platforms.
 
+## Pattern map
+
+This map shows the current platform pattern and its supported relationships.
+
+```mermaid
+flowchart TD
+    A["Golden paths reduce cognitive load"]
+```
+
+## Domain workflow
+
+No supported domain workflow yet.
+
 ## Notes
 
 - [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — Decide when a maintained default can remove repeated delivery choices.
@@ -378,6 +391,57 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             linked_files=("platform-team-as-a-product.md", "platform.marp.md"),
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_requires_atomic_note_in_moc_pattern_map(self) -> None:
+        moc = MOC.replace(
+            'A["Golden paths reduce cognitive load"]',
+            'A["Different pattern"]',
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Pattern Map is missing atomic-note title", result.stdout)
+
+    def test_requires_pattern_map_to_preserve_all_moc_notes(self) -> None:
+        moc = MOC.replace(
+            "## Notes\n\n",
+            "## Notes\n\n"
+            "- [Platform teams as products](platform-team-as-a-product.md) "
+            "— Decide when platform ownership needs a product model.\n",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "Pattern Map is missing atomic-note title(s): Platform teams as products",
+            result.stdout,
+        )
+
+    def test_requires_every_moc_entry_to_match_linked_note_title(self) -> None:
+        moc = MOC.replace(
+            '    A["Golden paths reduce cognitive load"]',
+            '    A["Golden paths reduce cognitive load"]\n'
+            '    B["Platform teams as products"]',
+        ).replace(
+            "## Notes\n\n",
+            "## Notes\n\n"
+            "- [Platform teams as products](platform-team-as-a-product.md) "
+            "— Decide when platform ownership needs a product model.\n",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            'MOC Notes title "Platform teams as products" must match '
+            'atomic-note title "Existing note"',
+            result.stdout,
+        )
+
+    def test_requires_moc_entry_to_match_atomic_title(self) -> None:
+        moc = MOC.replace(
+            "[Golden paths reduce cognitive load]",
+            "[Golden path]",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("entry title must match", result.stdout)
 
     def test_ignores_headings_and_links_inside_fenced_code(self) -> None:
         note = replace_section_body(

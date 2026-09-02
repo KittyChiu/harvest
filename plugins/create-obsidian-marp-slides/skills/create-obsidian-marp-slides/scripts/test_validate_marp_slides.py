@@ -61,6 +61,24 @@ class ValidateMarpSlidesTests(unittest.TestCase):
 
 Platform practices.
 
+## Pattern map
+
+```mermaid
+flowchart TD
+    A["Golden paths"]
+    B["Feedback loops"]
+    A -->|enables| B
+```
+
+## Domain workflow
+
+```mermaid
+flowchart TD
+    A["Golden paths"]
+    B["Feedback loops"]
+    A -->|enables| B
+```
+
 ## Notes
 
 - [Golden paths](platform-golden-paths.md) - paved routes for common work.
@@ -136,7 +154,7 @@ Source:
 # Pattern map
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph C1["Delivery defaults"]
         A["Golden paths"]
     end
@@ -162,7 +180,7 @@ Source:
 
 ---
 
-###### P1 of 2 · Delivery defaults
+###### p1 of 2 · Delivery defaults
 
 # Golden paths
 
@@ -225,7 +243,7 @@ Source:
 ## Scenario: A team repeatedly rebuilds deployment setup
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["Repeated setup signal"]
     A["Golden paths"]
     B["Feedback loops"]
@@ -288,7 +306,7 @@ Source:
 # Pattern map revisited
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph C1["Delivery defaults"]
         A["Golden paths"]
     end
@@ -388,6 +406,58 @@ Source:
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assertIn("2 atomic sources", result.stdout)
         self.assertIn("1 coaching sources", result.stdout)
+
+    def test_rejects_map_that_omits_moc_relationship(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "    A -->|enables| B\n```",
+                "```",
+                1,
+            )
+        )
+        self.assert_invalid(
+            "Pattern map relationship topology must match the MOC Pattern map"
+        )
+
+    def test_rejects_scenario_that_changes_moc_workflow(self) -> None:
+        marker = "# Apply the patterns together"
+        before, after = self.valid_deck().split(marker, 1)
+        after = after.replace("    A -->|enables| B", "    B -->|precedes| A", 1)
+        self.write_deck(before + marker + after)
+        self.assert_invalid(
+            "Apply the patterns together relationship topology must match "
+            "the MOC Domain workflow"
+        )
+
+    def test_rejects_scenario_that_reverses_unlabeled_moc_workflow(self) -> None:
+        self.moc.write_text(
+            self.valid_moc().replace(
+                "## Domain workflow\n\n"
+                "```mermaid\n"
+                "flowchart TD\n"
+                '    A["Golden paths"]\n'
+                '    B["Feedback loops"]\n'
+                "    A -->|enables| B\n"
+                "```",
+                "## Domain workflow\n\n"
+                "```mermaid\n"
+                "flowchart TD\n"
+                '    A["Golden paths"]\n'
+                '    B["Feedback loops"]\n'
+                "    A --> B\n"
+                "```",
+            ),
+            encoding="utf-8",
+        )
+        deck = self.valid_deck()
+        marker = "# Apply the patterns together"
+        before, after = deck.split(marker, 1)
+        after = after.replace("A -->|enables| B", "B --> A", 1)
+        self.write_deck(before + marker + after)
+        self.assert_invalid(
+            "Apply the patterns together relationship topology must match "
+            "the MOC Domain workflow"
+        )
 
     def test_template_and_contract_share_new_schema(self) -> None:
         titles = re.findall(r"^#(?!#)\s+(.+?)\s*$", TEMPLATE, re.MULTILINE)
@@ -684,7 +754,7 @@ Source:
         self.assert_invalid("Arbitrary HTML is not allowed")
 
     def test_requires_lowercase_pattern_metadata(self) -> None:
-        self.write_deck(self.valid_deck().replace("###### P1 of 2", "###### P1 OF 2"))
+        self.write_deck(self.valid_deck().replace("###### p1 of 2", "###### P1 OF 2"))
         self.assert_invalid("pattern metadata must use")
 
     def test_requires_contiguous_pattern_ids(self) -> None:
@@ -692,11 +762,11 @@ Source:
         self.assert_invalid("contiguous internal IDs")
 
     def test_rejects_duplicate_pattern_id(self) -> None:
-        self.write_deck(self.valid_deck().replace("###### p2 of 2", "###### P1 of 2"))
+        self.write_deck(self.valid_deck().replace("###### p2 of 2", "###### p1 of 2"))
         self.assert_invalid("used more than once")
 
     def test_requires_correct_pattern_total(self) -> None:
-        self.write_deck(self.valid_deck().replace("###### P1 of 2", "###### P1 of 3"))
+        self.write_deck(self.valid_deck().replace("###### p1 of 2", "###### p1 of 3"))
         self.assert_invalid("declare of 2")
 
     def test_rejects_pattern_id_in_title(self) -> None:
@@ -847,7 +917,7 @@ Source:
 
     def test_hidden_mermaid_does_not_satisfy_pattern_map(self) -> None:
         diagram = """```mermaid
-flowchart LR
+flowchart TD
     subgraph C1["Delivery defaults"]
         A["Golden paths"]
     end
@@ -1015,12 +1085,20 @@ Source:
             "must be understood first.\n",
             encoding="utf-8",
         )
+        self.moc.write_text(
+            self.valid_moc().replace("enables", "depends on"),
+            encoding="utf-8",
+        )
         deck = self.valid_deck().replace("enables", "depends on")
         self.write_deck(deck)
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
 
     def test_accepts_extension_complements_translation(self) -> None:
+        self.moc.write_text(
+            self.valid_moc().replace("enables", "complements"),
+            encoding="utf-8",
+        )
         self.write_deck(self.valid_deck().replace("enables", "complements"))
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
@@ -1029,6 +1107,10 @@ Source:
         self.note_one.write_text(
             "# Golden paths\n\n## Relationships\n\n"
             "No supported relationships yet.\n",
+            encoding="utf-8",
+        )
+        self.moc.write_text(
+            self.valid_moc().replace("    A -->|enables| B\n", ""),
             encoding="utf-8",
         )
         deck = self.valid_deck().replace("    A -->|enables| B\n", "")

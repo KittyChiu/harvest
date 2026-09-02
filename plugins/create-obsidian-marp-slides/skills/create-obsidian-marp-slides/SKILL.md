@@ -7,7 +7,7 @@ compatibility: Produces conservative Obsidian-compatible Marp Markdown ending in
 
 # Create Obsidian Marp Slides
 
-Create or update one domain presentation that moves from the domain challenge to a map of its atomic patterns, teaches each pattern, applies them together, and closes with one small experiment.
+Create or update one domain presentation that moves from the domain challenge through the MOC's authoritative pattern map and workflow, teaches each pattern, applies them together, and closes with one small experiment.
 
 ## Artifact contract
 
@@ -39,10 +39,10 @@ The template requires Mermaid maps and flows. If the target setup does not rende
 
 ## Workflow
 
-1. Read the MOC's scope and `Notes` entries, every linked atomic note, and each available matching coaching companion. In update mode, also read the current deck.
+1. Read the MOC's scope, `Pattern map`, `Domain workflow`, and `Notes` entries, every linked atomic note, and each available matching coaching companion. In update mode, also read the current deck.
 2. Extract each atomic note's Pattern, Practice, Signals, Constraints, and supported Relationships. From companions, extract relevant Conversation questions.
 3. Assign every pattern one stable contiguous internal identifier (`P1` through `PN`), one short memorable name, and one cluster. Preserve existing IDs when their pattern remains unless removing a source creates a gap; then minimally renumber the following patterns to restore contiguity.
-4. Propose the domain promise, challenges and opportunities, pattern clusters, supported relationship map, one slide per pattern, optional comparison, combined scenario, expected directional changes, remaining constraint, and closing experiment.
+4. Propose the domain promise, challenges and opportunities, a presentation rendering of the MOC pattern map and workflow, one slide per pattern, optional comparison, combined scenario, expected directional changes, remaining constraint, and closing experiment.
 5. Provide a source-to-pattern-ID plan and identify additions, revisions, removals, retained content, and synthesis. Distinguish source-grounded claims from presentation synthesis.
 6. Obtain approval for the plan, diagram format, Marp configuration, exact output path, and sole-file write authority.
 7. Create or update only `<domain>.marp.md`, replacing every template prompt and placeholder.
@@ -60,7 +60,8 @@ Do not ask for information already supplied. Combine confirmations when the user
 - Include one `Coach cue:` question ending in `?` on every pattern slide. Coaching companions remain optional source inputs.
 - Show only source-supported relationships and preserve the declaring note, linked target, type, and permitted direction. Apply the translation table in [references/slides-design.md](references/slides-design.md); a reversed claim requires its own supporting atomic relationship. In pattern notes, format a relationship as `Related:` followed by `<target short name> (<relationship>)`.
 - Omit a `Related:` field when no source-supported relationship exists.
-- Keep each map consistent with pattern short names, clusters, and supported relationships. Use fenced Mermaid diagrams and do not expose internal pattern IDs in node labels.
+- Preserve the MOC Pattern map's pattern membership, direction, and exact relationship labels in both deck maps. Preserve the MOC Domain workflow's labeled or unlabeled pattern-to-pattern edges in the combined scenario; add scenario signals and outcomes without changing the authoritative pattern sequence.
+- Keep each map consistent with pattern short names, MOC clusters, and supported relationships. Use fenced Mermaid diagrams and do not expose internal pattern IDs in node labels.
 - Include the comparison slide only when two patterns are genuine alternatives.
 - Move narrative, domain questions, domain takeaways, selection rationale, evidence qualifiers, and remaining constraints into speaker notes as shown by the template.
 - Treat before/after content and expected outcomes as source-grounded direction or clearly identified synthesis, never as measured results.
@@ -81,4 +82,4 @@ Fix every error and review density warnings. Then verify qualitatively that inte
 
 ## Completion
 
-Complete only when `<domain>.marp.md` is the sole changed file; it follows the template with no prompts or placeholders; it contains one stable pattern slide for every MOC atomic note and no source outside the domain; internal IDs appear only in H6 position metadata; visible slides use short names while speaker notes carry narrative, questions, relationships, and sources; Mermaid maps and relationships are consistent and supported; tags and portability rules hold; and the validator reports zero errors.
+Complete only when `<domain>.marp.md` is the sole changed file; it follows the template with no prompts or placeholders; it contains one stable pattern slide for every MOC atomic note and no source outside the domain; internal IDs appear only in H6 position metadata; visible slides use short names while speaker notes carry narrative, questions, relationships, and sources; Mermaid maps preserve the MOC's authoritative relationship and workflow topology; tags and portability rules hold; and the validator reports zero errors.

@@ -49,6 +49,8 @@ The MOC entry is navigation, not a second summary. Describe the decision a reade
 - [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — Decide when a maintained default can remove repeated delivery choices.
 ```
 
+Use the note's exact H1 title for the MOC entry and its Pattern map node. When adding, revising, or renaming a note, update the MOC Pattern map and any populated Domain workflow in the same change. Preserve an honest `No supported domain workflow yet.` state rather than inventing a sequence.
+
 ## Create meaningful relationships
 
 Choose a relationship type by the role the linked note plays:
