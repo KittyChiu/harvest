@@ -10,6 +10,9 @@ from pathlib import Path
 
 
 VALIDATOR = Path(__file__).with_name("validate_moc.py")
+TEMPLATE = (
+    Path(__file__).parents[1] / "assets" / "domain-moc-template.md"
+).read_text(encoding="utf-8")
 
 EMPTY_MOC = """# AI and engineering
 
@@ -62,6 +65,20 @@ class ValidateMocTests(unittest.TestCase):
         result = run_validator()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("0 error(s)", result.stdout)
+
+    def test_rejects_untouched_template_scaffold(self) -> None:
+        result = run_validator(moc=TEMPLATE, moc_name="domain-moc.md")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("unreplaced template prompt(s)", result.stdout)
+
+    def test_rejects_template_prompt_left_in_completed_moc(self) -> None:
+        moc = EMPTY_MOC.replace(
+            "Reusable ideas about how AI changes engineering work. Product setup belongs elsewhere.",
+            "State what belongs in this domain. State the closest material that belongs elsewhere.",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("unreplaced template prompt(s)", result.stdout)
 
     def test_accepts_descriptive_link_to_existing_note(self) -> None:
         result = run_validator(
@@ -170,8 +187,34 @@ class ValidateMocTests(unittest.TestCase):
             )
         )
         self.assertEqual(result.returncode, 1)
-        self.assertIn('"Scope"', result.stdout)
-        self.assertIn('"Notes"', result.stdout)
+        self.assertIn("scope", result.stdout)
+        self.assertIn("notes", result.stdout)
+
+    def test_rejects_duplicate_required_section(self) -> None:
+        moc = EMPTY_MOC.replace(
+            "## Notes",
+            "## Scope\n\nAnother boundary.\n\n## Notes",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("repeats section(s): scope", result.stdout)
+
+    def test_rejects_required_sections_out_of_order(self) -> None:
+        moc = """# AI and engineering
+
+Tags: #ai #moc #draft #private
+
+## Notes
+
+No atomic notes yet.
+
+## Scope
+
+Reusable ideas about AI engineering. Product setup belongs elsewhere.
+"""
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must follow this order", result.stdout)
 
     def test_rejects_bare_internal_link(self) -> None:
         result = run_validator(

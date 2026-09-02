@@ -1,6 +1,6 @@
 {
   "name": "create-obsidian-marp-slides",
-  "description": "Create or update one domain's shared Obsidian Marp presentation from its MOC and atomic notes, adding speaker notes when coaching companions exist.",
+  "description": "Create or update one domain's Obsidian Marp presentation as a connected system of atomic patterns, practices, relationships, application, and optional coaching questions.",
   "version": "1.0.0",
   "author": {
     "name": "Kitty Chiu",

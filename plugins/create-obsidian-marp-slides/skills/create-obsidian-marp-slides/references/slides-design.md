@@ -1,68 +1,101 @@
-# Domain slide design
+# Domain presentation design
 
-## Build one domain presentation
+## Build one system narrative
 
-The MOC defines the source boundary. Its scope supplies orientation; every atomic note in its `Notes` section supplies one reusable idea. The result is one evolving domain presentation, not one deck per note and not a concatenation of mini-decks.
+The MOC defines the boundary. Its scope orients the audience; each Notes entry supplies one reusable pattern. The presentation should reveal how those patterns form a useful system rather than concatenate mini-decks.
 
-Choose one throughline that answers:
+Move through:
 
-> What should this audience understand about the domain, and how should the sequence change their view or action?
+1. **Orient** — promise a domain-level outcome.
+2. **Frame** — name recurring challenges and opportunities.
+3. **Map** — cluster the patterns and show only supported connections.
+4. **Teach** — give each pattern one memorable slide.
+5. **Choose** — compare patterns only when they are alternatives.
+6. **Apply** — combine patterns in one realistic scenario.
+7. **Synthesize** — show directional change and remaining constraints.
+8. **Revisit** — use the map to explain the system.
+9. **Try** — invite one small practice against one visible signal.
 
-A useful domain movement is:
+## Assign stable pattern identities
 
-1. **Orient** — define the domain and why it matters.
-2. **Create tension** — identify the shared problem or decision.
-3. **Develop** — sequence atomic ideas so each creates the need for the next.
-4. **Apply** — combine the ideas in one example, contrast, or demonstration.
-5. **Close** — resolve the opening and invite one domain-level next action.
+Give each atomic source a contiguous identifier (`P1` through `PN`), a short name, and a cluster. In update mode, preserve an existing pattern's ID unless the user approves a renumbering. Remove gaps after sources leave the MOC and update every map, comparison, scenario, and table consistently.
 
-## Map sources to slides
+One pattern slide contains:
 
-Before authoring, map every MOC note to a visible destination. Put a `Source:` line on the slide where its idea is conveyed. One note may support several slides, but it needs only one source declaration. Multiple related notes may share a slide only when the slide still has one primary idea.
+- its `Pn of N` position and cluster;
+- an assertion-led short name;
+- the atomic note's one-sentence Pattern;
+- observable Signals;
+- one to three concrete Practices;
+- one source link;
+- an optional supported relationship;
+- when a companion exists, one coach link and one question in a speaker-note comment.
 
-Use available `.coach.md` companions to shape speaker notes. Put a `Coach source:` line and a non-empty speaker-note comment on the relevant slide. When an atomic note has no coaching companion, speaker notes are optional.
+Do not merge multiple atomic sources onto one pattern slide.
 
-## Update without fragmenting
+## Map relationships faithfully
 
-When the MOC changes:
+Atomic-note relationships are typed and directed. For a relationship declared by source note `S` that links target note `T`, use only these translations:
 
-1. Compare its atomic-note set with the existing presentation's source lines.
-2. Add newly linked notes.
-3. Revise changed ideas without duplicating them.
-4. Remove sources and slides for notes no longer in the MOC.
-5. Reorder and rewrite transitions so the presentation remains one story.
-6. Preserve confirmed Marp configuration and useful unaffected slides.
+| Atomic type | Permitted deck claim |
+| --- | --- |
+| `Prerequisite` | `S depends on T` or `T precedes S` |
+| `Extension` | `S enables T`, `S informs T`, or `S complements T` |
+| `Contrast` | `S contrasts with T` |
+| `Example` | No pattern-to-pattern edge; use the example in the scenario |
 
-Do not append every new idea to the end by default.
+Do not reverse `Extension` or `Contrast` claims unless the other note declares its own relationship. Omit unsupported edges instead of completing a visually balanced graph.
 
-## Write for projection
+On a pattern slide, use `**Related:** P<n> · <name> through **<relationship>**`. Keep the `P<n>` target outside Markdown-link brackets so the relationship remains unambiguous and machine-checkable.
 
-- Use assertion-led headlines.
-- Keep one primary claim per slide.
-- Prefer 3-5 short bullets or one small table.
-- Keep critical constraints visible.
-- Split content the audience would need to read rather than hear.
-- Use one connected example rather than unrelated anecdotes.
+Use Mermaid only when the user confirms that the target Marp setup renders it. Otherwise use a fenced `text` map with the same IDs and labels. The map is communication, not a new graph database.
 
-## Write coaching speaker notes
+## Apply without overstating
 
-When a coaching companion exists, its relevant slide has a non-empty HTML comment beginning with:
+Choose one realistic situation whose signals make several patterns relevant. Sequence practices using supported relationships and keep at least one critical constraint visible.
+
+The before/after synthesis describes an expected direction, not a measured result. Label presentation synthesis clearly when the source notes do not state it directly. The closing experiment should pair:
+
+- one observable signal;
+- one pattern;
+- one small practice;
+- one way to review what happened.
+
+## Use coaching companions
+
+Use a companion's Conversation section to select one open question for its pattern slide. Put the companion in `Coach:` and the question in an HTML comment:
 
 ```markdown
+Coach: [Golden-path coaching](platform-golden-paths.coach.md)
+
 <!--
-Coach cue: Ask what the audience notices before explaining the model.
+Coach cue: Where does repeated setup work consume the most attention?
 -->
 ```
 
-A cue may ask an open question, identify what to listen for, surface a constraint, suggest a non-coercive nudge, or provide a transition. Do not invent a coaching cue merely to populate every slide.
+Do not turn Progress signals into targets or copy the companion into visible slide content.
+
+## Update without fragmentation
+
+When the MOC changes:
+
+1. compare atomic sources with pattern slides;
+2. preserve IDs for retained patterns;
+3. add or remove pattern slides;
+4. make IDs contiguous and update every cross-reference;
+5. revise clusters, maps, scenario, synthesis, and close;
+6. remove coach links for missing companions and add newly available ones;
+7. preserve confirmed configuration and useful unaffected content.
 
 ## Review
 
 Confirm:
 
-- there is exactly one presentation file for the domain;
-- every MOC atomic note has a visible destination;
-- no source remains after its note leaves the MOC;
-- every available coaching companion informs at least one sourced speaker note;
-- the sequence is one coherent domain story;
-- the close resolves the opening.
+- the domain promise and closing experiment resolve the same need;
+- challenges, opportunities, and domain question frame the pattern system;
+- each MOC note has exactly one pattern slide;
+- IDs, names, clusters, maps, comparisons, and scenarios agree;
+- patterns and practices remain distinct;
+- every relationship and directional change is supported or identified as synthesis;
+- coaching cues are open questions;
+- no source or coach remains after leaving the MOC.

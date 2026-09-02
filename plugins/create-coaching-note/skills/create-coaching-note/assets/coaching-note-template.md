@@ -1,34 +1,71 @@
-# Coaching companion: Atomic idea title
+# Coaching companion: Atomic pattern title
 
 Parent: [Domain name](domain-moc.md)
-Companion to: [Atomic idea title](domain-atomic-note.md)
+Companion to: [Atomic pattern title](domain-atomic-note.md)
+
 Tags: #domain #coaching #draft #private
 
-## Coaching intent
+## Teach
 
-Describe what the person or team should be better able to notice, discuss, or try.
+Explain the pattern in simple language.
 
-## Consider
+- What is the idea?
+- Why does it matter?
+- What misconception does it correct?
 
-- Name an enabling condition, tension, or context to explore before suggesting action.
+## Watch for
 
-## Start, continue, stop
+Signals that indicate the learner or team would benefit from this pattern.
 
-**Start:** Introduce one small, testable practice.
+- Observable behaviour
+- Common symptom
+- Typical failure mode
 
-**Continue:** Preserve one behavior that already supports the idea.
+## Conversation
 
-**Stop:** Remove one behavior that works against the idea.
+Questions to help the learner discover the pattern themselves.
 
-## Questions
+- Question
+- Question
+- Question
 
-- What concrete example would help explore this idea?
-- What small experiment would fit the learner's context?
+## Exercise
 
-## Signals and metrics
+A small practical activity that lets the learner experience the pattern.
 
-- Name an observable signal and explain what it can and cannot show.
+Steps:
+1.
+2.
+3.
 
-## Resistance and support
+Expected outcome:
 
-Describe how to understand likely resistance and reduce friction without coercion.
+## Adoption
+
+### Start
+
+- New behaviour to introduce.
+
+### Continue
+
+- Existing behaviour worth preserving.
+
+### Stop
+
+- Behaviour that works against the pattern.
+
+## Progress signals
+
+Signs that learning is occurring.
+
+- What to observe.
+- What improvement looks like.
+- What this signal cannot prove.
+
+## Common resistance
+
+Likely objections and how to respond.
+
+| Resistance | Response |
+| ---------- | -------- |
+|            |          |

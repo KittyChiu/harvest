@@ -1,24 +1,59 @@
-# Atomic note title: one reusable claim
+# Atomic reusable pattern
 
 Parent: [Domain name](domain-moc.md)
 Tags: #domain #draft #private
 
-## Core idea
+## Pattern
 
-State one self-contained insight in plain language.
+State the reusable rule in a single sentence.
 
-## Why it matters
+Use:
 
-Explain the practical consequence of the idea.
+> When X, do Y, because Z.
 
-## Practices
+A reader should understand the idea after reading it once.
 
-- Name the few actions that follow from the idea.
+## Practice
+
+Describe the smallest set of actions needed to apply the pattern.
+
+- Use concrete, observable behaviours.
+- Keep the list short.
+- Prefer actions over advice.
+
+## Why it works
+
+Explain the mechanism.
+
+Describe the cause-and-effect that makes the pattern effective.
+
+## Signals
+
+Apply this pattern when:
+
+- Observable symptom
+- Recurring situation
+- Trigger condition
+- Common failure mode
+
+## Learning
+
+Record the observation, experience, failure, article, conversation, or analysis that led to discovering this pattern.
+
+Write what was learned, not what should be done.
 
 ## Constraints
 
-- State the boundary, trade-off, or condition that prevents overgeneralization.
+- When the pattern does not apply.
+- Trade-offs, assumptions, or costs.
+- Conditions that would make the pattern ineffective.
 
 ## Relationships
 
-Explain each internal link in a sentence. If no supported relationship exists yet, say so rather than adding decorative links.
+- Prerequisite:
+- Extension:
+- Contrast:
+- Example:
+
+Only include supported relationships.
+If none exist yet, state that explicitly.

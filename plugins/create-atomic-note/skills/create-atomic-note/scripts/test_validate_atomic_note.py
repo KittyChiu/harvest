@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Regression tests for the atomic-note validator."""
+"""Regression tests for the atomic-pattern validator."""
 
 from __future__ import annotations
 
+import re
 import subprocess
 import tempfile
 import unittest
@@ -10,31 +11,54 @@ from pathlib import Path
 
 
 VALIDATOR = Path(__file__).with_name("validate_atomic_note.py")
+TEMPLATE = (
+    Path(__file__).parents[1] / "assets" / "atomic-note-template.md"
+).read_text(encoding="utf-8")
+REQUIRED_SECTIONS = (
+    "Pattern",
+    "Practice",
+    "Why it works",
+    "Signals",
+    "Learning",
+    "Constraints",
+    "Relationships",
+)
 
 NOTE = """# Golden paths reduce cognitive load
 
 Parent: [Platform](platform-moc.md)
 Tags: #platform #draft #private
 
-## Core idea
+## Pattern
 
-Golden paths reduce repeated decisions without removing escape hatches.
+When teams repeat common delivery decisions, provide a golden path, because it preserves attention without removing escape hatches.
 
-## Why it matters
+## Practice
 
-Teams can spend attention on product-specific work.
+- Automate the common path.
+- Document how teams can choose an exception.
 
-## Practices
+## Why it works
 
-- Automate the common path and document exceptions.
+A maintained default removes avoidable choices while documented escape hatches preserve autonomy.
+
+## Signals
+
+- Teams repeatedly solve the same delivery setup problems.
+- Product work is delayed by avoidable platform decisions.
+
+## Learning
+
+Teams adopted maintained defaults when those defaults removed setup work without blocking legitimate exceptions.
 
 ## Constraints
 
-- A golden path becomes harmful when teams cannot leave it.
+- The default must be maintained as user needs change.
+- Teams need a supported way to leave the path.
 
 ## Relationships
 
-This practice supports [platform teams as products](platform-team-as-a-product.md) because both optimize for user needs.
+- Extension: [Platform teams as products](platform-team-as-a-product.md) explains why the path needs product ownership.
 """
 
 MOC = """# Platform
@@ -43,11 +67,11 @@ Tags: #platform #moc #draft #private
 
 ## Scope
 
-Reusable ideas about internal platforms.
+Reusable patterns for internal platforms.
 
 ## Notes
 
-- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — How paved roads preserve team attention.
+- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — Decide when a maintained default can remove repeated delivery choices.
 """
 
 
@@ -77,17 +101,177 @@ def run_validator(
         )
 
 
+def remove_section(note: str, section: str) -> str:
+    return re.sub(
+        rf"\n## {re.escape(section)}\n.*?(?=\n## |\Z)",
+        "",
+        note,
+        flags=re.DOTALL,
+    )
+
+
+def replace_section_body(note: str, section: str, body: str) -> str:
+    return re.sub(
+        rf"(## {re.escape(section)}\n\n).*?(?=\n## |\Z)",
+        rf"\1{body}",
+        note,
+        flags=re.DOTALL,
+    )
+
+
 class ValidateAtomicNoteTests(unittest.TestCase):
-    def test_accepts_atomic_note_linked_from_moc(self) -> None:
+    def assert_invalid(self, note: str, message: str, **kwargs: object) -> None:
+        result = run_validator(note=note, **kwargs)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn(message, result.stdout)
+
+    def test_accepts_atomic_pattern_linked_from_moc(self) -> None:
         result = run_validator()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("0 error(s)", result.stdout)
+
+    def test_accepts_explicit_no_relationships_state(self) -> None:
+        note = replace_section_body(
+            NOTE, "Relationships", "No supported relationships yet.\n"
+        )
+        result = run_validator(note=note, linked_files=())
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_template_defines_exact_section_schema(self) -> None:
+        headings = re.findall(r"^##\s+(.+?)\s*$", TEMPLATE, re.MULTILINE)
+        self.assertEqual(headings, list(REQUIRED_SECTIONS))
+        self.assertTrue(TEMPLATE.endswith("\n"))
+
+    def test_template_is_scaffold_not_completed_note(self) -> None:
+        result = run_validator(note=TEMPLATE)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("unreplaced template prompt(s)", result.stdout)
+        self.assertIn('one "When X, do Y, because Z." sentence', result.stdout)
+
+    def test_rejects_prompt_left_in_completed_structure(self) -> None:
+        note = NOTE.replace(
+            "- Automate the common path.",
+            "- Use concrete, observable behaviours.",
+        )
+        self.assert_invalid(note, "unreplaced template prompt(s)")
+
+    def test_rejects_each_missing_required_section(self) -> None:
+        for section in REQUIRED_SECTIONS:
+            with self.subTest(section=section):
+                result = run_validator(note=remove_section(NOTE, section))
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(section.lower(), result.stdout)
+
+    def test_rejects_each_empty_required_section(self) -> None:
+        for section in REQUIRED_SECTIONS:
+            with self.subTest(section=section):
+                note = replace_section_body(NOTE, section, "")
+                result = run_validator(note=note)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    f'Atomic-note section "{section.lower()}" must not be empty.',
+                    result.stdout,
+                )
+
+    def test_rejects_required_sections_out_of_order(self) -> None:
+        practice = re.search(
+            r"\n## Practice\n.*?(?=\n## )", NOTE, re.DOTALL
+        ).group(0)
+        mechanism = re.search(
+            r"\n## Why it works\n.*?(?=\n## )", NOTE, re.DOTALL
+        ).group(0)
+        note = NOTE.replace(practice + mechanism, mechanism + practice)
+        self.assert_invalid(note, "must follow this order")
+
+    def test_rejects_duplicate_required_section(self) -> None:
+        note = NOTE.replace(
+            "\n## Relationships",
+            "\n## Constraints\n\n- A second constraint.\n\n## Relationships",
+        )
+        self.assert_invalid(note, "repeats section(s): constraints")
+
+    def test_rejects_unexpected_section(self) -> None:
+        note = NOTE.replace(
+            "\n## Constraints",
+            "\n## Benefits\n\nFaster setup.\n\n## Constraints",
+        )
+        self.assert_invalid(note, "unexpected section(s): benefits")
+
+    def test_requires_when_do_because_pattern_form(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Pattern",
+            "Golden paths reduce repeated decisions for delivery teams.\n",
+        )
+        self.assert_invalid(note, 'one "When X, do Y, because Z." sentence')
+
+    def test_rejects_multiple_lines_in_pattern(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Pattern",
+            "When teams repeat decisions, provide a default, because it saves attention.\n"
+            "This is a second sentence.\n",
+        )
+        self.assert_invalid(note, 'one "When X, do Y, because Z." sentence')
+
+    def test_rejects_multiple_sentences_on_one_pattern_line(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Pattern",
+            "When teams repeat decisions, provide a default, because it saves attention. Keep it maintained.\n",
+        )
+        self.assert_invalid(note, 'one "When X, do Y, because Z." sentence')
+
+    def test_accepts_blockquoted_pattern(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Pattern",
+            "> When teams repeat decisions, provide a default, because it saves attention.\n",
+        )
+        result = run_validator(note=note)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_requires_bullets_in_structured_action_sections(self) -> None:
+        for section in ("Practice", "Signals", "Constraints"):
+            with self.subTest(section=section):
+                note = replace_section_body(
+                    NOTE, section, "Describe this only as prose.\n"
+                )
+                self.assert_invalid(
+                    note,
+                    f'Atomic-note section "{section.lower()}" requires at least one bullet.',
+                )
+
+    def test_requires_typed_relationship(self) -> None:
+        note = NOTE.replace("- Extension:", "- Related:")
+        self.assert_invalid(note, "requires a supported type")
+
+    def test_requires_relationship_explanation(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Relationships",
+            "- Extension: [Platform teams as products](platform-team-as-a-product.md)\n",
+        )
+        self.assert_invalid(note, "requires explanatory prose")
+
+    def test_rejects_relationship_placeholders(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Relationships",
+            "- Prerequisite:\n- Extension:\n- Contrast:\n- Example:\n",
+        )
+        self.assert_invalid(note, "typed links or state")
+
+    def test_rejects_dangling_relationship_link(self) -> None:
+        result = run_validator(linked_files=())
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("unresolved internal link", result.stdout)
 
     def test_accepts_full_marp_markdown_link_in_moc(self) -> None:
         moc = (
             MOC
             + "\n## Presentation\n\n"
-            "[Domain presentation](platform.marp.md) — Presents these ideas together.\n"
+            "[Domain presentation](platform.marp.md) presents these patterns together.\n"
         )
         result = run_validator(
             moc=moc,
@@ -96,10 +280,11 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_ignores_headings_and_links_inside_fenced_code(self) -> None:
-        note = NOTE.replace(
-            "Golden paths reduce repeated decisions without removing escape hatches.",
-            "Golden paths reduce repeated decisions without removing escape hatches.\n\n"
-            "```markdown\n# Example\n[Missing](missing-note.md)\n```",
+        note = replace_section_body(
+            NOTE,
+            "Learning",
+            "Teams learned from repeated setup failures.\n\n"
+            "```markdown\n# Example\n[Missing](missing-note.md)\n```\n",
         )
         result = run_validator(note=note)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -109,36 +294,30 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             "platform-team-as-a-product.md",
             "/elsewhere/platform-team-as-a-product.md",
         )
-        result = run_validator(note=note)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("flat lowercase kebab-case", result.stdout)
+        self.assert_invalid(note, "flat lowercase kebab-case")
 
     def test_accepts_wiki_style_links_for_compatible_pkm_tools(self) -> None:
         note = NOTE.replace("[Platform](platform-moc.md)", "[[platform-moc]]").replace(
-            "[platform teams as products](platform-team-as-a-product.md)",
-            "[[platform-team-as-a-product]]",
+            "[Platform teams as products](platform-team-as-a-product.md)",
+            "[[platform-team-as-a-product|Platform teams as products]]",
         )
         moc = MOC.replace(
             "[Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md)",
-            "[[platform-golden-paths-reduce-cognitive-load]]",
+            "[[platform-golden-paths-reduce-cognitive-load|Golden paths reduce cognitive load]]",
         )
         result = run_validator(note=note, moc=moc)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_rejects_tool_specific_wiki_transclusions(self) -> None:
-        result = run_validator(
-            note=NOTE.replace(
-                "[platform teams as products](platform-team-as-a-product.md)",
-                "![[platform-team-as-a-product]]",
-            )
+        note = NOTE.replace(
+            "[Platform teams as products](platform-team-as-a-product.md)",
+            "![[platform-team-as-a-product]]",
         )
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("wiki transclusions", result.stdout)
+        self.assert_invalid(note, "wiki transclusions")
 
     def test_rejects_uppercase_markdown_extension(self) -> None:
-        result = run_validator(note=NOTE.replace("platform-moc.md", "platform-moc.MD"))
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("Markdown .md filename", result.stdout)
+        note = NOTE.replace("platform-moc.md", "platform-moc.MD")
+        self.assert_invalid(note, "Markdown .md filename")
 
     def test_requires_existing_files(self) -> None:
         result = subprocess.run(
@@ -168,36 +347,35 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("lowercase kebab-case", result.stdout)
 
-    def test_requires_parent_moc(self) -> None:
-        result = run_validator(
-            note=NOTE.replace("[Platform](platform-moc.md)", "[Other](other-moc.md)", 1)
+    def test_requires_exact_parent_moc(self) -> None:
+        note = NOTE.replace(
+            "[Platform](platform-moc.md)", "[Other](other-moc.md)", 1
         )
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("Parent must contain exactly", result.stdout)
+        self.assert_invalid(note, "Parent must contain exactly")
 
     def test_rejects_multiple_parent_mocs(self) -> None:
-        result = run_validator(
-            note=NOTE.replace(
-                "Parent: [Platform](platform-moc.md)",
-                "Parent: [Platform](platform-moc.md) [Leadership](leadership-moc.md)",
-            ),
+        note = NOTE.replace(
+            "Parent: [Platform](platform-moc.md)",
+            "Parent: [Platform](platform-moc.md) [Leadership](leadership-moc.md)",
+        )
+        self.assert_invalid(
+            note,
+            "exactly the supplied MOC",
             linked_files=("platform-team-as-a-product.md", "leadership-moc.md"),
         )
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("exactly the supplied MOC", result.stdout)
 
     def test_requires_tag_categories(self) -> None:
-        result = run_validator(note=NOTE.replace("#platform #draft #private", "#draft"))
+        note = NOTE.replace("#platform #draft #private", "#draft")
+        result = run_validator(note=note)
         self.assertEqual(result.returncode, 1)
         self.assertIn("visibility tag", result.stdout)
         self.assertIn("domain tag", result.stdout)
 
     def test_rejects_multiple_workflow_tags(self) -> None:
-        result = run_validator(
-            note=NOTE.replace("#platform #draft #private", "#platform #draft #review #private")
+        note = NOTE.replace(
+            "#platform #draft #private", "#platform #draft #review #private"
         )
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("exactly one workflow", result.stdout)
+        self.assert_invalid(note, "exactly one workflow")
 
     def test_requires_moc_filter_tags(self) -> None:
         result = run_validator(moc=MOC.replace(" #draft #private", ""))
@@ -205,42 +383,22 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         self.assertIn("MOC tags must include one workflow", result.stdout)
         self.assertIn("MOC tags must include one visibility", result.stdout)
 
-    def test_requires_all_atomic_sections(self) -> None:
-        result = run_validator(note=NOTE.replace("## Constraints", "## Boundaries"))
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("constraints", result.stdout)
-
-    def test_rejects_bare_relationship_links(self) -> None:
-        note = NOTE.replace(
-            "This practice supports [platform teams as products](platform-team-as-a-product.md) because both optimize for user needs.",
-            "- [Platform teams as products](platform-team-as-a-product.md)",
-        )
-        result = run_validator(note=note)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("explanatory prose", result.stdout)
-
-    def test_rejects_dangling_relationship_links(self) -> None:
-        result = run_validator(linked_files=())
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("unresolved internal link", result.stdout)
-
     def test_requires_descriptive_moc_entry(self) -> None:
-        result = run_validator(
-            moc=MOC.replace(
-                "- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — How paved roads preserve team attention.",
-                "- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md)",
-            )
+        moc = MOC.replace(
+            "- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — Decide when a maintained default can remove repeated delivery choices.",
+            "- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md)",
         )
+        result = run_validator(moc=moc)
         self.assertEqual(result.returncode, 1)
         self.assertIn("navigation description", result.stdout)
 
     def test_requires_moc_entry_inside_notes_section(self) -> None:
         moc = MOC.replace(
-            "Reusable ideas about internal platforms.",
-            "Reusable ideas about [golden paths](platform-golden-paths-reduce-cognitive-load.md).",
+            "Reusable patterns for internal platforms.",
+            "Reusable patterns such as [golden paths](platform-golden-paths-reduce-cognitive-load.md).",
         ).replace(
-            "- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — How paved roads preserve team attention.",
-            "- [Platform teams as products](platform-team-as-a-product.md) — How to run a platform team.",
+            "- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — Decide when a maintained default can remove repeated delivery choices.",
+            "- [Platform teams as products](platform-team-as-a-product.md) — Run the platform with product ownership.",
         )
         result = run_validator(moc=moc)
         self.assertEqual(result.returncode, 1)
@@ -248,18 +406,20 @@ class ValidateAtomicNoteTests(unittest.TestCase):
 
     def test_rejects_empty_state_with_atomic_note_entry(self) -> None:
         result = run_validator(
-            moc=MOC.replace(
-                "## Notes\n",
-                "## Notes\n\nNo atomic notes yet.\n",
-            )
+            moc=MOC.replace("## Notes\n", "## Notes\n\nNo atomic notes yet.\n")
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("cannot combine", result.stdout)
 
     def test_rejects_non_atomic_moc_entries(self) -> None:
+        moc = (
+            MOC
+            + "\n- [Coaching guidance]"
+            "(platform-golden-paths-reduce-cognitive-load.coach.md) "
+            "supports applying the pattern.\n"
+        )
         result = run_validator(
-            moc=MOC
-            + "\n- [Coaching guidance](platform-golden-paths-reduce-cognitive-load.coach.md) — Coaching guidance.\n",
+            moc=moc,
             linked_files=(
                 "platform-team-as-a-product.md",
                 "platform-golden-paths-reduce-cognitive-load.coach.md",

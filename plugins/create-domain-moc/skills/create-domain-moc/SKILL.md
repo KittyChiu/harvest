@@ -63,6 +63,7 @@ Inspect existing MOCs before proposing a new one. If the domain substantially ov
 - Explain every internal link in prose; never produce a bare related-links list.
 - Preserve stable domain naming when revising.
 - Do not invent domain consensus, evidence, atomic notes, or relationships.
+- Replace every instructional prompt and placeholder from the template.
 
 ## Validate
 
@@ -76,4 +77,4 @@ Resolve `<skill-directory>` from this `SKILL.md`. Fix every error, then confirm 
 
 ## Completion
 
-Complete only when one MOC is written in the approved knowledge directory, uses the required filename, defines useful boundaries, carries all tag categories, contains only descriptive and resolvable internal links, changes only the approved file, and the validator reports zero errors.
+Complete only when one MOC is written in the approved knowledge directory, uses the required filename, defines useful boundaries, carries all tag categories, contains only descriptive and resolvable internal links, contains no template prompts or placeholders, changes only the approved file, and the validator reports zero errors.

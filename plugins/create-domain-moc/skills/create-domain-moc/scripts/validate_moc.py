@@ -25,6 +25,12 @@ WORKFLOW_TAGS = {"draft", "review", "publish"}
 VISIBILITY_TAGS = {"private", "public"}
 RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc"}
 EMPTY_STATE = re.compile(r"\bNo atomic notes yet\.", re.IGNORECASE)
+REQUIRED_SECTIONS = ("scope", "notes")
+TEMPLATE_PROMPTS = {
+    "# Domain name",
+    "Tags: #domain #moc #draft #private",
+    "State what belongs in this domain. State the closest material that belongs elsewhere.",
+}
 
 
 def fail(message: str) -> None:
@@ -125,6 +131,11 @@ def validate_tags(tags_line: str | None, errors: list[str]) -> None:
         errors.append("MOC tags must include at least one domain tag.")
 
 
+def template_prompts(text: str) -> list[str]:
+    lines = {line.strip() for line in text.splitlines() if line.strip()}
+    return sorted(lines & TEMPLATE_PROMPTS)
+
+
 def main() -> int:
     args = parse_args()
     if not args.moc.is_file():
@@ -136,20 +147,53 @@ def main() -> int:
 
     if TRANSCLUSION.search(text):
         errors.append("MOC must not use tool-specific wiki transclusions.")
+    remaining_prompts = template_prompts(text)
+    if remaining_prompts:
+        errors.append(
+            "MOC contains unreplaced template prompt(s): "
+            + ", ".join(remaining_prompts)
+        )
     if not KEBAB_STEM.fullmatch(args.moc.stem):
         errors.append("MOC filename must use lowercase kebab-case and end in -moc.md.")
     if len(H1.findall(text)) != 1:
         errors.append("MOC requires exactly one level-one title.")
     validate_tags(field(text, "Tags"), errors)
 
+    sections = [heading.strip().lower() for heading in H2.findall(text)]
+    missing_sections = [
+        section for section in REQUIRED_SECTIONS if section not in sections
+    ]
+    if missing_sections:
+        errors.append(
+            "MOC is missing section(s): " + ", ".join(missing_sections)
+        )
+    duplicate_sections = [
+        section for section in REQUIRED_SECTIONS if sections.count(section) > 1
+    ]
+    if duplicate_sections:
+        errors.append(
+            "MOC repeats section(s): " + ", ".join(duplicate_sections)
+        )
+    required_in_document = [
+        section for section in sections if section in REQUIRED_SECTIONS
+    ]
+    if (
+        not missing_sections
+        and not duplicate_sections
+        and required_in_document != list(REQUIRED_SECTIONS)
+    ):
+        errors.append(
+            "MOC sections must follow this order: "
+            + ", ".join(REQUIRED_SECTIONS)
+            + "."
+        )
+
     section_bodies: dict[str, str] = {}
-    for section in ("scope", "notes"):
+    for section in REQUIRED_SECTIONS:
         body = section_body(text, section)
-        if body is None:
-            errors.append(f'MOC requires a "{section.title()}" section.')
-        elif not WORD.search(strip_internal_links(body)):
+        if body is not None and not WORD.search(strip_internal_links(body)):
             errors.append(f'MOC section "{section.title()}" must not be empty.')
-        else:
+        elif body is not None:
             section_bodies[section] = body
 
     notes = section_bodies.get("notes", "")

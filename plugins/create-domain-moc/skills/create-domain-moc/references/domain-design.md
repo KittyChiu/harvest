@@ -4,7 +4,7 @@
 
 A domain deserves its own MOC when it gives a stable answer to:
 
-> Would a reader expect to look here for this atomic idea?
+> Would a reader expect to look here for this atomic pattern?
 
 Create a separate domain when the scope, audience, or navigation purpose is meaningfully distinct. Do not create one merely because a source uses a new label.
 

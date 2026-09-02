@@ -10,6 +10,7 @@ from pathlib import Path
 
 H1 = re.compile(r"^#(?!#)\s+(.+?)\s*$", re.MULTILINE)
 H2 = re.compile(r"^##(?!#)\s+(.+?)\s*$", re.MULTILINE)
+H3 = re.compile(r"^###(?!#)\s+(.+?)\s*$", re.MULTILINE)
 WIKI_LINK = re.compile(r"(?<!!)\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
 TRANSCLUSION = re.compile(r"!\[\[")
 MARKDOWN_LINK = re.compile(
@@ -23,13 +24,47 @@ RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"coaching", "slides", "moc"}
 INTERNAL_FILENAME = re.compile(
     r"^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.(?:coach|marp))?\.md$"
 )
-REQUIRED_SECTIONS = {
-    "coaching intent",
-    "consider",
-    "start, continue, stop",
-    "questions",
-    "signals and metrics",
-    "resistance and support",
+REQUIRED_SECTIONS = (
+    "teach",
+    "watch for",
+    "conversation",
+    "exercise",
+    "adoption",
+    "progress signals",
+    "common resistance",
+)
+ADOPTION_SUBSECTIONS = ("start", "continue", "stop")
+BULLET = re.compile(r"^\s*[-*+]\s+\S.*$", re.MULTILINE)
+QUESTION_BULLET = re.compile(r"^\s*[-*+]\s+\S.*\?\s*$", re.MULTILINE)
+NUMBERED_STEP = re.compile(r"^\s*(\d+)\.\s+(\S.*)$", re.MULTILINE)
+TABLE_HEADER = re.compile(
+    r"^\s*\|\s*Resistance\s*\|\s*Response\s*\|\s*$", re.IGNORECASE
+)
+TABLE_SEPARATOR = re.compile(
+    r"^\s*\|\s*:?-{3,}:?\s*\|\s*:?-{3,}:?\s*\|\s*$"
+)
+TEMPLATE_PROMPTS = {
+    "# Coaching companion: Atomic pattern title",
+    "Explain the pattern in simple language.",
+    "- What is the idea?",
+    "- Why does it matter?",
+    "- What misconception does it correct?",
+    "Signals that indicate the learner or team would benefit from this pattern.",
+    "- Observable behaviour",
+    "- Common symptom",
+    "- Typical failure mode",
+    "Questions to help the learner discover the pattern themselves.",
+    "- Question",
+    "A small practical activity that lets the learner experience the pattern.",
+    "- New behaviour to introduce.",
+    "- Existing behaviour worth preserving.",
+    "- Behaviour that works against the pattern.",
+    "Signs that learning is occurring.",
+    "- What to observe.",
+    "- What improvement looks like.",
+    "- What this signal cannot prove.",
+    "Likely objections and how to respond.",
+    "|            |          |",
 }
 
 
@@ -99,6 +134,11 @@ def strip_fenced_blocks(text: str) -> str:
     return "\n".join(visible_lines)
 
 
+def template_prompts(text: str) -> list[str]:
+    lines = {line.strip() for line in text.splitlines() if line.strip()}
+    return sorted(lines & TEMPLATE_PROMPTS)
+
+
 def links(value: str | None) -> set[str]:
     return {
         filename.lower()
@@ -115,6 +155,37 @@ def section_body(text: str, name: str) -> str | None:
         end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
         return text[heading.end() : end].strip()
     return None
+
+
+def subsection_body(text: str, name: str) -> str | None:
+    headings = list(H3.finditer(text))
+    for index, heading in enumerate(headings):
+        if heading.group(1).strip().lower() != name:
+            continue
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        return text[heading.end() : end].strip()
+    return None
+
+
+def bullet_lines(text: str) -> list[str]:
+    return [match.group(0) for match in BULLET.finditer(text)]
+
+
+def has_populated_resistance_table(text: str) -> bool:
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        if not TABLE_HEADER.fullmatch(line):
+            continue
+        if index + 1 >= len(lines) or not TABLE_SEPARATOR.fullmatch(lines[index + 1]):
+            return False
+        for row in lines[index + 2 :]:
+            if not row.strip().startswith("|"):
+                break
+            cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
+            if len(cells) == 2 and all(cells):
+                return True
+        return False
+    return False
 
 
 def validate_tags(tags_line: str | None, errors: list[str]) -> None:
@@ -179,6 +250,12 @@ def main() -> int:
 
     if TRANSCLUSION.search(atomic) or TRANSCLUSION.search(coach):
         errors.append("Atomic and coaching notes must not use tool-specific wiki transclusions.")
+    remaining_prompts = template_prompts(coach)
+    if remaining_prompts:
+        errors.append(
+            "Coaching note contains unreplaced template prompt(s): "
+            + ", ".join(remaining_prompts)
+        )
     if args.atomic_note.parent.resolve() != args.coach_note.parent.resolve():
         errors.append("Atomic note and coaching note must share a knowledge directory.")
     expected_name = f"{args.atomic_note.stem}.coach.md"
@@ -187,8 +264,15 @@ def main() -> int:
     if args.atomic_note.name.endswith(("-moc.md", ".coach.md", ".marp.md")):
         errors.append("Source must be an atomic note.")
 
-    if len(H1.findall(coach)) != 1:
+    titles = H1.findall(coach)
+    if len(titles) != 1:
         errors.append("Coaching note requires exactly one level-one title.")
+    elif not re.fullmatch(
+        r"Coaching companion:\s+\S.*", titles[0], re.IGNORECASE
+    ):
+        errors.append(
+            'Coaching-note title must use "Coaching companion: <atomic pattern title>".'
+        )
 
     atomic_parent = links(field(atomic, "Parent"))
     coach_parent = links(field(coach, "Parent"))
@@ -212,23 +296,138 @@ def main() -> int:
             + ", ".join(f"#{tag}" for tag in missing_domains)
         )
 
-    sections = {heading.strip().lower() for heading in H2.findall(coach)}
-    missing_sections = sorted(REQUIRED_SECTIONS - sections)
+    sections = [heading.strip().lower() for heading in H2.findall(coach)]
+    missing_sections = [
+        section for section in REQUIRED_SECTIONS if section not in sections
+    ]
     if missing_sections:
         errors.append("Coaching note is missing section(s): " + ", ".join(missing_sections))
+    duplicate_sections = [
+        section for section in REQUIRED_SECTIONS if sections.count(section) > 1
+    ]
+    if duplicate_sections:
+        errors.append(
+            "Coaching note repeats section(s): " + ", ".join(duplicate_sections)
+        )
+    unexpected_sections = [
+        section for section in sections if section not in REQUIRED_SECTIONS
+    ]
+    if unexpected_sections:
+        errors.append(
+            "Coaching note has unexpected section(s): "
+            + ", ".join(unexpected_sections)
+        )
+    required_in_document = [
+        section for section in sections if section in REQUIRED_SECTIONS
+    ]
+    if not missing_sections and required_in_document != list(REQUIRED_SECTIONS):
+        errors.append(
+            "Coaching-note sections must follow this order: "
+            + ", ".join(REQUIRED_SECTIONS)
+            + "."
+        )
     for section in REQUIRED_SECTIONS:
         body = section_body(coach, section)
         if body is not None and not WORD.search(strip_internal_links(body)):
             errors.append(f'Coaching-note section "{section}" must not be empty.')
 
-    practice_body = section_body(coach, "start, continue, stop") or ""
-    for label in ("Start", "Continue", "Stop"):
-        if not re.search(rf"^\*\*{label}:\*\*\s+\S", practice_body, re.MULTILINE):
-            errors.append(f"Start, continue, stop section requires **{label}:**.")
+    watch_for = section_body(coach, "watch for") or ""
+    if watch_for and not bullet_lines(watch_for):
+        errors.append('Coaching-note section "watch for" requires at least one bullet.')
 
-    questions = section_body(coach, "questions") or ""
-    if "?" not in questions:
-        errors.append("Questions section requires at least one open question.")
+    conversation = section_body(coach, "conversation") or ""
+    conversation_bullets = bullet_lines(conversation)
+    if conversation and (
+        len(conversation_bullets) != 3
+        or len(QUESTION_BULLET.findall(conversation)) != 3
+    ):
+        errors.append(
+            "Conversation requires exactly three bullet questions ending in ?."
+        )
+
+    exercise = section_body(coach, "exercise") or ""
+    steps_block = re.search(
+        r"^Steps:\s*\n(.*?)(?=^Expected outcome:)",
+        exercise,
+        re.MULTILINE | re.DOTALL | re.IGNORECASE,
+    )
+    steps = NUMBERED_STEP.findall(steps_block.group(1)) if steps_block else []
+    if exercise and [number for number, _body in steps] != ["1", "2", "3"]:
+        errors.append("Exercise requires exactly three populated steps numbered 1, 2, 3.")
+    outcome = re.search(
+        r"^Expected outcome:\s*(.*?)(?=\n###|\Z)",
+        exercise,
+        re.MULTILINE | re.DOTALL | re.IGNORECASE,
+    )
+    if exercise and (
+        outcome is None
+        or not WORD.search(strip_internal_links(outcome.group(1)))
+    ):
+        errors.append("Exercise requires a populated Expected outcome.")
+
+    adoption = section_body(coach, "adoption") or ""
+    adoption_sections = [
+        heading.strip().lower() for heading in H3.findall(adoption)
+    ]
+    missing_adoption = [
+        section for section in ADOPTION_SUBSECTIONS
+        if section not in adoption_sections
+    ]
+    if adoption and missing_adoption:
+        errors.append(
+            "Adoption is missing subsection(s): " + ", ".join(missing_adoption)
+        )
+    duplicate_adoption = [
+        section for section in ADOPTION_SUBSECTIONS
+        if adoption_sections.count(section) > 1
+    ]
+    if duplicate_adoption:
+        errors.append(
+            "Adoption repeats subsection(s): " + ", ".join(duplicate_adoption)
+        )
+    unexpected_adoption = [
+        section for section in adoption_sections
+        if section not in ADOPTION_SUBSECTIONS
+    ]
+    if unexpected_adoption:
+        errors.append(
+            "Adoption has unexpected subsection(s): "
+            + ", ".join(unexpected_adoption)
+        )
+    adoption_in_document = [
+        section for section in adoption_sections
+        if section in ADOPTION_SUBSECTIONS
+    ]
+    if (
+        adoption
+        and not missing_adoption
+        and adoption_in_document != list(ADOPTION_SUBSECTIONS)
+    ):
+        errors.append(
+            "Adoption subsections must follow this order: "
+            + ", ".join(ADOPTION_SUBSECTIONS)
+            + "."
+        )
+    for section in ADOPTION_SUBSECTIONS:
+        body = subsection_body(adoption, section)
+        if body is not None and (
+            not WORD.search(strip_internal_links(body))
+            or not bullet_lines(body)
+        ):
+            errors.append(
+                f'Adoption subsection "{section}" requires at least one populated bullet.'
+            )
+
+    progress = section_body(coach, "progress signals") or ""
+    if progress and len(bullet_lines(progress)) < 3:
+        errors.append("Progress signals requires at least three bullets.")
+
+    resistance = section_body(coach, "common resistance") or ""
+    if resistance and not has_populated_resistance_table(resistance):
+        errors.append(
+            "Common resistance requires a Resistance | Response table "
+            "with at least one populated row."
+        )
 
     validate_internal_links(coach, args.coach_note.parent, errors)
 

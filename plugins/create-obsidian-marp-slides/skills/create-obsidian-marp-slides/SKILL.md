@@ -1,74 +1,70 @@
 ---
 name: create-obsidian-marp-slides
-description: Create or update the single Obsidian Marp presentation for a knowledge domain. Use when turning a domain MOC and its atomic notes into one coherent <domain>.marp.md file, adding coaching speaker notes when coaching companions exist.
+description: Create or update one Obsidian Marp presentation that shows a knowledge domain as a connected system of reusable patterns and practices. Use when a domain MOC and its atomic notes should become one coherent <domain>.marp.md deck with optional coaching questions.
 license: MIT
 compatibility: Produces conservative Obsidian-compatible Marp Markdown ending in .marp.md. Python 3 is required for validation.
 ---
 
 # Create Obsidian Marp Slides
 
-Create or update one presentation for one knowledge domain. The domain MOC defines the presentation boundary; its linked atomic notes supply the ideas, and available coaching companions inform the speaker notes.
+Create or update one domain presentation that moves from the domain challenge to a map of its atomic patterns, teaches each pattern, applies them together, and closes with one small experiment.
 
-## Domain presentation contract
+## Artifact contract
 
-Write one file directly beside the domain MOC in the approved existing knowledge directory within the target Obsidian vault:
+Write one file directly beside the approved domain MOC in the target Obsidian vault:
 
-- navigation source: `<domain>-moc.md`
-- knowledge sources: atomic notes linked from the MOC's `Notes` section
-- optional coaching sources: `<atomic-stem>.coach.md` files that exist beside those notes
-- output: `<domain>.marp.md`
+- navigation source: `<domain>-moc.md`;
+- knowledge sources: atomic notes linked from the MOC's `Notes` section;
+- optional coaching sources: matching `<atomic-stem>.coach.md` files that exist beside those notes;
+- output: `<domain>.marp.md`.
 
-There must be only one `.marp.md` file for the domain.
+The MOC, atomic notes, and coaching companions are read-only. There is only one `.marp.md` file per domain. Use [assets/slides-template.md](assets/slides-template.md) as the presentation schema. Read [references/slides-design.md](references/slides-design.md) and [references/obsidian-marp-compatibility.md](references/obsidian-marp-compatibility.md).
 
-In create mode, initialize `<domain>.marp.md`. In update mode, read and revise that same file:
-
-- add or update coverage for atomic notes currently linked from the MOC;
-- remove source references and slides that no longer belong to the MOC;
-- preserve useful configuration, narrative structure, and unaffected content;
-- restore coherence after every addition, removal, or reorder.
-
-The MOC, atomic notes, and coaching notes are always read-only. Read [references/slides-design.md](references/slides-design.md) and [references/obsidian-marp-compatibility.md](references/obsidian-marp-compatibility.md). Use [assets/slides-template.md](assets/slides-template.md).
+In update mode, revise the same domain presentation: add, change, or remove pattern coverage to match the MOC while preserving confirmed configuration and useful unaffected content. Restore the pattern IDs, maps, scenario, and narrative coherence after every source change.
 
 ## Source and write gate
 
 Before analysis, confirm:
 
 - the authoritative domain MOC;
-- the MOC, atomic notes, and coaching notes that remain read-only;
+- the MOC, atomic notes, and coaching companions as read-only inputs;
 - create or update mode;
 - the approved existing knowledge directory in the target Obsidian vault;
-- the exact `<domain>.marp.md` output filename;
-- that no other file may be created or changed;
-- audience, presentation objective, available time, and any required example;
-- whether to use the portable default Marp configuration or confirmed local customization.
+- the exact `<domain>.marp.md` filename and that it is the only permitted change;
+- the audience, presentation objective, available time, and required example;
+- the portable default Marp configuration or confirmed local customization;
+- whether the target setup renders Mermaid in Marp.
 
-If the MOC has no linked atomic notes, stop and explain that the domain has no knowledge to present. Do not create notes inside this skill.
+If Mermaid support is not confirmed, use readable fenced `text` maps instead. If the MOC has no linked atomic notes, stop; do not create knowledge artifacts inside this skill.
 
-## Interaction flow
+## Workflow
 
-1. Read the MOC's scope and `Notes` entries, then read every linked atomic note and each available matching coaching note.
-2. In update mode, read the existing domain presentation and compare its `Source:` and `Coach source:` lines with the current MOC.
-3. Propose one domain throughline and a source-to-slide plan. Every atomic note must have a visible destination; related notes may share a slide only when one primary idea remains clear.
-4. Identify additions, revisions, removals, retained slides, and any presentation or coaching synthesis.
-5. Confirm the plan, configuration, exact output path, and sole-file write authority.
-6. Create or update only `<domain>.marp.md`.
+1. Read the MOC's scope and `Notes` entries, every linked atomic note, and each available matching coaching companion. In update mode, also read the current deck.
+2. Extract each atomic note's Pattern, Practice, Signals, Constraints, and supported Relationships. From companions, extract relevant Conversation questions.
+3. Assign every pattern one stable contiguous identifier (`P1` through `PN`), one short memorable name, and one cluster. Preserve existing IDs when their pattern remains.
+4. Propose the domain promise, challenges and opportunities, pattern clusters, supported relationship map, one slide per pattern, optional comparison, combined scenario, expected directional changes, remaining constraint, and closing experiment.
+5. Provide a source-to-pattern-ID plan and identify additions, revisions, removals, retained content, and synthesis. Distinguish source-grounded claims from presentation synthesis.
+6. Obtain approval for the plan, diagram format, Marp configuration, exact output path, and sole-file write authority.
+7. Create or update only `<domain>.marp.md`, replacing every template prompt and placeholder.
 
-## Slide rules
+Do not ask for information already supplied. Combine confirmations when the user can approve them safely in one decision.
 
+## Presentation rules
+
+- Use the template's narrative sequence: opening, challenges and opportunities, pattern map, one slide per pattern, optional comparison, combined application, what changes, map revisited, and one pattern to try.
 - Use `MOC: [<domain name>](<domain>-moc.md)` once on the opening slide.
-- Put `Source: [<atomic-note-title>](<atomic-stem>.md)` on the slide where each atomic idea is visibly conveyed.
-- When a coaching companion exists, put `Coach source: [<coaching-note-title>](<atomic-stem>.coach.md)` on a relevant slide and add a speaker-note comment grounded in that companion.
-- Cover every atomic note currently listed in the MOC exactly as a domain source; do not retain sources outside the MOC.
-- Reference every available coaching companion at least once.
-- Use portable relative Markdown links by default. Obsidian wiki-style links are also accepted.
-- Keep one primary idea and one story beat per slide.
-- Use one domain throughline that makes the sequence more useful than a collection of mini-decks.
-- Preserve each atomic note's terminology and critical constraints.
-- Use `Tags:` with the MOC's domain tags, `#slides`, exactly one workflow tag, and exactly one visibility tag.
-- Speaker notes are optional when no coaching companion supports the slide.
-- When a slide has a `Coach source:`, include a non-empty HTML-comment speaker note beginning with `Coach cue:` and make it useful for prompting, listening, explaining, or transitioning.
-- Use standard Markdown, including URL and email autolinks, and approved local images. Do not use arbitrary HTML, JavaScript, remote fonts, unconfirmed plugins, or custom CSS by default.
-- Never invent quotes, evidence, outcomes, or certainty.
+- Use stable contiguous pattern IDs. Each pattern slide uses `PATTERN Pn OF N`, `# Pn · <short name>`, one `When X, do Y, because Z.` statement, observable signals, and one to three numbered practices.
+- Put exactly one `Source: [<atomic-note-title>](<atomic-stem>.md)` on each pattern slide. Every MOC atomic note appears exactly once and nowhere else.
+- When the matching coaching companion exists, put `Coach: [<coaching-title>](<atomic-stem>.coach.md)` on that pattern slide and add one HTML-comment `Coach cue:` question ending in `?`.
+- A pattern without a coaching companion does not require `Coach:` or a speaker note.
+- Show only source-supported relationships and preserve the declaring note, linked target, type, and permitted direction. Apply the translation table in [references/slides-design.md](references/slides-design.md); a reversed claim requires its own supporting atomic relationship. Format a pattern-slide relationship as `**Related:** P<n> · <name> through **<relationship>**`.
+- Keep each map consistent with the pattern IDs, names, clusters, and supported relationships. Use Mermaid only when confirmed; otherwise use a portable fenced `text` map.
+- Include the comparison slide only when two patterns are genuine alternatives.
+- Treat before/after content and expected outcomes as source-grounded direction or clearly identified synthesis, never as measured results.
+- Keep one primary idea and story beat per slide. Preserve source terminology and critical constraints.
+- Use `Tags:` with every MOC domain tag, `#slides`, exactly one workflow tag, and exactly one visibility tag.
+- Use standard Markdown, including URL and email autolinks and approved local images. Speaker-note comments are the only arbitrary-HTML exception. Do not use raw layout HTML, JavaScript, remote fonts, unconfirmed plugins, or custom CSS by default.
+- Never invent quotes, evidence, relationships, outcomes, or certainty.
 
 ## Validate
 
@@ -78,8 +74,8 @@ Run:
 python3 "<skill-directory>/scripts/validate_marp_slides.py" "<domain>.marp.md" "<domain>-moc.md"
 ```
 
-The validator resolves atomic and coaching sources from the MOC and knowledge directory. Fix every error and review density warnings. Then confirm that every atomic idea remains understandable without speaker notes and that the domain narrative opens, develops, and closes coherently.
+Fix every error and review density warnings. Then verify qualitatively that IDs and maps agree, each pattern is understandable without notes, practices remain separate from the pattern, relationship labels are source-supported, the scenario combines patterns coherently, and the close offers a proportionate experiment.
 
 ## Completion
 
-Complete only when the single `<domain>.marp.md` file is beside its MOC, includes exactly the MOC's atomic-note source set, references every available coaching companion with a grounded speaker note, carries the required tags, changes no other file, and the validator reports zero errors.
+Complete only when `<domain>.marp.md` is the sole changed file; it follows the template with no prompts or placeholders; it contains one stable pattern slide for every MOC atomic note and no other source; every available companion provides one coaching question; maps and relationships are consistent and supported; tags and portability rules hold; and the validator reports zero errors.

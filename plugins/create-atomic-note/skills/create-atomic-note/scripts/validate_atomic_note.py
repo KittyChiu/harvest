@@ -20,18 +20,63 @@ WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9'-]*")
 WORKFLOW_TAGS = {"draft", "review", "publish"}
 VISIBILITY_TAGS = {"private", "public"}
 RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc"}
-REQUIRED_SECTIONS = {
-    "core idea",
-    "why it matters",
-    "practices",
+REQUIRED_SECTIONS = (
+    "pattern",
+    "practice",
+    "why it works",
+    "signals",
+    "learning",
     "constraints",
     "relationships",
-}
+)
+ACTION_SECTIONS = ("practice", "signals", "constraints")
 KEBAB_STEM = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 INTERNAL_FILENAME = re.compile(
     r"^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.(?:coach|marp))?\.md$"
 )
 EMPTY_MOC = re.compile(r"\bNo atomic notes yet\.", re.IGNORECASE)
+PATTERN_FORM = re.compile(
+    r"^When\b.+,\s*.+,\s*because\b.+[.!?]$", re.IGNORECASE
+)
+BULLET = re.compile(r"^\s*[-*+]\s+\S", re.MULTILINE)
+TYPED_RELATIONSHIP = re.compile(
+    r"^\s*[-*+]\s+(?:\*\*)?"
+    r"(?:prerequisite|extension|contrast|example)"
+    r"(?:\*\*)?:\s+",
+    re.IGNORECASE,
+)
+NO_RELATIONSHIPS = re.compile(
+    r"\bno supported relationships?(?: exist)?(?: yet)?\b", re.IGNORECASE
+)
+TEMPLATE_PROMPTS = {
+    "# Atomic reusable pattern",
+    "State the reusable rule in a single sentence.",
+    "Use:",
+    "> When X, do Y, because Z.",
+    "A reader should understand the idea after reading it once.",
+    "Describe the smallest set of actions needed to apply the pattern.",
+    "- Use concrete, observable behaviours.",
+    "- Keep the list short.",
+    "- Prefer actions over advice.",
+    "Explain the mechanism.",
+    "Describe the cause-and-effect that makes the pattern effective.",
+    "Apply this pattern when:",
+    "- Observable symptom",
+    "- Recurring situation",
+    "- Trigger condition",
+    "- Common failure mode",
+    "Record the observation, experience, failure, article, conversation, or analysis that led to discovering this pattern.",
+    "Write what was learned, not what should be done.",
+    "- When the pattern does not apply.",
+    "- Trade-offs, assumptions, or costs.",
+    "- Conditions that would make the pattern ineffective.",
+    "- Prerequisite:",
+    "- Extension:",
+    "- Contrast:",
+    "- Example:",
+    "Only include supported relationships.",
+    "If none exist yet, state that explicitly.",
+}
 
 
 def fail(message: str) -> None:
@@ -120,6 +165,11 @@ def strip_fenced_blocks(text: str) -> str:
     return "\n".join(visible_lines)
 
 
+def template_prompts(text: str) -> list[str]:
+    lines = {line.strip() for line in text.splitlines() if line.strip()}
+    return sorted(lines & TEMPLATE_PROMPTS)
+
+
 def link_filenames(text: str) -> set[str]:
     return {
         filename.lower()
@@ -194,6 +244,12 @@ def main() -> int:
 
     if TRANSCLUSION.search(note) or TRANSCLUSION.search(moc):
         errors.append("Atomic note and MOC must not use tool-specific wiki transclusions.")
+    remaining_prompts = template_prompts(note)
+    if remaining_prompts:
+        errors.append(
+            "Atomic note contains unreplaced template prompt(s): "
+            + ", ".join(remaining_prompts)
+        )
     if args.note.parent.resolve() != args.moc.parent.resolve():
         errors.append("Atomic note and MOC must be in the same knowledge directory.")
     if not args.note.name.endswith(".md") or args.note.name.endswith(
@@ -227,18 +283,79 @@ def main() -> int:
     validate_tags(field(note, "Tags"), errors, "Atomic note")
     validate_tags(field(moc, "Tags"), errors, "MOC", "moc")
 
-    sections = {heading.strip().lower() for heading in H2.findall(note)}
-    missing_sections = sorted(REQUIRED_SECTIONS - sections)
+    sections = [heading.strip().lower() for heading in H2.findall(note)]
+    missing_sections = [
+        section for section in REQUIRED_SECTIONS if section not in sections
+    ]
     if missing_sections:
         errors.append("Atomic note is missing section(s): " + ", ".join(missing_sections))
+    duplicate_sections = [
+        section for section in REQUIRED_SECTIONS if sections.count(section) > 1
+    ]
+    if duplicate_sections:
+        errors.append(
+            "Atomic note repeats section(s): " + ", ".join(duplicate_sections)
+        )
+    unexpected_sections = [
+        section for section in sections if section not in REQUIRED_SECTIONS
+    ]
+    if unexpected_sections:
+        errors.append(
+            "Atomic note has unexpected section(s): "
+            + ", ".join(unexpected_sections)
+        )
+    required_in_document = [
+        section for section in sections if section in REQUIRED_SECTIONS
+    ]
+    if not missing_sections and required_in_document != list(REQUIRED_SECTIONS):
+        errors.append(
+            "Atomic-note sections must follow this order: "
+            + ", ".join(REQUIRED_SECTIONS)
+            + "."
+        )
     for section in REQUIRED_SECTIONS:
         body = section_body(note, section)
         if body is not None and not WORD.search(strip_internal_links(body)):
             errors.append(f'Atomic-note section "{section}" must not be empty.')
 
+    pattern = section_body(note, "pattern") or ""
+    pattern_lines = [
+        re.sub(r"^\s*>\s?", "", line).strip()
+        for line in pattern.splitlines()
+        if line.strip()
+    ]
+    if pattern and (
+        len(pattern_lines) != 1
+        or not PATTERN_FORM.fullmatch(pattern_lines[0])
+        or len(re.findall(r"[.!?]", pattern_lines[0])) != 1
+    ):
+        errors.append(
+            'Pattern section must contain one "When X, do Y, because Z." sentence.'
+        )
+
+    for section in ACTION_SECTIONS:
+        body = section_body(note, section) or ""
+        if body and not BULLET.search(body):
+            errors.append(
+                f'Atomic-note section "{section}" requires at least one bullet.'
+            )
+
     relationships = section_body(note, "relationships") or ""
+    relationship_links = internal_links(relationships)
+    if relationships and not relationship_links:
+        if not NO_RELATIONSHIPS.search(relationships):
+            errors.append(
+                "Relationships must contain typed links or state "
+                '"No supported relationships yet."'
+            )
     for line in relationships.splitlines():
-        if internal_links(line):
+        links = internal_links(line)
+        if links:
+            if not TYPED_RELATIONSHIP.match(line):
+                errors.append(
+                    "Every relationship link requires a supported type: "
+                    "Prerequisite, Extension, Contrast, or Example."
+                )
             prose = strip_internal_links(line)
             if len(WORD.findall(prose)) < 2:
                 errors.append("Every relationship link requires explanatory prose.")

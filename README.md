@@ -10,17 +10,17 @@ A GitHub Copilot CLI plugin marketplace for building a portable personal knowled
 | Plugin | Capability |
 | --- | --- |
 | `create-domain-moc` | Define one domain and create its navigation MOC. |
-| `create-atomic-note` | Create one atomic note and connect it to a domain MOC. |
-| `create-coaching-note` | Create the atomic note's supportive coaching companion. |
-| `create-obsidian-marp-slides` | Create or update the domain's single Obsidian Marp presentation, with speaker notes when coaching companions exist. |
+| `create-atomic-note` | Create one reusable knowledge pattern and connect it to a domain MOC. |
+| `create-coaching-note` | Turn one atomic pattern into a supportive coaching experience. |
+| `create-obsidian-marp-slides` | Present the domain as one connected system of patterns, practices, and optional coaching questions. |
 
 Together, the plugins use one flat directory in any file-based PKM tool:
 
 ```text
 <knowledge-directory>/
 ├── <domain>-moc.md
-├── <domain>-<idea>.md
-├── <domain>-<idea>.coach.md
+├── <domain>-<pattern>.md
+├── <domain>-<pattern>.coach.md
 └── <domain>.marp.md
 ```
 

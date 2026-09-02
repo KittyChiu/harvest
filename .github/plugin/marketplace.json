@@ -17,21 +17,21 @@
     },
     {
       "name": "create-atomic-note",
-      "description": "Create or revise one atomic note and connect it to a domain Map of Content with meaningful internal links and filtering tags.",
+      "description": "Create or revise one reusable knowledge pattern and connect it to a domain Map of Content with practical signals, learning, constraints, links, and tags.",
       "version": "1.0.0",
       "license": "MIT",
       "source": "./plugins/create-atomic-note"
     },
     {
       "name": "create-coaching-note",
-      "description": "Create or revise a supportive coaching companion for one atomic knowledge note.",
+      "description": "Create or revise a coaching companion with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
       "version": "1.0.0",
       "license": "MIT",
       "source": "./plugins/create-coaching-note"
     },
     {
       "name": "create-obsidian-marp-slides",
-      "description": "Create or update one domain's shared Obsidian Marp presentation from its MOC and atomic notes, adding speaker notes when coaching companions exist.",
+      "description": "Create or update one domain's Obsidian Marp presentation as a connected system of atomic patterns, practices, relationships, application, and optional coaching questions.",
       "version": "1.0.0",
       "license": "MIT",
       "source": "./plugins/create-obsidian-marp-slides"

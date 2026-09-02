@@ -31,6 +31,9 @@ size: 16:9
 - Use the built-in `default` theme unless the user confirms another installed or built-in theme.
 - Use the selected theme's standard styling; do not add custom CSS by default.
 - Use standard Markdown for all visible slide content.
+- Mermaid rendering is not part of the documented conservative surface. Use a
+  fenced `mermaid` map only when the target setup is confirmed to render it;
+  otherwise use a fenced `text` map.
 - Treat URL autolinks such as `<https://example.com>` and email autolinks such as `<person@example.com>` as standard Markdown, not raw HTML.
 - Use Markdown image syntax rather than HTML image tags.
 - Keep images local when portability or offline presenting matters.
@@ -63,7 +66,7 @@ Coach cue: Ask what changes when the audience applies this idea.
 
 This is not arbitrary slide-body HTML. The compatibility restriction targets rendered HTML layout elements such as `<div>`, not Marp's comment-based directives or notes.
 
-Slides without coaching companions do not require speaker notes. When a slide declares a `Coach source:`, an empty speaker-note block does not satisfy the domain-presentation contract.
+Slides without coaching companions do not require speaker notes. When a pattern slide declares `Coach:`, its note block must contain one non-empty `Coach cue:` question ending in `?`.
 
 ## Density guardrails
 
@@ -74,6 +77,6 @@ Treat these as warnings, not rigid limits:
 - bullets: 3–5;
 - table: no more than 5 columns or 6 body rows;
 - code: approximately 12–15 visible lines;
-- one primary claim per slide.
+- one primary pattern per slide.
 
 Split content when the audience would need to read rather than listen.

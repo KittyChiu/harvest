@@ -1,81 +1,74 @@
-# Atomic-note graph authoring
+# Atomic-pattern authoring
 
-## Choose one idea
+## Select a reusable pattern
 
-An atomic note makes one claim that can be reused in more than one context.
+A pattern connects a recurring situation to a practical response and explains why that response should work. It must be reusable beyond the source event without becoming so broad that it loses its trigger or boundary.
 
-Good titles state the claim:
+Prefer titles that state the pattern, such as:
 
-- `platform-engineering-is-a-product-discipline`
 - `golden-paths-reduce-cognitive-load`
+- `small-batches-shorten-feedback-loops`
 
-Avoid topic containers such as `everything-about-platform-engineering`. Broad navigation belongs in the domain MOC.
+Reject topic containers such as `everything-about-platform-engineering`, event summaries, isolated facts, personal reminders, and collections of loosely related advice.
 
 When reading a source:
 
-1. Remove meeting narrative, repeated wording, and delivery commentary.
-2. Group duplicate claims.
-3. Preserve meaningful tensions and constraints.
-4. Propose no more than three candidate claims.
-5. Write only the selected claim.
+1. Remove chronology, repetition, and delivery commentary.
+2. Group observations that support the same response and mechanism.
+3. Preserve contradictions, uncertainty, failures, and boundary conditions.
+4. Distinguish learning present in the source from recommendations synthesized for the note.
+5. Propose no more than three patterns and write only the selected one.
+
+## Test the causal chain
+
+Check the proposed note in both directions:
+
+- Forward: does the learning support the pattern, and does the mechanism explain why the practice should affect the named situation?
+- Reverse: do the signals actually indicate the pattern is relevant, and do the constraints identify when the mechanism would fail?
+
+Do not use outcomes, popularity, or confidence as substitutes for a mechanism. If the source supports an observation but not a causal explanation, preserve that uncertainty rather than inventing one.
 
 ## Choose the parent MOC
 
-Every atomic note has one primary domain MOC. Use an approved existing MOC whose scope clearly contains the idea. If none fits, offer an available domain-MOC specialist with the approved continuation context or stop; do not create the MOC inside the atomic-note workflow.
+Use one approved existing MOC whose scope contains the pattern. If none fits, offer a domain-MOC specialist or stop.
 
-The atomic note uses:
-
-```markdown
-Parent: [AI engineering](ai-engineering-moc.md)
-```
-
-The MOC uses a descriptive navigation entry:
+The MOC entry is navigation, not a second summary. Describe the decision a reader can make by opening the note:
 
 ```markdown
-- [Golden paths reduce cognitive load](ai-engineering-golden-paths-reduce-cognitive-load.md) — Why paved roads matter more as AI increases change volume.
+- [Golden paths reduce cognitive load](platform-golden-paths-reduce-cognitive-load.md) — Decide when a maintained default can remove repeated delivery choices.
 ```
-
-The description helps a reader decide whether to open the note.
 
 ## Create meaningful relationships
 
-A relationship must explain the connection in a sentence:
+Choose a relationship type by the role the linked note plays:
 
-```markdown
-Platform teams need stronger paved roads when [AI-assisted development changes the unit of work](ai-assisted-development-changes-the-unit-of-work.md) because the volume and speed of change increase.
-```
+- **Prerequisite** — must be understood or present first.
+- **Extension** — develops this pattern further.
+- **Contrast** — exposes a meaningful alternative or boundary.
+- **Example** — demonstrates this pattern in a concrete case.
 
-Do not write a bare list:
+Explain the connection in the same list item. Do not add a link because two notes share a topic. Prefer an explicit no-relationship state over planned, dangling, or decorative links.
 
-```markdown
-- [Platform engineering](platform-engineering.md)
-- [AI](ai.md)
-```
+Use portable relative Markdown links by default. Wiki-style links are acceptable when the selected PKM tool prefers them. Every target must already exist in the approved knowledge directory.
 
-Use portable relative Markdown links by default. Wiki-style internal links are also acceptable when the selected PKM tool prefers them. Link only to notes that already exist in the approved knowledge directory. Prefer no related link over a planned, dangling, or decorative one.
+## Apply graph tags
 
-## Apply tags
+Use inline tags for three independent filtering dimensions:
 
-Use inline tags as plain Markdown text for three filtering dimensions:
-
-- domain: one or more subject tags such as `#ai`, `#platform`, or `#leadership`;
+- domain: one or more subject tags;
 - workflow: exactly one of `#draft`, `#review`, or `#publish`;
 - visibility: exactly one of `#private` or `#public`.
 
-Additional useful tags are allowed, but tags do not replace MOCs or relationship sentences.
-
-Apply the same workflow and visibility categories to a MOC, alongside its domain tag and `#moc`, so navigation notes can be filtered and published deliberately.
-
-Do not add tool-specific front matter, database properties, queries, transclusions, or plugins unless the user explicitly requests them.
+Tags do not replace MOC membership or relationship prose. Do not add tool-specific front matter, properties, queries, transclusions, or plugins unless explicitly requested.
 
 ## Review
 
 Before completion, confirm:
 
-- the title is one reusable claim;
-- the content can stand alone without the source;
-- the MOC is the right navigation home;
-- the MOC entry describes the note;
-- each relationship states why the linked idea matters;
-- the tags support filtering rather than duplicating prose;
-- no unsupported certainty, quote, example, or relationship was added.
+- the note contains one reusable pattern rather than a topic;
+- source learning and synthesized recommendations remain distinguishable;
+- the causal chain works in both directions;
+- the MOC is the correct navigation home;
+- every relationship has the right type and a supported explanation;
+- uncertainty and constraints are preserved;
+- no learning, evidence, example, or causal claim was invented.
