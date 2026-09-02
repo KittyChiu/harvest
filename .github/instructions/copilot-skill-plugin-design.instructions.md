@@ -10,9 +10,8 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 - A **skill** is one user-facing capability. A **plugin** is the installable package that contains one or more skills. Keep these concepts and terms distinct.
 - Design each skill as an atomic, independently usable capability.
 - Connect capabilities through small, explicit, structured capability and data contracts. Never couple a skill or plugin to another component's name, caller identity, directory layout, or internal schema.
-- Reference the existing source of truth instead of copying it. Add a shared dependency only when its contract and availability are deliberate and guaranteed.
+- Add a shared dependency only when its contract and availability are deliberate and guaranteed.
 - Prefer explicit structured contracts over inferred conventions or prose-based coupling.
-- Optimize every design and change for maintainability: keep instructions concise, duplication minimal, edits narrow, and validation executable.
 
 ## Skill Boundaries
 
@@ -28,6 +27,7 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 
 - Give every skill a unique, lowercase, hyphenated `name` that normally matches its directory.
 - Write a `description` that states both what the skill does and when it should be used.
+- Prefer deterministic components whenever behavior can be expressed reliably as executable logic, a schema, a validator, or a static asset. Reserve prompt instructions for judgment, decisions, interaction gates, and workflow orchestration.
 - Keep `SKILL.md` focused on decisions, interaction gates, and workflow orchestration. Put stable domain guidance in references, reusable static scaffolding in assets, and executable deterministic logic in scripts.
 - Grant only the minimum required `allowed-tools`. Do not pre-approve `shell` or `bash` unless both the skill and every script it references are trusted and require non-interactive execution.
 - Before an artifact-writing skill writes anything, confirm:
