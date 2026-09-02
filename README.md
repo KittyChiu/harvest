@@ -48,6 +48,50 @@ copilot plugin install create-obsidian-marp-slides@harvest
 
 Restart an active Copilot CLI session after installation, then use `/skills list` to verify that the installed skill is available.
 
+## Use the installed skills
+
+Invoke a skill by name in a normal Copilot prompt. For best results, provide:
+
+- the existing knowledge directory where artifacts may be written;
+- the source material or patterns to capture;
+- the workflow and visibility tags;
+- the audience and objective when requesting coaching notes or slides.
+
+The skills pause for approval before writing files. `create-atomic-note` and
+`create-coaching-note` each handle one pattern per invocation, while
+`create-obsidian-marp-slides` creates one presentation for the complete domain.
+
+For example:
+
+```text
+Use create-domain-moc to create the "delivery" domain in <knowledge-directory>
+with #draft and #private tags.
+
+After the MOC is created, use create-atomic-note once for each of
+these engineering delivery patterns:
+
+- Plan first, then code as stacked changes.
+- Move from user story to implementation plan to code.
+
+For each pattern, identify which GitHub Copilot features or specific
+capabilities to apply at each step, explain how they support the pattern, and
+include that guidance in the atomic note. Consider planning, custom
+instructions, agent workflows, code review, and pull request capabilities
+where they are relevant; do not force a feature where it does not fit.
+
+For each approved atomic note, use create-coaching-note to create a companion
+for software engineers learning the pattern.
+
+Finally, use create-obsidian-marp-slides to create delivery.marp.md for a
+30-minute engineering team workshop. Use the delivery MOC, its atomic notes,
+and their coaching companions as read-only sources.
+```
+
+Replace `<knowledge-directory>` with an existing directory in your PKM tool or
+Obsidian vault. Copilot will guide you through the required scope, filename,
+source, and write approvals at each stage. Run the steps as separate prompts if
+you want to review each artifact before continuing.
+
 ## Update
 
 ```bash
