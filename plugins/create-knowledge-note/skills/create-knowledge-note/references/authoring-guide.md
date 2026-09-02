@@ -35,12 +35,12 @@ Explicit approval is required before writing. If the user changes several fields
 
 Use 5–8 sections. Default to these six:
 
-1. Core Idea
-2. Guiding Principles
-3. Practices
-4. Examples
-5. Constraints
-6. Related Ideas
+1. Core Guiding Principle (one-sentence summary)
+2. Why this matters (one-paragraph on impact to subject or audience)
+3. Practices (reusable application pattern)
+4. Constraints / Requirements (concise bullet points)
+5. Examples / Relevant Context (1-2 illustrative situations)
+6. Related (links to other notes or sources)
 
 Omit a section when the source cannot support it. Add no more than two sections when they improve retrieval or preserve an essential idea. Useful additions include Questions, Terms, and Implications.
 
