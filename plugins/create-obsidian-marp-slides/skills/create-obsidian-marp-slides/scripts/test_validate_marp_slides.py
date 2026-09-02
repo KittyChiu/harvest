@@ -15,6 +15,14 @@ SCRIPT = Path(__file__).with_name("validate_marp_slides.py")
 TEMPLATE = (
     Path(__file__).parents[1] / "assets" / "slides-template.md"
 ).read_text(encoding="utf-8")
+SKILL = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
+DESIGN = (
+    Path(__file__).parents[1] / "references" / "slides-design.md"
+).read_text(encoding="utf-8")
+COMPATIBILITY = (
+    Path(__file__).parents[1] / "references" / "obsidian-marp-compatibility.md"
+).read_text(encoding="utf-8")
+PLUGIN = (Path(__file__).parents[3] / "plugin.json").read_text(encoding="utf-8")
 
 
 class ValidateMarpSlidesTests(unittest.TestCase):
@@ -33,7 +41,11 @@ class ValidateMarpSlidesTests(unittest.TestCase):
             "keeps the maintained path responsive to real use.\n",
             encoding="utf-8",
         )
-        self.note_two.write_text("# Feedback loops\n", encoding="utf-8")
+        self.note_two.write_text(
+            "# Feedback loops\n\n## Relationships\n\n"
+            "No supported relationships yet.\n",
+            encoding="utf-8",
+        )
         self.coach.write_text("# Golden paths coaching\n", encoding="utf-8")
         self.moc.write_text(self.valid_moc(), encoding="utf-8")
         self.deck.write_text(self.valid_deck(), encoding="utf-8")
@@ -80,8 +92,19 @@ description: Present platform delivery as a connected learning system
 
 Connect maintained defaults with learning from real use.
 
-MOC: [Platform](platform-moc.md)
+<!--
+Narrative:
+Repeated delivery decisions consume attention that could go to product work.
+
+Domain question:
+How can teams reduce repeated decisions without freezing learning?
+
+Source:
+[Platform](platform-moc.md)
+
+Metadata:
 Tags: #platform #slides #publish #private
+-->
 
 ---
 
@@ -97,68 +120,103 @@ Tags: #platform #slides #publish #private
 - Maintained defaults preserve attention.
 - Feedback keeps defaults relevant.
 
-> **Domain question:** How can teams reduce repeated decisions without freezing learning?
+<!--
+Narrative:
+The opportunity is to remove repeated work without removing adaptation.
+
+Domain question:
+How can a maintained path continue learning from real use?
+
+Source:
+[Platform](platform-moc.md)
+-->
 
 ---
 
 # Pattern map
 
-```text
-Platform delivery
-├── Delivery defaults
-│   └── P1 · Golden paths
-└── Learning loops
-    └── P2 · Feedback loops
-
-P1 · Golden paths --enables--> P2 · Feedback loops
+```mermaid
+flowchart LR
+    subgraph C1["Delivery defaults"]
+        A["Golden paths"]
+    end
+    subgraph C2["Learning loops"]
+        B["Feedback loops"]
+    end
+    A -->|enables| B
 ```
 
----
-
-###### PATTERN P1 OF 2 · Delivery defaults
-
-# P1 · Golden paths
-
-> **When teams repeat common setup decisions, provide a maintained default, because it preserves attention for product work.**
-
-## Use it when
-
-- Teams repeatedly rebuild the same delivery setup.
-- Product work waits on avoidable platform choices.
-
-## Practices
-
-1. Automate the common path.
-2. Document a supported exception.
-
-**Related:** P2 · Feedback loops through **enables**
-
-Source: [Golden paths](platform-golden-paths.md)
-Coach: [Golden paths coaching](platform-golden-paths.coach.md)
-
 <!--
-Coach cue: Where does repeated setup work consume the most attention?
+Narrative:
+Defaults and feedback form one learning system.
+
+Domain question:
+Which connection keeps the default relevant?
+
+Related:
+- Golden paths enables Feedback loops
+
+Source:
+[Platform](platform-moc.md)
 -->
 
 ---
 
-###### PATTERN P2 OF 2 · Learning loops
+###### P1 of 2 · Delivery defaults
 
-# P2 · Feedback loops
+# Golden paths
 
-> **When a default no longer fits current work, collect feedback, because real use reveals where the path needs to change.**
+### Use when
 
-## Use it when
+- Teams repeatedly rebuild the same delivery setup.
+- Product work waits on avoidable platform choices.
+
+### Do
+
+- Automate the common path.
+- Document a supported exception.
+
+<!--
+Pattern description:
+When teams repeat common setup decisions, provide a maintained default, because it preserves attention for product work.
+
+Coach cue:
+Where does repeated setup work consume the most attention?
+
+Related:
+Feedback loops (enables)
+
+Source:
+[Golden paths](platform-golden-paths.md)
+[Golden paths coaching](platform-golden-paths.coach.md)
+-->
+
+---
+
+###### p2 of 2 · Learning loops
+
+# Feedback loops
+
+### Use when
 
 - Teams leave the default for similar reasons.
 - Workarounds recur across products.
 
-## Practices
+### Do
 
-1. Review why teams choose exceptions.
-2. Update the common path when evidence repeats.
+- Review why teams choose exceptions.
+- Update the common path when evidence repeats.
 
-Source: [Feedback loops](platform-feedback-loops.md)
+<!--
+Pattern description:
+When a default no longer fits current work, collect feedback, because real use reveals where the path needs to change.
+
+Coach cue:
+Which repeated exception suggests the default should change?
+
+Source:
+[Feedback loops](platform-feedback-loops.md)
+-->
 
 ---
 
@@ -166,52 +224,114 @@ Source: [Feedback loops](platform-feedback-loops.md)
 
 ## Scenario: A team repeatedly rebuilds deployment setup
 
-```text
-Repeated setup signal
-       ↓
-P1 · Golden paths
-       ↓ enables
-P2 · Feedback loops
-       ↓
-Maintained default
+```mermaid
+flowchart LR
+    S["Repeated setup signal"]
+    A["Golden paths"]
+    B["Feedback loops"]
+    O["Maintained default"]
+    S --> A
+    A -->|enables| B
+    B --> O
 ```
 
 - **Start with:** Automate the repeated setup.
 - **Then:** Review why teams use exceptions.
 - **Watch for:** A default that no longer reflects current work.
 
+<!--
+Narrative:
+Start with the repeated work, then use exceptions as learning.
+
+Coach cue:
+Where might this sequence branch or fail?
+
+Related:
+- Golden paths enables Feedback loops
+
+Source:
+[Platform](platform-moc.md)
+[Golden paths](platform-golden-paths.md)
+[Feedback loops](platform-feedback-loops.md)
+-->
+
 ---
 
 # What changes
 
-| Before                    | Pattern | After                         |
-| ------------------------- | ------- | ----------------------------- |
-| Rebuild delivery setup    | **P1**  | Begin from a maintained path  |
-| Ignore recurring feedback | **P2**  | Revise the path from real use |
+| Before | Pattern | After |
+| --- | --- | --- |
+| Rebuild delivery setup | **Golden paths** | Begin from a maintained path |
+| Ignore recurring feedback | **Feedback loops** | Revise the path from real use |
 
-> **Remaining constraint:** Teams still need a supported way to leave the path.
+<!--
+Narrative:
+The expected direction is less repeated setup and more deliberate learning.
+
+Evidence:
+These are source-grounded expected directions, not measured results.
+
+Coach cue:
+Which change would provide the earliest useful evidence?
+
+Remaining constraint:
+Teams still need a supported way to leave the path.
+
+Source:
+[Platform](platform-moc.md)
+[Golden paths](platform-golden-paths.md)
+[Feedback loops](platform-feedback-loops.md)
+-->
 
 ---
 
 # Pattern map revisited
 
-```text
-P1 · Golden paths --enables--> P2 · Feedback loops
-P1 · Golden paths --informs--> P2 · Feedback loops
+```mermaid
+flowchart LR
+    subgraph C1["Delivery defaults"]
+        A["Golden paths"]
+    end
+    subgraph C2["Learning loops"]
+        B["Feedback loops"]
+    end
+    A -->|enables| B
 ```
 
-> **Domain takeaway:** Defaults and feedback form a learning system.
+<!--
+Domain takeaway:
+Defaults and feedback form a learning system.
+
+Coach cue:
+Which relationship should the audience retain?
+
+Related:
+- Golden paths enables Feedback loops
+
+Source:
+[Platform](platform-moc.md)
+-->
 
 ---
 
 # Choose one pattern to try
 
 - **Signal:** One setup decision recurs across teams.
-- **Pattern:** P1 · Golden paths
+- **Pattern:** Golden paths
 - **Practice:** Automate one common setup step.
 - **Review:** Discuss whether the default removed work without blocking exceptions.
 
-> Start with the pattern that addresses the clearest signal.
+<!--
+Narrative:
+Start with the pattern that addresses the clearest observable signal.
+
+Coach cue:
+What is the smallest action that could produce useful evidence?
+
+Source:
+[Golden paths](platform-golden-paths.md)
+[Golden paths coaching](platform-golden-paths.coach.md)
+-->
 """
 
     def run_validator(
@@ -226,11 +346,42 @@ P1 · Golden paths --informs--> P2 · Feedback loops
 
     def assert_invalid(self, message: str) -> None:
         result = self.run_validator()
-        self.assertNotEqual(result.returncode, 0)
+        self.assertNotEqual(result.returncode, 0, result.stdout)
         self.assertIn(message, result.stdout)
 
     def write_deck(self, deck: str) -> None:
         self.deck.write_text(deck, encoding="utf-8")
+
+    def deck_with_comparison(self) -> str:
+        comparison = """---
+
+# Choosing between Golden paths and Feedback loops
+
+| Situation | Use |
+| --- | --- |
+| Repeated setup | **Golden paths** |
+| Recurring exceptions | **Feedback loops** |
+
+<!--
+Selection rule:
+When setup repeats, prefer Golden paths, because defaults remove repeated work.
+
+Coach cue:
+Which observable condition distinguishes these choices?
+
+Related:
+Golden paths enables Feedback loops
+
+Source:
+[Golden paths](platform-golden-paths.md)
+[Feedback loops](platform-feedback-loops.md)
+-->
+
+"""
+        return self.valid_deck().replace(
+            "---\n\n# Apply the patterns together",
+            comparison + "---\n\n# Apply the patterns together",
+        )
 
     def test_accepts_complete_pattern_system_deck(self) -> None:
         result = self.run_validator()
@@ -238,57 +389,89 @@ P1 · Golden paths --informs--> P2 · Feedback loops
         self.assertIn("2 atomic sources", result.stdout)
         self.assertIn("1 coaching sources", result.stdout)
 
-    def test_template_contains_new_narrative_schema(self) -> None:
+    def test_template_and_contract_share_new_schema(self) -> None:
         titles = re.findall(r"^#(?!#)\s+(.+?)\s*$", TEMPLATE, re.MULTILINE)
         for title in (
             "[Domain name]",
             "Challenges & opportunities",
             "Pattern map",
-            "P1 · [Short pattern name]",
-            "P2 · [Short pattern name]",
+            "[Short pattern name]",
             "Apply the patterns together",
             "What changes",
             "Pattern map revisited",
             "Choose one pattern to try",
         ):
             self.assertIn(title, titles)
-        self.assertIn("###### PATTERN P1 OF [N] · [CLUSTER]", TEMPLATE)
-        self.assertIn("Coach:", TEMPLATE)
-        self.assertIn("```text", TEMPLATE)
-        self.assertNotIn("```mermaid", TEMPLATE)
-        self.assertNotIn("<small>", TEMPLATE)
-        self.assertTrue(TEMPLATE.endswith("\n"))
+        self.assertIn("###### P[1] of [N] · [Cluster]", TEMPLATE)
+        self.assertIn("Pattern description:\nWhen [condition]", TEMPLATE)
+        self.assertIn("Do not show identifiers in slide titles or Mermaid nodes.", TEMPLATE)
+        self.assertGreaterEqual(TEMPLATE.count("```mermaid"), 3)
+        self.assertNotIn("```text", TEMPLATE)
+        self.assertIn("pattern IDs only in the H6 position metadata", SKILL)
+        self.assertIn("fenced Mermaid", DESIGN)
+        self.assertIn("does not render Mermaid", COMPATIBILITY)
+        self.assertIn("optional coaching companions", PLUGIN)
+        self.assertNotIn("optional coaching questions", PLUGIN)
+        self.assertIn("P1, p2, p3", TEMPLATE)
+        self.assertNotIn("P1, P2, P3", TEMPLATE)
+        self.assertIn("Omit Related when no source-supported relationship exists.", TEMPLATE)
+        self.assertIn(
+            "Coach cue: What changes when the audience applies this idea?",
+            COMPATIBILITY,
+        )
 
     def test_template_is_scaffold_not_completed_deck(self) -> None:
-        self.write_deck(
-            TEMPLATE.replace("domain-moc.md", "platform-moc.md")
-            .replace("domain-atomic-note.md", "platform-golden-paths.md")
-            .replace(
-                "domain-atomic-note.coach.md",
-                "platform-golden-paths.coach.md",
-            )
-            .replace("#domain", "#platform")
-        )
-        self.assert_invalid("unreplaced template placeholder(s)")
+        self.write_deck(TEMPLATE.replace("domain-moc.md", "platform-moc.md"))
+        self.assert_invalid("unreplaced template")
 
-    def test_rejects_unremoved_template_instructions(self) -> None:
+    def test_rejects_unremoved_authoring_instructions(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "<!-- markdownlint-disable MD001 MD024 MD025 -->",
-                "<!-- markdownlint-disable MD001 MD024 MD025 -->\n"
-                "<!-- Repeat one slide for each pattern. -->",
+                "# Platform delivery",
+                "<!--\nAUTHORING RULES\n-->\n\n# Platform delivery",
             )
         )
-        self.assert_invalid("unreplaced template instruction(s)")
+        self.assert_invalid("unreplaced template instruction")
 
-    def test_rejects_filename_not_derived_from_moc(self) -> None:
-        wrong_deck = self.root / "slides.marp.md"
-        wrong_deck.write_text(self.valid_deck(), encoding="utf-8")
-        result = self.run_validator(deck=wrong_deck)
+    def test_requires_front_matter_fields(self) -> None:
+        for field in ("marp", "theme", "paginate", "size", "title", "description"):
+            with self.subTest(field=field):
+                self.write_deck(
+                    re.sub(rf"^{field}:.*\n", "", self.valid_deck(), count=1, flags=re.MULTILINE)
+                )
+                self.assert_invalid(f"'{field}'")
+
+    def test_rejects_internal_pattern_id_in_front_matter(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "title: Platform patterns",
+                "title: Platform P1 patterns",
+                1,
+            )
+        )
+        self.assert_invalid("Pattern IDs may appear only")
+
+    def test_requires_marp_true(self) -> None:
+        self.write_deck(self.valid_deck().replace("marp: true", "marp: false"))
+        self.assert_invalid("must be 'true'")
+
+    def test_requires_filename_derived_from_moc(self) -> None:
+        wrong = self.root / "slides.marp.md"
+        wrong.write_text(self.valid_deck(), encoding="utf-8")
+        result = self.run_validator(deck=wrong)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Deck filename must be 'platform.marp.md'", result.stdout)
 
-    def test_requires_each_core_system_slide(self) -> None:
+    def test_requires_same_directory(self) -> None:
+        other = self.root / "other"
+        other.mkdir()
+        deck = other / "platform.marp.md"
+        deck.write_text(self.valid_deck(), encoding="utf-8")
+        result = self.run_validator(deck=deck)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("same knowledge directory", result.stdout)
+
+    def test_requires_each_core_slide(self) -> None:
         for title in (
             "Challenges & opportunities",
             "Pattern map",
@@ -308,7 +491,7 @@ P1 · Golden paths --informs--> P2 · Feedback loops
                 self.write_deck(deck)
                 self.assert_invalid(f"exactly one '{title}' slide")
 
-    def test_rejects_core_system_slides_out_of_order(self) -> None:
+    def test_rejects_core_slides_out_of_order(self) -> None:
         deck = self.valid_deck()
         changes = re.search(
             r"\n---\n\n# What changes\n.*?(?=\n---\n)", deck, re.DOTALL
@@ -319,445 +502,545 @@ P1 · Golden paths --informs--> P2 · Feedback loops
         self.write_deck(deck.replace(changes + revisited, revisited + changes))
         self.assert_invalid("do not follow the template order")
 
-    def test_requires_challenges_and_opportunities_sections(self) -> None:
-        self.write_deck(self.valid_deck().replace("## Opportunities", "## Potential"))
-        self.assert_invalid("requires an Opportunities section")
+    def test_requires_opening_speaker_note_fields(self) -> None:
+        self.write_deck(self.valid_deck().replace("Narrative:\nRepeated", "Story:\nRepeated", 1))
+        self.assert_invalid("Opening slide speaker notes require")
 
-    def test_requires_domain_question_ending_in_question_mark(self) -> None:
+    def test_requires_domain_question_in_speaker_notes(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "without freezing learning?",
-                "while preserving learning.",
-            )
-        )
-        self.assert_invalid("Domain question ending in ?")
-
-    def test_requires_map_fence(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "```text\nPlatform delivery",
-                "Platform delivery",
-                1,
-            ).replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n```",
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
+                "How can teams reduce repeated decisions without freezing learning?",
+                "Teams should reduce repeated decisions.",
                 1,
             )
         )
-        self.assert_invalid("Pattern map requires a fenced mermaid or text")
+        self.assert_invalid("Domain question' ending in ?")
 
-    def test_requires_every_pattern_id_in_both_maps(self) -> None:
+    def test_requires_opening_moc_source(self) -> None:
         self.write_deck(
+            self.valid_deck().replace(
+                "[Platform](platform-moc.md)",
+                "[Golden paths](platform-golden-paths.md)",
+                1,
+            )
+        )
+        self.assert_invalid("Opening slide speaker-note Source")
+
+    def test_rejects_internal_pattern_id_in_link_label(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Platform](platform-moc.md)",
+                "[P1](platform-moc.md)",
+                1,
+            )
+        )
+        self.assert_invalid("Pattern IDs may appear only")
+
+    def test_rejects_plain_text_system_source(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "The opportunity is to remove repeated work without removing adaptation.\n\n"
+                "Domain question:\n"
+                "How can a maintained path continue learning from real use?\n\n"
+                "Source:\n"
+                "[Platform](platform-moc.md)",
+                "The opportunity is to remove repeated work without removing adaptation.\n\n"
+                "Domain question:\n"
+                "How can a maintained path continue learning from real use?\n\n"
+                "Source:\n"
+                "No source.",
+            )
+        )
+        self.assert_invalid("speaker-note Source must link exactly")
+
+    def test_rejects_extra_external_source_link(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Platform](platform-moc.md)\n\nMetadata:",
+                "[Platform](platform-moc.md)\n"
+                "[External reference](https://example.com/reference)\n\nMetadata:",
+                1,
+            )
+        )
+        self.assert_invalid("Source links must use local Markdown files")
+
+    def test_rejects_prose_in_source_field(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Platform](platform-moc.md)\n\nMetadata:",
+                "[Platform](platform-moc.md)\nGrounded in the domain.\n\nMetadata:",
+                1,
+            )
+        )
+        self.assert_invalid("Source must contain only one")
+
+    def test_rejects_visible_note_only_field(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Connect maintained defaults with learning from real use.",
+                "Connect maintained defaults with learning from real use.\n\n"
+                "Coach cue: What should the audience notice?",
+                1,
+            )
+        )
+        self.assert_invalid("must remain in speaker notes")
+
+    def test_rejects_visible_duplicate_of_note_only_question(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Connect maintained defaults with learning from real use.",
+                "Connect maintained defaults with learning from real use.\n\n"
+                "How can teams reduce repeated decisions without freezing learning?",
+                1,
+            )
+        )
+        self.assert_invalid("duplicates speaker-note-only field content visibly")
+
+    def test_requires_tags_in_opening_metadata(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Tags: #platform #slides #publish #private",
+                "Tags: #slides #private",
+            )
+        )
+        self.assert_invalid("every MOC domain tag")
+        self.assert_invalid("exactly one workflow tag")
+
+    def test_rejects_visible_source_link(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Connect maintained defaults with learning from real use.",
+                "Connect learning from [Platform](platform-moc.md).",
+            )
+        )
+        self.assert_invalid("only in speaker notes")
+
+    def test_rejects_source_outside_domain(self) -> None:
+        extra = self.root / "external-note.md"
+        extra.write_text("# External\n", encoding="utf-8")
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Platform](platform-moc.md)",
+                "[External](external-note.md)",
+                1,
+            )
+        )
+        self.assert_invalid("source links outside the MOC domain")
+
+    def test_requires_lowercase_internal_links(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "platform-golden-paths.md", "platform-golden-paths.MD", 1
+            )
+        )
+        self.assert_invalid("lowercase '.md' extension")
+
+    def test_requires_flat_internal_links(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "platform-golden-paths.md", "notes/platform-golden-paths.md", 1
+            )
+        )
+        self.assert_invalid("flat filename")
+
+    def test_accepts_wiki_links_in_speaker_notes(self) -> None:
+        deck = (
             self.valid_deck()
+            .replace("[Platform](platform-moc.md)", "[[platform-moc|Platform]]")
             .replace(
-                "    └── P2 · Feedback loops",
-                "    └── Feedback loops",
-                1,
+                "[Golden paths](platform-golden-paths.md)",
+                "[[platform-golden-paths|Golden paths]]",
             )
             .replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 · Golden paths --enables--> Feedback loops",
-                1,
+                "[Feedback loops](platform-feedback-loops.md)",
+                "[[platform-feedback-loops|Feedback loops]]",
             )
-        )
-        self.assert_invalid("Pattern map is missing pattern ID(s)")
-
-    def test_requires_exact_pattern_names_in_both_maps(self) -> None:
-        deck = self.valid_deck()
-        revisited = re.search(
-            r"\n---\n\n# Pattern map revisited\n.*?(?=\n---\n)",
-            deck,
-            re.DOTALL,
-        ).group(0)
-        self.write_deck(
-            deck.replace(
-                revisited,
-                revisited.replace("P2 · Feedback loops", "P2 · Learning loops"),
+            .replace(
+                "[Golden paths coaching](platform-golden-paths.coach.md)",
+                "[[platform-golden-paths.coach|Golden paths coaching]]",
             )
-        )
-        self.assert_invalid("Pattern map revisited is missing exact pattern name(s)")
-
-    def test_requires_pattern_clusters_in_first_map(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "└── Learning loops",
-                "└── Improvement",
-                1,
-            )
-        )
-        self.assert_invalid("Pattern map is missing pattern cluster(s)")
-
-    def test_requires_contiguous_pattern_ids(self) -> None:
-        self.write_deck(
-            self.valid_deck()
-            .replace("PATTERN P2 OF 2", "PATTERN P3 OF 2")
-            .replace("# P2 · Feedback loops", "# P3 · Feedback loops", 1)
-        )
-        self.assert_invalid("contiguous IDs P1 through P2")
-
-    def test_rejects_duplicate_pattern_id(self) -> None:
-        self.write_deck(
-            self.valid_deck()
-            .replace("PATTERN P2 OF 2", "PATTERN P1 OF 2")
-            .replace("# P2 · Feedback loops", "# P1 · Feedback loops", 1)
-        )
-        self.assert_invalid("Pattern ID P1 is used more than once")
-
-    def test_requires_correct_pattern_total(self) -> None:
-        self.write_deck(self.valid_deck().replace("OF 2", "OF 3"))
-        self.assert_invalid("must declare OF 2")
-
-    def test_requires_pattern_title_to_match_id(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "# P2 · Feedback loops",
-                "# P3 · Feedback loops",
-                1,
-            )
-        )
-        self.assert_invalid("requires one '# P2 · <short name>' title")
-
-    def test_requires_pattern_statement_shape(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "> **When teams repeat common setup decisions, provide a maintained default, because it preserves attention for product work.**",
-                "> **Golden paths preserve attention.**",
-            )
-        )
-        self.assert_invalid("'When X, do Y, because Z.' statement")
-
-    def test_accepts_version_number_inside_pattern_statement(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "provide a maintained default, because it preserves attention",
-                "provide a v2.0 default, because it preserves attention",
-                1,
-            )
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_requires_use_it_when_bullet(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "- Teams repeatedly rebuild the same delivery setup.\n"
-                "- Product work waits on avoidable platform choices.",
-                "Teams repeatedly rebuild the same delivery setup.",
-            )
-        )
-        self.assert_invalid("Use it when with at least one bullet")
-
-    def test_requires_one_to_three_numbered_practices(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "1. Automate the common path.",
-                "Automate the common path.",
-            )
-        )
-        self.assert_invalid("one to three contiguous numbered practices")
-
-    def test_rejects_four_practices(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "2. Document a supported exception.",
-                "2. Document a supported exception.\n"
-                "3. Review the path.\n"
-                "4. Mandate adoption.",
-            )
-        )
-        self.assert_invalid("one to three contiguous numbered practices")
-
-    def test_requires_exactly_one_source_on_pattern_slide(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Source: [Golden paths](platform-golden-paths.md)",
-                "Source: [Golden paths](platform-golden-paths.md)\n"
-                "Source: [Feedback loops](platform-feedback-loops.md)",
-            )
-        )
-        self.assert_invalid("requires exactly one Source link")
-
-    def test_rejects_source_on_non_pattern_slide(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "# What changes",
-                "# What changes\n\nSource: [Golden paths](platform-golden-paths.md)",
-            )
-        )
-        self.assert_invalid("has a Source but is not a PATTERN")
-
-    def test_rejects_missing_atomic_source(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Source: [Feedback loops](platform-feedback-loops.md)",
-                "",
-            )
-        )
-        self.assert_invalid("missing atomic Source links")
-
-    def test_rejects_source_outside_moc(self) -> None:
-        extra = self.root / "platform-roadmap.md"
-        extra.write_text("# Roadmap\n", encoding="utf-8")
-        self.write_deck(
-            self.valid_deck().replace(
-                "Source: [Feedback loops](platform-feedback-loops.md)",
-                "Source: [Roadmap](platform-roadmap.md)",
-            )
-        )
-        self.assert_invalid("Source links outside the MOC")
-
-    def test_requires_matching_coach_on_same_pattern_slide(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Coach: [Golden paths coaching](platform-golden-paths.coach.md)",
-                "",
-            )
-        )
-        self.assert_invalid("missing available Coach links")
-
-    def test_rejects_coach_on_non_pattern_slide(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "# What changes",
-                "# What changes\n\n"
-                "Coach: [Golden paths coaching](platform-golden-paths.coach.md)",
-            )
-        )
-        self.assert_invalid("has a Coach link but is not a pattern slide")
-
-    def test_allows_atomic_note_without_coaching_companion(self) -> None:
-        self.coach.unlink()
-        deck = self.valid_deck().replace(
-            "Coach: [Golden paths coaching](platform-golden-paths.coach.md)\n",
-            "",
-        )
-        deck = re.sub(
-            r"\n<!--\nCoach cue: Where does repeated setup work consume the most attention\?\n-->\n",
-            "\n",
-            deck,
         )
         self.write_deck(deck)
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("0 coaching sources", result.stdout)
+
+    def test_accepts_url_and_email_autolinks(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Connect maintained defaults with learning from real use.",
+                "See <https://example.com> or contact <coach@example.com>.",
+            )
+        )
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_rejects_arbitrary_html(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Connect maintained defaults with learning from real use.",
+                "<div>Layout content</div>",
+            )
+        )
+        self.assert_invalid("Arbitrary HTML is not allowed")
+
+    def test_requires_lowercase_pattern_metadata(self) -> None:
+        self.write_deck(self.valid_deck().replace("###### P1 of 2", "###### P1 OF 2"))
+        self.assert_invalid("pattern metadata must use")
+
+    def test_requires_contiguous_pattern_ids(self) -> None:
+        self.write_deck(self.valid_deck().replace("###### p2 of 2", "###### p3 of 2"))
+        self.assert_invalid("contiguous internal IDs")
+
+    def test_rejects_duplicate_pattern_id(self) -> None:
+        self.write_deck(self.valid_deck().replace("###### p2 of 2", "###### P1 of 2"))
+        self.assert_invalid("used more than once")
+
+    def test_requires_correct_pattern_total(self) -> None:
+        self.write_deck(self.valid_deck().replace("###### P1 of 2", "###### P1 of 3"))
+        self.assert_invalid("declare of 2")
+
+    def test_rejects_pattern_id_in_title(self) -> None:
+        self.write_deck(self.valid_deck().replace("# Golden paths", "# P1 · Golden paths", 1))
+        self.assert_invalid("must not expose its internal pattern ID")
+
+    def test_rejects_pattern_id_in_mermaid_node(self) -> None:
+        self.write_deck(self.valid_deck().replace('A["Golden paths"]', 'A["P1 · Golden paths"]', 1))
+        self.assert_invalid("Pattern IDs may appear only")
+
+    def test_rejects_pattern_id_in_speaker_notes(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Repeated delivery decisions consume attention",
+                "P1 shows that repeated delivery decisions consume attention",
+                1,
+            )
+        )
+        self.assert_invalid("Pattern IDs may appear only")
+
+    def test_requires_unique_pattern_names(self) -> None:
+        self.write_deck(self.valid_deck().replace("# Feedback loops", "# Golden paths", 1))
+        self.assert_invalid("short names must be unique")
+
+    def test_requires_pattern_description_in_speaker_notes(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Pattern description:\nWhen teams repeat common setup decisions",
+                "Pattern summary:\nWhen teams repeat common setup decisions",
+                1,
+            )
+        )
+        self.assert_invalid("Pattern description")
+
+    def test_requires_when_do_because_description(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "When teams repeat common setup decisions, provide a maintained default, because it preserves attention for product work.",
+                "Golden paths preserve attention.",
+                1,
+            )
+        )
+        self.assert_invalid("When X, do Y, because Z")
+
+    def test_rejects_visible_complete_pattern_description(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "# Golden paths\n\n### Use when",
+                "# Golden paths\n\n"
+                "When teams repeat decisions, provide a default, because it saves attention.\n\n"
+                "### Use when",
+            )
+        )
+        self.assert_invalid("complete pattern description in speaker notes")
+
+    def test_requires_use_when_bullets(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "- Teams repeatedly rebuild the same delivery setup.",
+                "Teams repeatedly rebuild the same delivery setup.",
+                1,
+            ).replace(
+                "- Product work waits on avoidable platform choices.",
+                "Product work waits on avoidable platform choices.",
+                1,
+            )
+        )
+        self.assert_invalid("'Use when' bullets")
+
+    def test_requires_one_to_three_do_bullets(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "- Document a supported exception.",
+                "- Document a supported exception.\n"
+                "- Review usage.\n"
+                "- Mandate adoption.",
+                1,
+            )
+        )
+        self.assert_invalid("'Do' bullets")
+
+    def test_requires_atomic_source_on_pattern_slide(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Feedback loops](platform-feedback-loops.md)",
+                "",
+                1,
+            )
+        )
+        self.assert_invalid("exactly one MOC atomic note")
+
+    def test_rejects_duplicate_atomic_pattern_source(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Feedback loops](platform-feedback-loops.md)",
+                "[Golden paths](platform-golden-paths.md)",
+                1,
+            )
+        )
+        self.assert_invalid("duplicates")
+
+    def test_requires_matching_coaching_companion(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Golden paths coaching](platform-golden-paths.coach.md)",
+                "",
+                1,
+            )
+        )
+        self.assert_invalid("matching coaching companion")
+
+    def test_allows_pattern_without_coaching_companion(self) -> None:
+        self.coach.unlink()
+        self.write_deck(
+            self.valid_deck().replace(
+                "[Golden paths coaching](platform-golden-paths.coach.md)\n",
+                "",
+            )
+        )
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_requires_pattern_note_field_order(self) -> None:
+        deck = self.valid_deck()
+        related = "Related:\nFeedback loops (enables)\n\n"
+        source = (
+            "Source:\n[Golden paths](platform-golden-paths.md)\n"
+            "[Golden paths coaching](platform-golden-paths.coach.md)\n"
+        )
+        self.write_deck(deck.replace(related + source, source + "\n" + related, 1))
+        self.assert_invalid("speaker-note fields must follow")
 
     def test_requires_coach_cue_question(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
                 "Where does repeated setup work consume the most attention?",
-                "Discuss repeated setup work.",
-            )
-        )
-        self.assert_invalid("Coach cue question ending in ?")
-
-    def test_rejects_multiple_coach_cues_in_one_comment(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Coach cue: Where does repeated setup work consume the most attention?",
-                "Coach cue: Where does repeated setup work consume the most attention?\n"
-                "Coach cue: What exception should the team preserve?",
-            )
-        )
-        self.assert_invalid("requires one Coach cue question")
-
-    def test_rejects_unsupported_relationship_label(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "through **enables**",
-                "through **causes**",
-            )
-        )
-        self.assert_invalid("Relationship labels must be one of")
-
-    def test_rejects_unsupported_text_map_relationship(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "--informs-->",
-                "--causes-->",
+                "Notice repeated setup work.",
                 1,
             )
         )
-        self.assert_invalid("Relationship labels must be one of")
+        self.assert_invalid("Coach cue' ending in ?")
 
-    def test_rejects_unsupported_scenario_relationship(self) -> None:
+    def test_requires_mermaid_pattern_maps(self) -> None:
         self.write_deck(
-            self.valid_deck().replace(
-                "       ↓ enables",
-                "       ↓ causes",
-            )
+            self.valid_deck().replace("```mermaid", "```text", 1)
+        )
+        self.assert_invalid("requires exactly one fenced Mermaid diagram")
+
+    def test_hidden_mermaid_does_not_satisfy_pattern_map(self) -> None:
+        diagram = """```mermaid
+flowchart LR
+    subgraph C1["Delivery defaults"]
+        A["Golden paths"]
+    end
+    subgraph C2["Learning loops"]
+        B["Feedback loops"]
+    end
+    A -->|enables| B
+```"""
+        deck = self.valid_deck().replace(diagram, "", 1)
+        deck = deck.replace(
+            "Narrative:\nDefaults and feedback form one learning system.",
+            diagram + "\n\nNarrative:\nDefaults and feedback form one learning system.",
+            1,
+        )
+        self.write_deck(deck)
+        self.assert_invalid("requires exactly one fenced Mermaid diagram")
+
+    def test_requires_mermaid_scenario_flow(self) -> None:
+        marker = "# Apply the patterns together"
+        before, after = self.valid_deck().split(marker, 1)
+        after = after.replace("```mermaid", "```text", 1)
+        self.write_deck(before + marker + after)
+        self.assert_invalid("requires exactly one fenced Mermaid flow")
+
+    def test_hidden_mermaid_does_not_satisfy_scenario_flow(self) -> None:
+        marker = "# Apply the patterns together"
+        before, after = self.valid_deck().split(marker, 1)
+        diagram = re.search(r"```mermaid\n.*?\n```", after, re.DOTALL).group(0)
+        after = after.replace(diagram, "", 1).replace(
+            "Narrative:\nStart with the repeated work",
+            diagram + "\n\nNarrative:\nStart with the repeated work",
+            1,
+        )
+        self.write_deck(before + marker + after)
+        self.assert_invalid("requires exactly one fenced Mermaid flow")
+
+    def test_requires_every_pattern_name_in_both_maps(self) -> None:
+        deck = self.valid_deck()
+        second_map = deck.rfind('B["Feedback loops"]')
+        self.write_deck(
+            deck[:second_map]
+            + deck[second_map:].replace('B["Feedback loops"]', 'B["Learning"]', 1)
+        )
+        self.assert_invalid("Pattern map revisited is missing exact pattern name")
+
+    def test_requires_clusters_in_first_map(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace('C1["Delivery defaults"]', 'C1["Defaults"]', 1)
+        )
+        self.assert_invalid("Pattern map is missing pattern cluster")
+
+    def test_rejects_unsupported_mermaid_relationship(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace("A -->|enables| B", "A -->|causes| B", 1)
         )
         self.assert_invalid("Relationship labels must be one of")
 
-    def test_rejects_relationship_not_found_in_atomic_notes(self) -> None:
+    def test_rejects_unlabelled_pattern_relationship(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace("A -->|enables| B", "A --> B", 1)
+        )
+        self.assert_invalid("edges between patterns require")
+
+    def test_rejects_every_unlabelled_mermaid_pattern_edge_form(self) -> None:
+        for connector in ("-->", "---", "==>", "===", "-.->", "-.-", "~~~"):
+            with self.subTest(connector=connector):
+                self.write_deck(
+                    self.valid_deck().replace(
+                        "A -->|enables| B",
+                        f"A {connector} B",
+                        1,
+                    )
+                )
+                self.assert_invalid("edges between patterns require")
+
+    def test_rejects_unlabelled_pattern_edge_in_mermaid_chain(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "A -->|enables| B",
+                "A -->|enables| B --> A",
+                1,
+            )
+        )
+        self.assert_invalid("edges between patterns require")
+
+    def test_rejects_empty_related_field(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Source:\n[Feedback loops](platform-feedback-loops.md)",
+                "Related:\n\nSource:\n[Feedback loops](platform-feedback-loops.md)",
+                1,
+            )
+        )
+        self.assert_invalid("must omit Related")
+
+    def test_requires_closing_source_to_match_selected_pattern(self) -> None:
+        source = (
+            "Source:\n"
+            "[Golden paths](platform-golden-paths.md)\n"
+            "[Golden paths coaching](platform-golden-paths.coach.md)\n"
+            "-->\n"
+        )
+        before, separator, _after = self.valid_deck().rpartition(source)
+        self.assertTrue(separator)
+        self.write_deck(
+            before
+            + "Source:\n[Feedback loops](platform-feedback-loops.md)\n-->\n"
+        )
+        self.assert_invalid("Source must match the selected pattern")
+
+    def test_rejects_slide_outside_template_sequence(self) -> None:
+        extra = """---
+
+# Appendix
+
+- Additional material
+
+<!--
+Source:
+[Platform](platform-moc.md)
+-->
+
+"""
+        self.write_deck(
+            self.valid_deck().replace(
+                "---\n\n# Choose one pattern to try",
+                extra + "---\n\n# Choose one pattern to try",
+                1,
+            )
+        )
+        self.assert_invalid("outside the template sequence")
+
+    def test_rejects_reversed_extension_relationship(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace("A -->|enables| B", "B -->|enables| A", 1)
+        )
+        self.assert_invalid("not permitted by typed, directed")
+
+    def test_rejects_valid_label_for_wrong_atomic_type(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace("A -->|enables| B", "A -->|depends on| B", 1)
+        )
+        self.assert_invalid("not permitted by typed, directed")
+
+    def test_rejects_unsupported_related_claim(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Feedback loops (enables)", "Feedback loops (depends on)", 1
+            )
+        )
+        self.assert_invalid("not permitted by typed, directed")
+
+    def test_rejects_unparseable_related_claim(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Feedback loops (enables)", "Something vaguely related", 1
+            )
+        )
+        self.assert_invalid("unparseable Related claim")
+
+    def test_accepts_prerequisite_translation(self) -> None:
+        self.note_one.write_text(
+            "# Golden paths\n\n## Relationships\n\n"
+            "- Prerequisite: [Feedback loops](platform-feedback-loops.md) "
+            "must be understood first.\n",
+            encoding="utf-8",
+        )
+        deck = self.valid_deck().replace("enables", "depends on")
+        self.write_deck(deck)
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_accepts_extension_complements_translation(self) -> None:
+        self.write_deck(self.valid_deck().replace("enables", "complements"))
+        result = self.run_validator()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_accepts_domain_without_supported_relationships(self) -> None:
         self.note_one.write_text(
             "# Golden paths\n\n## Relationships\n\n"
             "No supported relationships yet.\n",
             encoding="utf-8",
         )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_reversed_extension_edge(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P2 · Feedback loops --enables--> P1 · Golden paths",
-                1,
-            )
+        deck = self.valid_deck().replace("    A -->|enables| B\n", "")
+        deck = deck.replace(
+            "    A -->|enables| B\n    B --> O",
+            "    A --> O\n    S --> B\n    B --> O",
         )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_supported_label_not_permitted_for_extension(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 · Golden paths --depends on--> P2 · Feedback loops",
-                1,
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_reversed_unquoted_mermaid_extension_edge(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P2 -->|enables| P1",
-                1,
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_unquoted_mermaid_label_not_permitted_for_extension(
-        self,
-    ) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 -->|depends on| P2",
-                1,
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_accepts_unquoted_mermaid_extension_edge(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 -->|enables| P2",
-                1,
-            )
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_accepts_spaced_mermaid_extension_edge(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 -- enables --> P2",
-                1,
-            )
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_rejects_reversed_spaced_mermaid_extension_edge(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P2 -- enables --> P1",
-                1,
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_spaced_mermaid_label_not_permitted_for_extension(
-        self,
-    ) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 -- depends on --> P2",
-                1,
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_invalid_second_edge_in_chained_text_map(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops",
-                "P1 · Golden paths --enables--> P2 · Feedback loops "
-                "--depends on--> P1 · Golden paths",
-                1,
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_rejects_invalid_second_edge_in_chained_vertical_path(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "       ↓ enables\n"
-                "P2 · Feedback loops\n"
-                "       ↓\n"
-                "Maintained default",
-                "       ↓ enables\n"
-                "P2 · Feedback loops\n"
-                "       ↓ depends on\n"
-                "P1 · Golden paths\n"
-                "       ↓\n"
-                "Maintained default",
-            )
-        )
-        self.assert_invalid("not permitted by typed, directed atomic-note Relationships")
-
-    def test_accepts_prerequisite_as_source_depends_on_target(self) -> None:
-        self.note_one.write_text(
-            "# Golden paths\n\n## Relationships\n\n"
-            "- Prerequisite: [Feedback loops](platform-feedback-loops.md) "
-            "must be understood before selecting a default.\n",
-            encoding="utf-8",
-        )
-        deck = (
-            self.valid_deck()
-            .replace("--enables-->", "--depends on-->")
-            .replace("--informs-->", "--depends on-->")
-            .replace("through **enables**", "through **depends on**")
-            .replace("       ↓ enables", "       ↓ depends on")
-        )
+        deck = deck.replace("Related:\nFeedback loops (enables)\n\n", "", 1)
+        deck = deck.replace("Related:\n- Golden paths enables Feedback loops\n\n", "")
         self.write_deck(deck)
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_accepts_extension_as_source_complements_target(self) -> None:
-        deck = (
-            self.valid_deck()
-            .replace("--enables-->", "--complements-->")
-            .replace("--informs-->", "--complements-->")
-            .replace("through **enables**", "through **complements**")
-            .replace("       ↓ enables", "       ↓ complements")
-        )
-        self.write_deck(deck)
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_rejects_malformed_related_line(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "**Related:** P2 · Feedback loops through **enables**",
-                "**Related to:** P2 · Feedback loops",
-            )
-        )
-        self.assert_invalid("invalid Related relationship")
-
-    def test_rejects_bracketed_related_target(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "**Related:** P2 · Feedback loops through **enables**",
-                "**Related:** [P2 · Feedback loops] through **depends on**",
-                1,
-            )
-        )
-        self.assert_invalid("invalid Related relationship")
 
     def test_requires_named_scenario(self) -> None:
         self.write_deck(
@@ -768,218 +1051,113 @@ P1 · Golden paths --informs--> P2 · Feedback loops
         )
         self.assert_invalid("requires a named Scenario")
 
-    def test_requires_pattern_slides_between_map_and_application(self) -> None:
-        deck = self.valid_deck()
-        pattern_two = re.search(
-            r"\n---\n\n###### PATTERN P2 OF 2.*?(?=\n---\n)",
-            deck,
-            re.DOTALL,
-        ).group(0)
-        deck = deck.replace(pattern_two, "")
-        deck = deck.replace(
-            "\n---\n\n# What changes",
-            pattern_two + "\n---\n\n# What changes",
-        )
-        self.write_deck(deck)
-        self.assert_invalid("Pattern slides must appear between Pattern map")
-
-    def test_requires_application_action_labels(self) -> None:
+    def test_requires_application_bullets(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "- **Then:** Review why teams use exceptions.",
-                "- Review why teams use exceptions.",
+                "- **Watch for:** A default that no longer reflects current work.",
+                "",
             )
         )
-        self.assert_invalid("requires a 'Then' bullet")
+        self.assert_invalid("requires a 'Watch for' bullet")
 
     def test_requires_before_pattern_after_table(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "| Before                    | Pattern | After                         |",
-                "| Current | Future |",
+                "| Before | Pattern | After |",
+                "| Current | Pattern | Future |",
             )
         )
         self.assert_invalid("Before | Pattern | After table")
 
-    def test_requires_remaining_constraint(self) -> None:
+    def test_rejects_unknown_pattern_name_in_changes_table(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "> **Remaining constraint:** Teams still need a supported way to leave the path.",
+                "**Feedback loops**", "**Learning reviews**", 1
+            )
+        )
+        self.assert_invalid("Pattern column must use exact pattern short names")
+
+    def test_requires_remaining_constraint_in_speaker_notes(self) -> None:
+        self.write_deck(
+            self.valid_deck().replace(
+                "Remaining constraint:\nTeams still need a supported way to leave the path.",
                 "",
             )
         )
-        self.assert_invalid("requires a Remaining constraint")
+        self.assert_invalid("'Remaining constraint' field")
 
-    def test_requires_closing_experiment_fields(self) -> None:
+    def test_requires_exact_pattern_name_in_close(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "- **Review:** Discuss whether the default removed work without blocking exceptions.",
-                "- Discuss the result.",
+                "- **Pattern:** Golden paths",
+                "- **Pattern:** P1",
             )
         )
-        self.assert_invalid("requires a 'Review' bullet")
+        self.assert_invalid("exact pattern short name")
 
-    def test_rejects_unknown_pattern_id_in_closing_experiment(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "- **Pattern:** P1 · Golden paths",
-                "- **Pattern:** P99 · Ghost pattern",
-            )
-        )
-        self.assert_invalid("unknown pattern ID(s): [99]")
-
-    def test_rejects_inconsistent_pattern_name_in_closing_experiment(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "- **Pattern:** P1 · Golden paths",
-                "- **Pattern:** P1 · Paved roads",
-            )
-        )
-        self.assert_invalid("inconsistent pattern name reference(s)")
-
-    def test_requires_closing_experiment_as_final_slide(self) -> None:
-        self.write_deck(
-            self.valid_deck()
-            + "\n---\n\n# Appendix\n\nAdditional context.\n"
-        )
+    def test_requires_close_as_final_slide(self) -> None:
+        self.write_deck(self.valid_deck() + "\n---\n\n# Appendix\n")
         self.assert_invalid("must be the final slide")
 
-    def test_rejects_wrong_moc_link(self) -> None:
-        other_moc = self.root / "other-moc.md"
-        other_moc.write_text("# Other\n", encoding="utf-8")
-        self.write_deck(self.valid_deck().replace("platform-moc.md", "other-moc.md"))
-        self.assert_invalid("only MOC field linking exactly")
+    def test_comparison_requires_two_atomic_sources(self) -> None:
+        comparison = """---
 
-    def test_rejects_duplicate_moc_fields(self) -> None:
+# Choosing between Golden paths and Feedback loops
+
+| Situation | Use |
+| --- | --- |
+| Repeated setup | **Golden paths** |
+| Recurring exceptions | **Feedback loops** |
+
+<!--
+Selection rule:
+When setup repeats, prefer Golden paths, because defaults remove repeated work.
+
+Coach cue:
+Which observable condition distinguishes these choices?
+
+Related:
+Golden paths contrasts with Feedback loops
+
+Source:
+[Golden paths](platform-golden-paths.md)
+-->
+
+"""
         self.write_deck(
             self.valid_deck().replace(
-                "MOC: [Platform](platform-moc.md)",
-                "MOC: [Platform](platform-moc.md)\n"
-                "MOC: [Platform](platform-moc.md)",
+                "---\n\n# Apply the patterns together",
+                comparison + "---\n\n# Apply the patterns together",
             )
         )
-        self.assert_invalid("found 2 fields")
+        self.assert_invalid("requires exactly two atomic notes")
 
-    def test_rejects_moc_field_outside_opening_slide(self) -> None:
+    def test_comparison_title_uses_source_linked_names(self) -> None:
         self.write_deck(
-            self.valid_deck()
-            .replace("MOC: [Platform](platform-moc.md)\n", "")
-            .replace(
-                "# Challenges & opportunities",
-                "# Challenges & opportunities\n\nMOC: [Platform](platform-moc.md)",
+            self.deck_with_comparison().replace(
+                "# Choosing between Golden paths and Feedback loops",
+                "# Choosing between Defaults and Reviews",
             )
         )
-        self.assert_invalid("Opening slide must contain")
+        self.assert_invalid("title must use its two source-linked pattern short names")
 
-    def test_accepts_wiki_links_with_markdown_extensions(self) -> None:
-        self.moc.write_text(
-            self.valid_moc()
-            .replace(
-                "[Golden paths](platform-golden-paths.md)",
-                "[[platform-golden-paths.md|Golden paths]]",
-            )
-            .replace(
-                "[Feedback loops](platform-feedback-loops.md)",
-                "[[platform-feedback-loops.md|Feedback loops]]",
-            ),
-            encoding="utf-8",
-        )
+    def test_comparison_table_uses_source_linked_names(self) -> None:
         self.write_deck(
-            self.valid_deck()
-            .replace("[Platform](platform-moc.md)", "[[platform-moc.md|Platform]]")
-            .replace(
-                "[Golden paths](platform-golden-paths.md)",
-                "[[platform-golden-paths.md|Golden paths]]",
-            )
-            .replace(
-                "[Golden paths coaching](platform-golden-paths.coach.md)",
-                "[[platform-golden-paths.coach.md|Golden paths coaching]]",
-            )
-            .replace(
-                "[Feedback loops](platform-feedback-loops.md)",
-                "[[platform-feedback-loops.md|Feedback loops]]",
+            self.deck_with_comparison().replace(
+                "| Recurring exceptions | **Feedback loops** |",
+                "| Recurring exceptions | **Learning reviews** |",
             )
         )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assert_invalid("table must use its two source-linked pattern short names")
 
-    def test_rejects_missing_domain_tag(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Tags: #platform #slides #publish #private",
-                "Tags: #slides #publish #private",
-            )
-        )
-        self.assert_invalid("every MOC domain tag")
+    def test_scenario_uses_source_linked_pattern_names(self) -> None:
+        marker = "# Apply the patterns together"
+        before, after = self.valid_deck().split(marker, 1)
+        after = after.replace('B["Feedback loops"]', 'B["Learning reviews"]', 1)
+        self.write_deck(before + marker + after)
+        self.assert_invalid("Mermaid flow is missing source-linked pattern name")
 
-    def test_accepts_url_and_email_autolinks(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Connect maintained defaults with learning from real use.",
-                "See <https://example.com/docs> or contact <coach@example.com>.",
-            )
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_rejects_arbitrary_html(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "Connect maintained defaults with learning from real use.",
-                "<small>Unsupported layout</small>",
-            )
-        )
-        self.assert_invalid("Arbitrary HTML is not allowed")
-
-    def test_rejects_uppercase_markdown_extension(self) -> None:
-        uppercase_note = self.root / "platform-golden-paths.MD"
-        uppercase_note.write_text("# Duplicate\n", encoding="utf-8")
-        self.write_deck(
-            self.valid_deck().replace(
-                "platform-golden-paths.md",
-                "platform-golden-paths.MD",
-                1,
-            )
-        )
-        self.assert_invalid("lowercase '.md' extension")
-
-    def test_separator_inside_fence_does_not_create_slide(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n```",
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n---\n===\n```",
-                1,
-            )
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("(9 slides,", result.stdout)
-
-    def test_shorter_fence_does_not_close_longer_fenced_block(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace(
-                "```text\nPlatform delivery",
-                "````text\nPlatform delivery",
-                1,
-            ).replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n```",
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n"
-                "```\n---\n===\n````",
-                1,
-            )
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("(9 slides,", result.stdout)
-
-    def test_accepts_tilde_fenced_text_map(self) -> None:
-        self.write_deck(
-            self.valid_deck().replace("```text", "~~~text").replace("```", "~~~")
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_accepts_fence_aware_equals_slide_separator(self) -> None:
+    def test_accepts_fence_aware_equals_separator(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
                 "\n---\n\n# What changes",
@@ -989,52 +1167,49 @@ P1 · Golden paths --informs--> P2 · Feedback loops
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
 
-    def test_ignores_fields_links_and_html_inside_fenced_code(self) -> None:
+    def test_separator_inside_fence_does_not_create_slide(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n```",
-                "P1 · Golden paths --enables--> P2 · Feedback loops\n"
-                "Source: [Example](example-note.md)\n"
-                "Coach: [Example](example-note.coach.md)\n"
-                "<div>Example HTML</div>\n```",
+                "A -->|enables| B\n```",
+                "A -->|enables| B\n---\n===\n```",
                 1,
             )
         )
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
 
-    def test_accepts_case_insensitive_moc_notes_heading(self) -> None:
-        self.moc.write_text(
-            self.valid_moc().replace("## Notes", "## notes"),
-            encoding="utf-8",
-        )
-        result = self.run_validator()
-        self.assertEqual(result.returncode, 0, result.stdout)
-
-    def test_separator_inside_speaker_note_does_not_create_slide(self) -> None:
+    def test_separator_inside_speaker_notes_does_not_create_slide(self) -> None:
         self.write_deck(
             self.valid_deck().replace(
-                "Coach cue: Where does repeated setup work consume the most attention?",
-                "Coach cue: Where does repeated setup work consume the most attention?\n"
-                "---\n"
-                "Keep listening for a concrete example.",
+                "Where does repeated setup work consume the most attention?",
+                "---\n===\n"
+                "Where does repeated setup work consume the most attention?",
             )
         )
         result = self.run_validator()
         self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn("(9 slides,", result.stdout)
+
+    def test_rejects_moc_without_atomic_notes(self) -> None:
+        self.moc.write_text(
+            self.valid_moc().replace(
+                "- [Golden paths](platform-golden-paths.md) - paved routes for common work.\n"
+                "- [Feedback loops](platform-feedback-loops.md) - use learning to improve routes.",
+                "No atomic notes yet.",
+            ),
+            encoding="utf-8",
+        )
+        self.assert_invalid("must link at least one atomic note")
 
     def test_rejects_moc_atomic_link_outside_domain(self) -> None:
         other_note = self.root / "leadership-feedback.md"
         other_note.write_text("# Feedback\n", encoding="utf-8")
         self.moc.write_text(
             self.valid_moc().replace(
-                "platform-feedback-loops.md",
-                "leadership-feedback.md",
+                "platform-feedback-loops.md", "leadership-feedback.md"
             ),
             encoding="utf-8",
         )
-        self.assert_invalid("is not an atomic note in domain 'platform'")
+        self.assert_invalid("is not an atomic note in domain")
 
 
 if __name__ == "__main__":

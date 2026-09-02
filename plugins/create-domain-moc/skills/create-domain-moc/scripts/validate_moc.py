@@ -23,7 +23,7 @@ INTERNAL_FILENAME = re.compile(
 )
 WORKFLOW_TAGS = {"draft", "review", "publish"}
 VISIBILITY_TAGS = {"private", "public"}
-RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc"}
+RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc", "coaching", "slides"}
 EMPTY_STATE = re.compile(r"\bNo atomic notes yet\.", re.IGNORECASE)
 REQUIRED_SECTIONS = ("scope", "notes")
 TEMPLATE_PROMPTS = {
@@ -205,6 +205,13 @@ def main() -> int:
     if note_targets and EMPTY_STATE.search(notes):
         errors.append(
             'MOC Notes cannot combine "No atomic notes yet." with atomic-note links.'
+        )
+    elif not note_targets and not re.fullmatch(
+        r"No atomic notes yet\.", notes.strip(), re.IGNORECASE
+    ):
+        errors.append(
+            'MOC Notes must contain atomic-note links or exactly '
+            '"No atomic notes yet."'
         )
     domain = args.moc.stem[: -len("-moc")] if args.moc.stem.endswith("-moc") else ""
     for target in note_targets:

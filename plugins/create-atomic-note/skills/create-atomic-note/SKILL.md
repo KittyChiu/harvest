@@ -36,7 +36,7 @@ If no existing MOC fits, offer an available domain-MOC specialist with the propo
 ## Workflow
 
 1. Read the approved source and MOC. In revise mode, read the existing atomic note. Inspect nearby note titles only to detect duplication and supported relationships.
-2. Extract no more than three candidate patterns. Each candidate must include:
+2. Extract no more than three candidate patterns. Before presenting them, replace customer, organization, and team names with neutral role descriptions and remove source attribution. Each candidate must include:
    - one reusable “When X, do Y, because Z” rule;
    - the learning from the source that supports it;
    - the smallest practical action;
@@ -52,7 +52,9 @@ Do not ask for information already supplied. Combine confirmations when the user
 ## Authoring rules
 
 - Express one reusable pattern, not a topic, source summary, broad principle collection, or implementation plan.
-- Preserve distinctive terminology, uncertainty, and boundaries from the source.
+- Preserve distinctive non-identifying terminology, uncertainty, and boundaries from the source.
+- Obfuscate customer, organization, and team names with stable neutral roles such as `a customer`, `a product team`, or `an enablement group`. Remove identifying combinations of project names, locations, dates, and organizational details when they could reveal the source.
+- Use source material only for grounding. Do not put source names, filenames, meeting or transcript references, citations, attribution fields, or external source URLs in the atomic note or its MOC entry.
 - Separate what was learned from what the pattern recommends.
 - Explain why the pattern works through cause and effect, not unsupported benefits.
 - Keep the practice observable and signals recognizable before or during application.
@@ -72,7 +74,7 @@ Run:
 python3 "<skill-directory>/scripts/validate_atomic_note.py" "<atomic-note.md>" "<domain-moc.md>"
 ```
 
-Fix every error. Then confirm qualitatively that the source supports the learning, the learning supports the pattern, the mechanism explains the recommendation, the signals indicate when to use it, and the constraints prevent overgeneralization.
+Fix every error. Then confirm qualitatively that the source supports the learning without being named or linked, customer and team identities are obfuscated, the learning supports the pattern, the mechanism explains the recommendation, the signals indicate when to use it, and the constraints prevent overgeneralization.
 
 ## Companion assets
 
@@ -86,4 +88,4 @@ Offer available coaching or presentation specialists only with explicit consent.
 
 ## Completion
 
-Complete only when the approved atomic note and MOC are the only changed files; the note follows the template with no prompts or placeholders left, has one parent MOC and a descriptive MOC entry, carries all tag categories, contains one source-grounded reusable pattern, uses only meaningful and resolvable relationships, and the validator reports zero errors.
+Complete only when the approved atomic note and MOC are the only changed files; the note follows the template with no prompts or placeholders left, has one parent MOC and a descriptive MOC entry, carries all tag categories, contains one source-grounded reusable pattern without source attribution or external source URLs, obfuscates customer and team identities, uses only meaningful and resolvable relationships, and the validator reports zero errors.

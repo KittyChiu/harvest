@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 from pathlib import Path
 from urllib.parse import unquote
+
 
 REQUIRED_FRONT_MATTER = {
     "marp": "true",
@@ -20,80 +20,6 @@ REQUIRED_FRONT_MATTER = {
 WORKFLOW_TAGS = {"draft", "review", "publish"}
 VISIBILITY_TAGS = {"private", "public"}
 RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc", "coaching", "slides"}
-HTML_TAG = re.compile(r"<(?!\!--)[A-Za-z][^>]*>")
-AUTOLINK = re.compile(
-    r"<(?:[A-Za-z][A-Za-z0-9+.-]{1,31}:[^ <>\n]*|[^ <>\n@]+@[^ <>\n@]+)>"
-)
-MARKDOWN_LINK = re.compile(
-    r"(?<!!)\[[^\]]+\]\(\s*(<?[^)\s>]+>?)\s*(?:[\"'][^)]*[\"'])?\)"
-)
-WIKI_LINK = re.compile(r"(?<!!)\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
-TAG = re.compile(r"(?<!\w)#([a-z0-9][a-z0-9-]*)\b", re.IGNORECASE)
-MOC_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*-moc\.md$")
-PATTERN_HEADER = re.compile(
-    r"^######\s+PATTERN P(\d+) OF (\d+)\s+·\s+(\S.*?)\s*$",
-    re.MULTILINE | re.IGNORECASE,
-)
-PATTERN_TITLE = re.compile(
-    r"^#\s+P(\d+)\s+·\s+(\S.*?)\s*$",
-    re.MULTILINE,
-)
-PATTERN_STATEMENT = re.compile(
-    r"^>\s+\*\*When\s+.+,\s*.+,\s*because\s+.+[.!?]\*\*\s*$",
-    re.MULTILINE | re.IGNORECASE,
-)
-BULLET = re.compile(r"^\s*[-*+]\s+\S.*$", re.MULTILINE)
-NUMBERED_ITEM = re.compile(r"^\s*(\d+)\.\s+\S.*$", re.MULTILINE)
-SUPPORTED_RELATIONSHIPS = {
-    "enables",
-    "precedes",
-    "informs",
-    "complements",
-    "contrasts with",
-    "depends on",
-}
-RELATED_LINE = re.compile(
-    r"^\*\*Related:\*\*\s+P(\d+)\s+·\s+\S.*?"
-    r"\s+through\s+\*\*(.+?)\*\*\s*$",
-    re.MULTILINE | re.IGNORECASE,
-)
-MERMAID_EDGE_LABEL = re.compile(
-    r'(?:-->|==>)\|\s*"?([^"|]+?)"?\s*\|',
-    re.IGNORECASE,
-)
-TEXT_EDGE_LABEL = re.compile(
-    r"--\s*([a-z][a-z ]*?)\s*-->",
-    re.IGNORECASE,
-)
-VERTICAL_EDGE_LABEL = re.compile(
-    r"^[ \t]*↓[ \t]+([a-z][a-z ]+?)[ \t]*$",
-    re.MULTILINE | re.IGNORECASE,
-)
-ATOMIC_RELATIONSHIP_LINE = re.compile(
-    r"^\s*[-*+]\s+(?:\*\*)?"
-    r"(prerequisite|extension|contrast|example)"
-    r"(?:\*\*)?:\s+",
-    re.IGNORECASE,
-)
-MERMAID_RELATIONSHIP = re.compile(
-    r'(?=\bP(\d+)\b[^\n]*?(?:-->|==>)\|\s*"?([^"|]+?)"?'
-    r"\s*\|\s*P(\d+)\b)",
-    re.IGNORECASE,
-)
-TEXT_RELATIONSHIP = re.compile(
-    r"(?=\bP(\d+)\b[^\n]*?--\s*([a-z][a-z ]*?)\s*-->\s*P(\d+)\b)",
-    re.IGNORECASE,
-)
-VERTICAL_RELATIONSHIP = re.compile(
-    r"(?=^[ \t]*P(\d+)\b.*\n"
-    r"[ \t]*↓[ \t]+([a-z][a-z ]+?)[ \t]*\n"
-    r"[ \t]*P(\d+)\b)",
-    re.MULTILINE | re.IGNORECASE,
-)
-NAMED_PATTERN_REFERENCE = re.compile(
-    r"\bP(\d+)\s+·\s+([^|\]\n\"*]+?)"
-    r"(?=\s+through\s+\*\*|\s+--|[|\]\n\"*]|$)"
-)
 CORE_SLIDE_TITLES = (
     "Challenges & opportunities",
     "Pattern map",
@@ -102,32 +28,90 @@ CORE_SLIDE_TITLES = (
     "Pattern map revisited",
     "Choose one pattern to try",
 )
-TEMPLATE_PLACEHOLDER = re.compile(
-    r"\[(?:"
-    r"Domain name|One-line domain promise|"
-    r"Describe the outcome this domain helps people achieve\.|"
-    r"Recurring challenge|Practical consequence|"
-    r"Limitation of the current approach|Potential improvement|"
-    r"Capability the domain can enable|Value of connecting the patterns|"
-    r"What do the patterns collectively help answer\?|"
-    r"Cluster \d+|Pattern name|N|CLUSTER|Short pattern name|"
-    r"condition|action|mechanism|Observable signal|Recurring situation|"
-    r"Concrete action|Optional concrete action|relationship|"
-    r"One question that helps the audience discover or apply the pattern\.|"
-    r"Realistic situation|Observed signal|Expected outcome|"
-    r"First practice|Next practice|Constraint or failure condition|"
-    r"Current behaviour|Improved behaviour|"
-    r"What these patterns do not solve\.|"
-    r"Explain how the patterns work as a system\.|Something observable|"
-    r"One small action|How the result will be discussed"
-    r")\]",
+SUPPORTED_RELATIONSHIPS = {
+    "enables",
+    "precedes",
+    "informs",
+    "complements",
+    "contrasts with",
+    "depends on",
+}
+
+HTML_TAG = re.compile(r"<(?!\!--)[A-Za-z][^>]*>")
+AUTOLINK = re.compile(
+    r"<(?:[A-Za-z][A-Za-z0-9+.-]{1,31}:[^ <>\n]*|[^ <>\n@]+@[^ <>\n@]+)>"
+)
+MARKDOWN_LINK = re.compile(
+    r"(?<!!)\[[^\]]+\]\(\s*(<?[^)\s>]+>?)\s*(?:[\"'][^)]*[\"'])?\)"
+)
+MARKDOWN_LINK_DISPLAY = re.compile(
+    r"(?<!!)\[([^\]]+)\]\(\s*<?[^)\s>]+>?\s*(?:[\"'][^)]*[\"'])?\)"
+)
+WIKI_LINK = re.compile(r"(?<!!)\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
+WIKI_LINK_DISPLAY = re.compile(
+    r"(?<!!)\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]"
+)
+TAG = re.compile(r"(?<!\w)#([a-z0-9][a-z0-9-]*)\b", re.IGNORECASE)
+MOC_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*-moc\.md$")
+H1 = re.compile(r"^#(?!#)\s+(.+?)\s*$", re.MULTILINE)
+PATTERN_HEADER = re.compile(
+    r"^######\s+p(\d+)\s+of\s+(\d+)\s+·\s+(\S.*?)\s*$",
+    re.MULTILINE,
+)
+PATTERN_HEADER_CANDIDATE = re.compile(
+    r"^######\s+\S+\s+of\s+\d+\s+·\s+\S",
+    re.MULTILINE | re.IGNORECASE,
+)
+PATTERN_FORM = re.compile(
+    r"^When\b.+,\s*.+,\s*because\b.+[.!?]$",
     re.IGNORECASE,
 )
-EMPTY_PATTERN_CHOICE = re.compile(r"\bP\[\s*\]")
+BULLET = re.compile(r"^\s*[-*+]\s+\S.*$", re.MULTILINE)
+ATOMIC_RELATIONSHIP_LINE = re.compile(
+    r"^\s*[-*+]\s+(?:\*\*)?"
+    r"(prerequisite|extension|contrast|example)"
+    r"(?:\*\*)?:\s+",
+    re.IGNORECASE,
+)
+MERMAID_NODE = re.compile(
+    r'^\s*([A-Za-z][A-Za-z0-9_-]*)\s*\[\s*"([^"]+)"\s*\]\s*$',
+    re.MULTILINE,
+)
+MERMAID_ID_TOKEN = re.compile(r"\b([A-Za-z][A-Za-z0-9_-]*)\b")
+MERMAID_PIPE_LABEL = re.compile(r"\|\s*\"?([^\"|]+?)\"?\s*\|")
+MERMAID_INLINE_LABEL = re.compile(
+    r"(?:--|-\.)\s+(.+?)\s+(?:-->|\.->)|"
+    r"==\s+(.+?)\s+==>"
+)
+NOTE_LABEL = re.compile(r"^([A-Z][A-Za-z ]+):[ \t]*(.*?)$", re.MULTILINE)
+NOTE_ONLY_VISIBLE = re.compile(
+    r"^\s*(?:#{1,6}\s+)?(?:Narrative|Domain question|Pattern description|"
+    r"Coach cue|Related|Source|Metadata|Evidence|Remaining constraint|"
+    r"Domain takeaway|Selection rule):",
+    re.MULTILINE | re.IGNORECASE,
+)
+SPEAKER_NOTE_ONLY_FIELDS = (
+    "Narrative",
+    "Domain question",
+    "Pattern description",
+    "Coach cue",
+    "Related",
+    "Evidence",
+    "Remaining constraint",
+    "Domain takeaway",
+    "Selection rule",
+)
+POSITION_PLACEHOLDER = re.compile(r"\bp\[\d+\]", re.IGNORECASE)
+BRACKET_PLACEHOLDER = re.compile(
+    r"(?<![\[\w])\[(?!\[)([^\]\n]+)\](?!\()"
+)
 TEMPLATE_PROMPTS = (
-    "Use the domain MOC, atomic pattern notes, and coaching companions.",
-    "Repeat one slide for each pattern.",
-    "Optional: use when two patterns are alternatives.",
+    "INPUTS",
+    "AUTHORING RULES",
+    "PATTERN SLIDE",
+    "Duplicate this slide once for each pattern.",
+    "Replace the position, total, cluster, name, signals, practices, and notes.",
+    "Optional: use only when two patterns are genuine alternatives.",
 )
 
 
@@ -147,7 +131,7 @@ def parse_front_matter(text: str) -> tuple[dict[str, str], str]:
 
 def opening_fence(line: str) -> tuple[str, int, str] | None:
     match = re.match(r"^\s*(`{3,}|~{3,})(.*)$", line)
-    if not match:
+    if match is None:
         return None
     marker = match.group(1)
     return marker[0], len(marker), match.group(2).strip()
@@ -174,7 +158,7 @@ def split_slides(body: str) -> list[str]:
             slides[-1].append(line)
             continue
         fence_match = opening_fence(line)
-        if fence_match:
+        if fence_match is not None:
             fence = fence_match[0], fence_match[1]
             slides[-1].append(line)
             continue
@@ -189,6 +173,26 @@ def split_slides(body: str) -> list[str]:
     return ["\n".join(lines).strip() for lines in slides if "\n".join(lines).strip()]
 
 
+def fenced_blocks(text: str) -> list[tuple[str, str]]:
+    blocks: list[tuple[str, str]] = []
+    fence: tuple[str, int, str] | None = None
+    content: list[str] = []
+    for line in text.splitlines():
+        if fence is not None:
+            if closes_fence(line, fence[0], fence[1]):
+                blocks.append((fence[2], "\n".join(content)))
+                fence = None
+                content = []
+            else:
+                content.append(line)
+            continue
+        match = opening_fence(line)
+        if match is not None:
+            language = match[2].split(maxsplit=1)[0].lower() if match[2] else ""
+            fence = match[0], match[1], language
+    return blocks
+
+
 def strip_fenced_blocks(text: str) -> str:
     visible_lines: list[str] = []
     fence: tuple[str, int] | None = None
@@ -198,33 +202,54 @@ def strip_fenced_blocks(text: str) -> str:
                 fence = None
             visible_lines.append("")
             continue
-        fence_match = opening_fence(line)
-        if fence_match:
-            fence = fence_match[0], fence_match[1]
+        match = opening_fence(line)
+        if match is not None:
+            fence = match[0], match[1]
             visible_lines.append("")
             continue
         visible_lines.append(line)
     return "\n".join(visible_lines)
 
 
-def fenced_languages(text: str) -> list[str]:
-    languages: list[str] = []
-    fence: tuple[str, int] | None = None
-    for line in text.splitlines():
-        if fence is not None:
-            if closes_fence(line, *fence):
-                fence = None
+def strip_comments(text: str) -> str:
+    return re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+
+
+def speaker_notes(slide: str) -> str:
+    return "\n\n".join(
+        match.group(1).strip()
+        for match in re.finditer(r"<!--(.*?)-->", slide, re.DOTALL)
+        if match.group(1).strip()
+        and not match.group(1).strip().lower().startswith("markdownlint-")
+    )
+
+
+def note_field(notes: str, name: str) -> str | None:
+    matches = list(NOTE_LABEL.finditer(notes))
+    for index, match in enumerate(matches):
+        if match.group(1).strip().lower() != name.lower():
             continue
-        match = opening_fence(line)
-        if match:
-            fence = match[0], match[1]
-            languages.append(match[2].split(maxsplit=1)[0].lower() if match[2] else "")
-    return languages
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(notes)
+        inline = match.group(2).strip()
+        remainder = notes[match.end() : end].strip()
+        return "\n".join(part for part in (inline, remainder) if part).strip()
+    return None
 
 
-def section(text: str, heading: str) -> str | None:
+def note_field_positions(notes: str, names: tuple[str, ...]) -> list[int]:
+    positions: list[int] = []
+    for name in names:
+        match = re.search(rf"^{re.escape(name)}:", notes, re.MULTILINE)
+        if match is not None:
+            positions.append(match.start())
+    return positions
+
+
+def section(text: str, heading: str, level: int = 2) -> str | None:
+    marker = "#" * level
     match = re.search(
-        rf"^##\s+{re.escape(heading)}\s*$\n(.*?)(?=^##\s+|\Z)",
+        rf"^{marker}(?!#)\s+{re.escape(heading)}\s*$\n"
+        rf"(.*?)(?=^{marker}(?!#)\s+|\Z)",
         text,
         re.MULTILINE | re.DOTALL | re.IGNORECASE,
     )
@@ -237,10 +262,6 @@ def field_values(text: str, name: str) -> list[str]:
         text,
         re.MULTILINE | re.IGNORECASE,
     )
-
-
-def strip_comments(text: str) -> str:
-    return re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
 
 
 def link_targets(text: str) -> list[str]:
@@ -263,12 +284,56 @@ def is_external(target: str) -> bool:
     return bool(re.match(r"^(?:[a-z][a-z0-9+.-]*:|//)", target, re.IGNORECASE))
 
 
-def local_markdown_targets(text: str) -> set[str]:
-    targets: set[str] = set()
+def local_markdown_target_list(text: str) -> list[str]:
+    targets: list[str] = []
     for raw_target in link_targets(text):
         target = normalize_target(raw_target)
         if target and not is_external(target) and target.lower().endswith(".md"):
-            targets.add(target)
+            targets.append(target)
+    return targets
+
+
+def local_markdown_targets(text: str) -> set[str]:
+    return set(local_markdown_target_list(text))
+
+
+def strict_source_targets(
+    notes: str,
+    slide_name: str,
+    errors: list[str],
+) -> list[str]:
+    value = note_field(notes, "Source")
+    if value is None:
+        return []
+    targets: list[str] = []
+    for line in (line.strip() for line in value.splitlines() if line.strip()):
+        raw_targets = link_targets(line)
+        remainder = MARKDOWN_LINK.sub("", line)
+        remainder = WIKI_LINK.sub("", remainder).strip()
+        if len(raw_targets) != 1 or remainder:
+            errors.append(
+                f"{slide_name} speaker-note Source must contain only one "
+                "Markdown or wiki link per line."
+            )
+            continue
+        target = normalize_target(raw_targets[0])
+        if (
+            not target
+            or is_external(target)
+            or not target.lower().endswith(".md")
+        ):
+            errors.append(
+                f"{slide_name} speaker-note Source links must use local Markdown files."
+            )
+            continue
+        targets.append(target)
+    duplicates = sorted(
+        target for target in set(targets) if targets.count(target) > 1
+    )
+    if duplicates:
+        errors.append(
+            f"{slide_name} speaker-note Source repeats link(s): {duplicates}."
+        )
     return targets
 
 
@@ -287,30 +352,12 @@ def resolve_target(base: Path, target: str) -> Path | None:
     return (base / normalized).resolve()
 
 
-def source_targets(text: str, field_name: str) -> set[str]:
-    return {
-        normalize_target(target)
-        for value in field_values(text, field_name)
-        for target in link_targets(value)
-        if normalize_target(target)
-    }
-
-
-def source_target_list(text: str, field_name: str) -> list[str]:
-    return [
-        normalize_target(target)
-        for value in field_values(text, field_name)
-        for target in link_targets(value)
-        if normalize_target(target)
-    ]
-
-
 def visible_slide(slide: str) -> str:
     return strip_comments(strip_fenced_blocks(slide))
 
 
 def slide_title(slide: str) -> str | None:
-    match = re.search(r"^#(?!#)\s+(.+?)\s*$", visible_slide(slide), re.MULTILINE)
+    match = H1.search(visible_slide(slide))
     return match.group(1).strip() if match else None
 
 
@@ -321,21 +368,29 @@ def find_slide(slides: list[str], title: str) -> tuple[int, str] | None:
     return None
 
 
-def relationship_labels(text: str) -> list[str]:
-    labels = [match.group(2).strip().lower() for match in RELATED_LINE.finditer(text)]
-    labels.extend(
-        match.group(1).strip().lower()
-        for match in MERMAID_EDGE_LABEL.finditer(text)
-    )
-    labels.extend(
-        match.group(1).strip().lower()
-        for match in TEXT_EDGE_LABEL.finditer(text)
-    )
-    labels.extend(
-        match.group(1).strip().lower()
-        for match in VERTICAL_EDGE_LABEL.finditer(text)
-    )
-    return labels
+def require_note_fields(
+    notes: str,
+    labels: tuple[str, ...],
+    slide_name: str,
+    errors: list[str],
+) -> None:
+    for label in labels:
+        value = note_field(notes, label)
+        if value is None or not value.strip():
+            errors.append(f"{slide_name} speaker notes require a non-empty '{label}' field.")
+
+
+def require_question(
+    notes: str,
+    label: str,
+    slide_name: str,
+    errors: list[str],
+) -> None:
+    value = note_field(notes, label)
+    if value is None or not value.rstrip().endswith("?"):
+        errors.append(
+            f"{slide_name} speaker notes require '{label}' ending in ?."
+        )
 
 
 def allowed_deck_relationships(
@@ -364,40 +419,204 @@ def allowed_deck_relationships(
     return allowed
 
 
-def deck_relationship_claims(
-    body: str,
-    pattern_sources: dict[int, str],
-    pattern_slides: dict[int, tuple[int, str]],
-) -> set[tuple[str, str, str]]:
-    id_claims: set[tuple[int, str, int]] = set()
-    for pattern in (MERMAID_RELATIONSHIP, TEXT_RELATIONSHIP, VERTICAL_RELATIONSHIP):
-        for match in pattern.finditer(strip_comments(body)):
-            source_id = int(match.group(1))
-            label = match.group(2).strip().lower()
-            target_id = int(match.group(3))
-            if source_id != target_id:
-                id_claims.add((source_id, label, target_id))
-    for pattern_id, (_index, slide) in pattern_slides.items():
-        for line in visible_slide(slide).splitlines():
-            match = RELATED_LINE.fullmatch(line.strip())
-            if match is None:
-                continue
-            target_id = int(match.group(1))
-            label = match.group(2).strip().lower()
-            if pattern_id != target_id:
-                id_claims.add((pattern_id, label, target_id))
+def mermaid_node_labels(text: str) -> dict[str, str]:
+    return {
+        match.group(1): match.group(2).strip()
+        for match in MERMAID_NODE.finditer(text)
+    }
 
-    claims: set[tuple[str, str, str]] = set()
-    for source_id, label, target_id in id_claims:
-        if source_id in pattern_sources and target_id in pattern_sources:
-            claims.add(
-                (
-                    pattern_sources[source_id],
-                    label,
-                    pattern_sources[target_id],
-                )
+
+def parse_named_relationship(
+    line: str,
+    name_to_source: dict[str, str],
+) -> tuple[str, str, str] | None:
+    cleaned = re.sub(r"^\s*[-*+]\s+", "", line).strip()
+    names = sorted(name_to_source, key=len, reverse=True)
+    for source_name in names:
+        for target_name in names:
+            if source_name == target_name:
+                continue
+            match = re.fullmatch(
+                rf"{re.escape(source_name)}\s+(.+?)\s+{re.escape(target_name)}",
+                cleaned,
+                re.IGNORECASE,
             )
+            if match is not None:
+                return (
+                    name_to_source[source_name],
+                    " ".join(match.group(1).lower().split()),
+                    name_to_source[target_name],
+                )
+    return None
+
+
+def relationship_claims(
+    body: str,
+    slides: list[str],
+    pattern_sources: dict[int, str],
+    pattern_names: dict[int, str],
+    pattern_slides: dict[int, tuple[int, str]],
+    errors: list[str],
+) -> set[tuple[str, str, str]]:
+    name_to_source = {
+        pattern_names[pattern_id].lower(): source
+        for pattern_id, source in pattern_sources.items()
+        if pattern_id in pattern_names
+    }
+    claims: set[tuple[str, str, str]] = set()
+    labels: set[str] = set()
+
+    for language, content in fenced_blocks(strip_comments(body)):
+        if language != "mermaid":
+            continue
+        nodes = mermaid_node_labels(content)
+        for line in content.splitlines():
+            node_tokens = [
+                token
+                for token in MERMAID_ID_TOKEN.finditer(line)
+                if token.group(1) in nodes
+            ]
+            for source_token, target_token in zip(node_tokens, node_tokens[1:]):
+                connector = line[source_token.end() : target_token.start()]
+                if not re.search(r"[-=.~]{2}", connector):
+                    continue
+                source_name = nodes[source_token.group(1)].lower()
+                target_name = nodes[target_token.group(1)].lower()
+                source = name_to_source.get(source_name)
+                target = name_to_source.get(target_name)
+
+                pipe_label = MERMAID_PIPE_LABEL.search(connector)
+                inline_label = MERMAID_INLINE_LABEL.search(connector)
+                label_text = (
+                    pipe_label.group(1)
+                    if pipe_label is not None
+                    else next(
+                        (
+                            group
+                            for group in (
+                                inline_label.groups() if inline_label else ()
+                            )
+                            if group is not None
+                        ),
+                        None,
+                    )
+                )
+                if label_text is not None:
+                    label = " ".join(label_text.lower().split())
+                    labels.add(label)
+                    if source is not None and target is not None and source != target:
+                        claims.add((source, label, target))
+                    elif source is not None or target is not None:
+                        errors.append(
+                            "Labeled Mermaid relationship must connect two known "
+                            f"pattern names: {line.strip()}."
+                        )
+                    continue
+                if source is not None and target is not None and source != target:
+                    errors.append(
+                        "Mermaid edges between patterns require a supported relationship "
+                        f"label: {line.strip()}."
+                    )
+
+    slide_to_pattern = {
+        slide_index: pattern_id
+        for pattern_id, (slide_index, _slide) in pattern_slides.items()
+    }
+    for slide_index, slide in enumerate(slides, start=1):
+        notes = speaker_notes(slide)
+        related = note_field(notes, "Related")
+        if related is None:
+            continue
+        if not related.strip():
+            errors.append(
+                f"Slide {slide_index} must omit Related when no supported "
+                "relationship exists."
+            )
+            continue
+        atomic_sources = [
+            target
+            for target in local_markdown_target_list(note_field(notes, "Source") or "")
+            if target in set(pattern_sources.values())
+        ]
+        current_source = None
+        pattern_id = slide_to_pattern.get(slide_index)
+        if pattern_id is not None:
+            current_source = pattern_sources.get(pattern_id)
+        elif len(set(atomic_sources)) == 1:
+            current_source = atomic_sources[0]
+
+        for line in related.splitlines():
+            cleaned = re.sub(r"^\s*[-*+]\s+", "", line).strip()
+            if not cleaned:
+                continue
+            parenthetical = re.fullmatch(r"(.+?)\s+\(([^()]+)\)", cleaned)
+            if parenthetical is not None and current_source is not None:
+                target = name_to_source.get(parenthetical.group(1).strip().lower())
+                label = " ".join(parenthetical.group(2).lower().split())
+                labels.add(label)
+                if target is not None and target != current_source:
+                    claims.add((current_source, label, target))
+                    continue
+            named = parse_named_relationship(cleaned, name_to_source)
+            if named is not None:
+                labels.add(named[1])
+                claims.add(named)
+                continue
+            errors.append(
+                f"Slide {slide_index} has an unparseable Related claim: {cleaned}."
+            )
+
+    invalid_labels = sorted(labels - SUPPORTED_RELATIONSHIPS)
+    if invalid_labels:
+        errors.append(
+            "Relationship labels must be one of "
+            + ", ".join(sorted(SUPPORTED_RELATIONSHIPS))
+            + f"; found {invalid_labels}."
+        )
     return claims
+
+
+def validate_internal_links(
+    scan_body: str,
+    deck: Path,
+    errors: list[str],
+) -> None:
+    allowed_root = deck.parent.resolve()
+    for target in link_targets(scan_body):
+        normalized = normalize_target(target)
+        if not normalized or is_external(normalized):
+            continue
+        if normalized.endswith(".MD") or not normalized.endswith(".md"):
+            errors.append(
+                f"Internal link '{normalized}' must use the lowercase '.md' extension."
+            )
+            continue
+        if Path(normalized).name != normalized:
+            errors.append(f"Internal link '{normalized}' must be a flat filename.")
+            continue
+        resolved = resolve_target(deck.parent, normalized)
+        if resolved is None or resolved.parent != allowed_root:
+            errors.append(
+                f"Internal link '{normalized}' must stay in the knowledge directory."
+            )
+        elif not resolved.is_file():
+            errors.append(f"Internal link does not resolve: {normalized}.")
+
+
+def markdown_table_rows(text: str) -> list[list[str]]:
+    rows: list[list[str]] = []
+    for line in text.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
+            continue
+        rows.append(cells)
+    return rows
+
+
+def plain_cell(value: str) -> str:
+    return re.sub(r"^(?:\*\*|__)(.*)(?:\*\*|__)$", r"\1", value).strip()
 
 
 def main() -> int:
@@ -423,13 +642,11 @@ def main() -> int:
 
     if deck.parent != moc.parent:
         errors.append("Deck and MOC must be in the same knowledge directory.")
-
     if not MOC_NAME.fullmatch(moc.name):
         errors.append("MOC filename must use lowercase kebab-case and end in '-moc.md'.")
         domain = moc.stem
     else:
         domain = moc.name[: -len("-moc.md")]
-
     expected_deck = f"{domain}.marp.md"
     if deck.name != expected_deck:
         errors.append(
@@ -453,19 +670,45 @@ def main() -> int:
 
     slides = split_slides(body)
     scan_body = strip_fenced_blocks(body)
-    contract_body = strip_comments(scan_body)
-
-    placeholders = sorted(set(TEMPLATE_PLACEHOLDER.findall(body)))
-    if placeholders or EMPTY_PATTERN_CHOICE.search(body):
-        rendered = placeholders + (["P[ ]"] if EMPTY_PATTERN_CHOICE.search(body) else [])
+    visible_body = strip_comments(scan_body)
+    visible_note_fields = sorted(
+        {match.group(0).strip() for match in NOTE_ONLY_VISIBLE.finditer(visible_body)}
+    )
+    if visible_note_fields:
+        errors.append(
+            "Narrative, questions, relationships, sources, and supporting metadata "
+            f"must remain in speaker notes; found visible field(s): {visible_note_fields}."
+        )
+    for index, slide in enumerate(slides, start=1):
+        visible = plain_cell(visible_slide(slide)).lower()
+        notes = speaker_notes(slide)
+        duplicated_fields: set[str] = set()
+        for label in SPEAKER_NOTE_ONLY_FIELDS:
+            value = note_field(notes, label)
+            for line in (value or "").splitlines():
+                candidate = plain_cell(
+                    re.sub(r"^\s*[-*+]\s+", "", line)
+                ).strip()
+                if candidate and candidate.lower() in visible:
+                    duplicated_fields.add(label)
+        if duplicated_fields:
+            errors.append(
+                f"Slide {index} duplicates speaker-note-only field content visibly: "
+                f"{sorted(duplicated_fields)}."
+            )
+    placeholders = sorted(set(BRACKET_PLACEHOLDER.findall(body)))
+    if placeholders or POSITION_PLACEHOLDER.search(body):
+        rendered = placeholders + (
+            [POSITION_PLACEHOLDER.search(body).group(0)]
+            if POSITION_PLACEHOLDER.search(body)
+            else []
+        )
         errors.append(
             "Deck contains unreplaced template placeholder(s): "
             + ", ".join(rendered)
             + "."
         )
-    remaining_prompts = sorted(
-        prompt for prompt in TEMPLATE_PROMPTS if prompt in body
-    )
+    remaining_prompts = sorted(prompt for prompt in TEMPLATE_PROMPTS if prompt in body)
     if remaining_prompts:
         errors.append(
             "Deck contains unreplaced template instruction(s): "
@@ -485,8 +728,7 @@ def main() -> int:
     expected_atomic: set[str] = set()
     expected_coaches: set[str] = set()
     for target in atomic_targets:
-        target_path = Path(target)
-        if target_path.name != target or target != target.lower():
+        if Path(target).name != target or target != target.lower():
             errors.append(
                 f"MOC atomic-note link '{target}' must be a lowercase flat filename."
             )
@@ -500,8 +742,7 @@ def main() -> int:
                 f"MOC Notes link '{target}' is not an atomic note in domain '{domain}'."
             )
             continue
-        atomic_path = (moc.parent / target).resolve()
-        if not atomic_path.is_file():
+        if not (moc.parent / target).is_file():
             errors.append(f"MOC atomic-note link does not resolve: {target}")
             continue
         expected_atomic.add(target)
@@ -509,59 +750,46 @@ def main() -> int:
         if (moc.parent / coach_target).is_file():
             expected_coaches.add(coach_target)
 
-    moc_values = field_values(contract_body, "MOC")
-    moc_links = source_targets(contract_body, "MOC")
-    expected_moc = {moc.name}
-    opening_moc_links = (
-        source_targets(visible_slide(slides[0]), "MOC") if slides else set()
-    )
-    if (
-        len(moc_values) != 1
-        or moc_links != expected_moc
-        or opening_moc_links != expected_moc
-    ):
+    allowed_links = expected_atomic | expected_coaches | {moc.name}
+    deck_links = local_markdown_targets(scan_body)
+    unexpected_links = sorted(deck_links - allowed_links)
+    if unexpected_links:
+        errors.append(f"Deck has source links outside the MOC domain: {unexpected_links}.")
+    visible_links = sorted(local_markdown_targets(visible_body))
+    if visible_links:
         errors.append(
-            f"Opening slide must contain the only MOC field linking exactly '{moc.name}'; "
-            f"found {len(moc_values)} fields and links {sorted(moc_links)}."
+            "MOC, atomic, and coaching source links must appear only in speaker notes: "
+            f"{visible_links}."
         )
 
-    deck_source_list = source_target_list(contract_body, "Source")
-    deck_sources = set(deck_source_list)
-    if deck_sources != expected_atomic:
-        missing = sorted(expected_atomic - deck_sources)
-        extra = sorted(deck_sources - expected_atomic)
-        if missing:
-            errors.append(f"Deck is missing atomic Source links: {missing}.")
-        if extra:
-            errors.append(f"Deck has Source links outside the MOC: {extra}.")
-    duplicate_sources = sorted(
-        source for source in deck_sources if deck_source_list.count(source) > 1
-    )
-    if duplicate_sources:
-        errors.append(
-            f"Each atomic Source must appear exactly once; duplicates: {duplicate_sources}."
+    if not slides:
+        errors.append("Deck must contain at least one slide.")
+        opening_notes = ""
+    else:
+        opening_notes = speaker_notes(slides[0])
+        require_note_fields(
+            opening_notes,
+            ("Narrative", "Domain question", "Source"),
+            "Opening slide",
+            errors,
         )
-
-    deck_coach_list = source_target_list(contract_body, "Coach")
-    deck_coaches = set(deck_coach_list)
-    if deck_coaches != expected_coaches:
-        missing = sorted(expected_coaches - deck_coaches)
-        extra = sorted(deck_coaches - expected_coaches)
-        if missing:
-            errors.append(f"Deck is missing available Coach links: {missing}.")
-        if extra:
-            errors.append(f"Deck has unexpected Coach links: {extra}.")
-    duplicate_coaches = sorted(
-        coach for coach in deck_coaches if deck_coach_list.count(coach) > 1
-    )
-    if duplicate_coaches:
-        errors.append(
-            f"Each Coach link must appear exactly once; duplicates: {duplicate_coaches}."
+        if not re.search(r"^Metadata:\s*$", opening_notes, re.MULTILINE):
+            errors.append("Opening slide speaker notes require a 'Metadata' field.")
+        require_question(opening_notes, "Domain question", "Opening slide", errors)
+        opening_sources = set(
+            strict_source_targets(opening_notes, "Opening slide", errors)
         )
+        if opening_sources != {moc.name}:
+            errors.append(
+                f"Opening slide speaker-note Source must link exactly '{moc.name}'."
+            )
 
     moc_tags = tags_from_fields(moc_text)
     domain_tags = moc_tags - RESERVED_TAGS
-    deck_tags = tags_from_fields(contract_body)
+    deck_tag_fields = field_values(opening_notes, "Tags")
+    deck_tags = tags_from_fields(opening_notes)
+    if len(deck_tag_fields) != 1:
+        errors.append("Opening slide Metadata requires exactly one Tags field.")
     if not domain_tags:
         errors.append("MOC Tags must include at least one domain tag.")
     elif not domain_tags.issubset(deck_tags):
@@ -570,11 +798,9 @@ def main() -> int:
         )
     if "slides" not in deck_tags:
         errors.append("Deck Tags must include '#slides'.")
-    workflow = deck_tags & WORKFLOW_TAGS
-    visibility = deck_tags & VISIBILITY_TAGS
-    if len(workflow) != 1:
+    if len(deck_tags & WORKFLOW_TAGS) != 1:
         errors.append("Deck Tags must include exactly one workflow tag.")
-    if len(visibility) != 1:
+    if len(deck_tags & VISIBILITY_TAGS) != 1:
         errors.append("Deck Tags must include exactly one visibility tag.")
 
     if len(slides) < len(expected_atomic) + 7:
@@ -595,9 +821,7 @@ def main() -> int:
             if (slide_title(slide) or "").lower() == title.lower()
         ]
         if len(matches) != 1:
-            errors.append(
-                f"Deck requires exactly one '{title}' slide; found {len(matches)}."
-            )
+            errors.append(f"Deck requires exactly one '{title}' slide; found {len(matches)}.")
         else:
             core_locations.append(matches[0])
     if len(core_locations) == len(CORE_SLIDE_TITLES) and core_locations != sorted(
@@ -605,32 +829,48 @@ def main() -> int:
     ):
         errors.append("Required system slides do not follow the template order.")
 
+    system_note_contracts = {
+        "Challenges & opportunities": (
+            ("Narrative", "Domain question", "Source"),
+            ("Domain question",),
+        ),
+        "Pattern map": (
+            ("Narrative", "Domain question", "Source"),
+            ("Domain question",),
+        ),
+        "Apply the patterns together": (
+            ("Narrative", "Coach cue", "Source"),
+            ("Coach cue",),
+        ),
+        "What changes": (
+            ("Narrative", "Evidence", "Coach cue", "Remaining constraint", "Source"),
+            ("Coach cue",),
+        ),
+        "Pattern map revisited": (
+            ("Domain takeaway", "Coach cue", "Source"),
+            ("Coach cue",),
+        ),
+        "Choose one pattern to try": (
+            ("Narrative", "Coach cue", "Source"),
+            ("Coach cue",),
+        ),
+    }
+    for title, (fields, questions) in system_note_contracts.items():
+        match = find_slide(slides, title)
+        if match is None:
+            continue
+        slide_notes = speaker_notes(match[1])
+        require_note_fields(slide_notes, fields, title, errors)
+        for question in questions:
+            require_question(slide_notes, question, title, errors)
+
     challenge_match = find_slide(slides, "Challenges & opportunities")
-    if challenge_match:
-        _index, challenge_slide = challenge_match
-        challenge_visible = visible_slide(challenge_slide)
+    if challenge_match is not None:
+        challenge_visible = visible_slide(challenge_match[1])
         if section(challenge_visible, "Challenges") is None:
             errors.append("Challenges & opportunities requires a Challenges section.")
         if section(challenge_visible, "Opportunities") is None:
             errors.append("Challenges & opportunities requires an Opportunities section.")
-        domain_question = re.search(
-            r"^\s*>\s+\*\*Domain question:\*\*\s+(.+?)\s*$",
-            challenge_visible,
-            re.MULTILINE | re.IGNORECASE,
-        )
-        if domain_question is None or not domain_question.group(1).endswith("?"):
-            errors.append(
-                "Challenges & opportunities requires a Domain question ending in ?."
-            )
-
-    for title in ("Pattern map", "Pattern map revisited"):
-        map_match = find_slide(slides, title)
-        if map_match:
-            _index, map_slide = map_match
-            if not {"mermaid", "text"} & set(fenced_languages(map_slide)):
-                errors.append(
-                    f"{title} requires a fenced mermaid or text system map."
-                )
 
     pattern_slides: dict[int, tuple[int, str]] = {}
     pattern_names: dict[int, str] = {}
@@ -640,20 +880,15 @@ def main() -> int:
     for index, slide in enumerate(slides, start=1):
         visible = visible_slide(slide)
         headers = list(PATTERN_HEADER.finditer(visible))
+        candidates = list(PATTERN_HEADER_CANDIDATE.finditer(visible))
+        if candidates and not headers:
+            errors.append(
+                f"Slide {index} pattern metadata must use '###### p<n> of <N> · <cluster>'."
+            )
         if len(headers) > 1:
             errors.append(f"Slide {index} contains more than one pattern header.")
             continue
-        source_list = source_target_list(visible, "Source")
-        coach_list = source_target_list(visible, "Coach")
         if not headers:
-            if source_list:
-                errors.append(
-                    f"Slide {index} has a Source but is not a PATTERN Pn OF N slide."
-                )
-            if coach_list:
-                errors.append(
-                    f"Slide {index} has a Coach link but is not a pattern slide."
-                )
             continue
 
         header = headers[0]
@@ -661,45 +896,74 @@ def main() -> int:
         declared_totals.add(int(header.group(2)))
         pattern_clusters[pattern_id] = header.group(3).strip()
         if pattern_id in pattern_slides:
-            errors.append(f"Pattern ID P{pattern_id} is used more than once.")
+            errors.append(f"Pattern ID p{pattern_id} is used more than once.")
         pattern_slides[pattern_id] = (index, slide)
 
-        titles = list(PATTERN_TITLE.finditer(visible))
-        if len(titles) != 1 or int(titles[0].group(1)) != pattern_id:
-            errors.append(
-                f"Pattern slide {index} requires one '# P{pattern_id} · <short name>' title."
-            )
+        titles = H1.findall(visible)
+        if len(titles) != 1:
+            errors.append(f"Pattern slide {index} requires one short-name H1 title.")
         else:
-            pattern_names[pattern_id] = titles[0].group(2).strip()
-        statements = PATTERN_STATEMENT.findall(visible)
-        if len(statements) != 1:
-            errors.append(
-                f"Pattern slide {index} requires one bold "
-                "'When X, do Y, because Z.' statement."
-            )
+            title = titles[0].strip()
+            if re.search(r"\bP\d+\b", title, re.IGNORECASE):
+                errors.append(
+                    f"Pattern slide {index} title must not expose its internal pattern ID."
+                )
+            pattern_names[pattern_id] = title
 
-        signals = section(visible, "Use it when")
-        if signals is None or not BULLET.search(signals):
+        signals = section(visible, "Use when", level=3)
+        signal_count = len(BULLET.findall(signals or ""))
+        if not 1 <= signal_count <= 3:
             errors.append(
-                f"Pattern slide {index} requires Use it when with at least one bullet."
+                f"Pattern slide {index} requires one to three 'Use when' bullets."
             )
-        practices = section(visible, "Practices")
-        practice_numbers = [
-            int(match.group(1)) for match in NUMBERED_ITEM.finditer(practices or "")
-        ]
-        if (
-            practices is None
-            or not 1 <= len(practice_numbers) <= 3
-            or practice_numbers != list(range(1, len(practice_numbers) + 1))
+        practices = section(visible, "Do", level=3)
+        practice_count = len(BULLET.findall(practices or ""))
+        if not 1 <= practice_count <= 3:
+            errors.append(f"Pattern slide {index} requires one to three 'Do' bullets.")
+
+        slide_notes = speaker_notes(slide)
+        require_note_fields(
+            slide_notes,
+            ("Pattern description", "Coach cue", "Source"),
+            f"Pattern slide {index}",
+            errors,
+        )
+        require_question(
+            slide_notes, "Coach cue", f"Pattern slide {index}", errors
+        )
+        description = note_field(slide_notes, "Pattern description") or ""
+        description_lines = [line.strip() for line in description.splitlines() if line.strip()]
+        if len(description_lines) != 1 or not PATTERN_FORM.fullmatch(
+            description_lines[0]
         ):
             errors.append(
-                f"Pattern slide {index} requires one to three contiguous numbered practices."
+                f"Pattern slide {index} speaker notes require one "
+                "'When X, do Y, because Z.' Pattern description."
             )
-        if len(source_list) != 1:
-            errors.append(f"Pattern slide {index} requires exactly one Source link.")
+        if any(
+            PATTERN_FORM.fullmatch(line.strip())
+            for line in visible.splitlines()
+            if line.strip()
+        ):
+            errors.append(
+                f"Pattern slide {index} must keep its complete pattern description "
+                "in speaker notes."
+            )
+
+        source_targets = strict_source_targets(
+            slide_notes,
+            f"Pattern slide {index}",
+            errors,
+        )
+        atomic_sources = [target for target in source_targets if target in expected_atomic]
+        coach_sources = [target for target in source_targets if target in expected_coaches]
+        if len(atomic_sources) != 1:
+            errors.append(
+                f"Pattern slide {index} Source requires exactly one MOC atomic note."
+            )
             source = None
         else:
-            source = source_list[0]
+            source = atomic_sources[0]
             pattern_sources[pattern_id] = source
         expected_coach = (
             f"{source[:-3]}.coach.md"
@@ -707,181 +971,223 @@ def main() -> int:
             else None
         )
         if expected_coach in expected_coaches:
-            if coach_list != [expected_coach]:
+            if coach_sources != [expected_coach]:
                 errors.append(
-                    f"Pattern slide {index} must link its matching Coach "
-                    f"'{expected_coach}'."
+                    f"Pattern slide {index} Source must link its matching coaching "
+                    f"companion '{expected_coach}'."
                 )
-        elif coach_list:
+        elif coach_sources:
             errors.append(
-                f"Pattern slide {index} must not declare a Coach without "
-                "a matching companion."
+                f"Pattern slide {index} Source must not link a coaching companion "
+                "without a matching atomic note."
+            )
+        expected_source_targets = set(atomic_sources) | set(coach_sources)
+        if set(source_targets) != expected_source_targets:
+            errors.append(
+                f"Pattern slide {index} Source may contain only its atomic note "
+                "and matching coaching companion."
             )
 
-        related_lines = [
-            line for line in visible.splitlines()
-            if line.strip().lower().startswith("**related")
-        ]
-        if related_lines and (
-            len(related_lines) != 1
-            or RELATED_LINE.fullmatch(related_lines[0].strip()) is None
-        ):
+        order = tuple(
+            label
+            for label in ("Pattern description", "Coach cue", "Related", "Source")
+            if note_field(slide_notes, label) is not None
+        )
+        positions = note_field_positions(slide_notes, order)
+        if positions != sorted(positions):
             errors.append(
-                f"Pattern slide {index} has an invalid Related relationship."
+                f"Pattern slide {index} speaker-note fields must follow: "
+                "Pattern description, Coach cue, Related, Source."
             )
-
-        if coach_list:
-            note_blocks = re.findall(r"<!--(.*?)-->", slide, re.DOTALL)
-            coaching_questions = [
-                match.group(1).strip()
-                for block in note_blocks
-                for match in re.finditer(
-                    r"^\s*Coach cue:\s*(\S.*?)\s*$",
-                    block,
-                    re.MULTILINE,
-                )
-            ]
-            if len(coaching_questions) != 1 or not coaching_questions[0].endswith("?"):
-                errors.append(
-                    f"Pattern slide {index} with Coach requires one "
-                    "Coach cue question ending in ?."
-                )
 
     expected_ids = list(range(1, len(expected_atomic) + 1))
     if sorted(pattern_slides) != expected_ids:
         errors.append(
-            f"Pattern slides must use contiguous IDs P1 through P{len(expected_atomic)}."
+            f"Pattern slides must use contiguous internal IDs P1 through "
+            f"p{len(expected_atomic)}."
         )
     if declared_totals and declared_totals != {len(expected_atomic)}:
+        errors.append(f"Every pattern header must declare of {len(expected_atomic)}.")
+    if len({name.lower() for name in pattern_names.values()}) != len(pattern_names):
+        errors.append("Pattern slide short names must be unique.")
+
+    mapped_sources = list(pattern_sources.values())
+    missing_sources = sorted(expected_atomic - set(mapped_sources))
+    extra_sources = sorted(set(mapped_sources) - expected_atomic)
+    duplicate_sources = sorted(
+        source for source in set(mapped_sources) if mapped_sources.count(source) > 1
+    )
+    if missing_sources:
+        errors.append(f"Deck is missing pattern slides for atomic sources: {missing_sources}.")
+    if extra_sources:
+        errors.append(f"Deck has pattern sources outside the MOC: {extra_sources}.")
+    if duplicate_sources:
         errors.append(
-            f"Every pattern header must declare OF {len(expected_atomic)}."
+            f"Each atomic source must map to one pattern slide; duplicates: "
+            f"{duplicate_sources}."
         )
 
-    expected_id_set = set(expected_ids)
-    referenced_ids = {
-        int(value)
-        for value in re.findall(r"\bP(\d+)\b", strip_comments(body))
+    source_to_name = {
+        source: pattern_names[pattern_id]
+        for pattern_id, source in pattern_sources.items()
+        if pattern_id in pattern_names
     }
-    unknown_ids = sorted(referenced_ids - expected_id_set)
-    if unknown_ids:
-        errors.append(f"Deck references unknown pattern ID(s): {unknown_ids}.")
-    mismatched_names: list[str] = []
-    for match in NAMED_PATTERN_REFERENCE.finditer(strip_comments(body)):
-        pattern_id = int(match.group(1))
-        actual_name = match.group(2).strip()
-        expected_name = pattern_names.get(pattern_id)
-        if expected_name is not None and actual_name.lower() != expected_name.lower():
-            mismatched_names.append(
-                f"P{pattern_id} · {actual_name} (expected {expected_name})"
+    exact_moc_source_slides = (
+        "Challenges & opportunities",
+        "Pattern map",
+        "Pattern map revisited",
+    )
+    for title in exact_moc_source_slides:
+        match = find_slide(slides, title)
+        if match is None:
+            continue
+        targets = set(
+            strict_source_targets(
+                speaker_notes(match[1]),
+                title,
+                errors,
             )
-    if mismatched_names:
+        )
+        if targets != {moc.name}:
+            errors.append(
+                f"{title} speaker-note Source must link exactly '{moc.name}'."
+            )
+
+    for title in ("Apply the patterns together", "What changes"):
+        match = find_slide(slides, title)
+        if match is None:
+            continue
+        targets = set(
+            strict_source_targets(
+                speaker_notes(match[1]),
+                title,
+                errors,
+            )
+        )
+        atomic_sources = targets & expected_atomic
+        if (
+            moc.name not in targets
+            or not atomic_sources
+            or targets - ({moc.name} | expected_atomic)
+        ):
+            errors.append(
+                f"{title} speaker-note Source must link the MOC and at least "
+                "one relevant atomic note."
+            )
+
+    close_source_targets: set[str] = set()
+    close_source_match = find_slide(slides, "Choose one pattern to try")
+    if close_source_match is not None:
+        close_source_targets = set(
+            strict_source_targets(
+                speaker_notes(close_source_match[1]),
+                "Choose one pattern to try",
+                errors,
+            )
+        )
+        atomic_sources = close_source_targets & expected_atomic
+        coach_sources = close_source_targets & expected_coaches
+        expected_linked_coaches = {
+            f"{source[:-3]}.coach.md"
+            for source in atomic_sources
+            if f"{source[:-3]}.coach.md" in expected_coaches
+        }
+        if (
+            not atomic_sources
+            or close_source_targets - (expected_atomic | expected_coaches)
+            or coach_sources != expected_linked_coaches
+        ):
+            errors.append(
+                "Choose one pattern to try speaker-note Source must link at "
+                "least one atomic note and each matching available companion."
+            )
+
+    body_without_headers = PATTERN_HEADER.sub("", deck_text)
+    body_without_headers = MARKDOWN_LINK_DISPLAY.sub(
+        lambda match: match.group(1),
+        body_without_headers,
+    )
+    body_without_headers = WIKI_LINK_DISPLAY.sub(
+        lambda match: match.group(2) or match.group(1),
+        body_without_headers,
+    )
+    exposed_ids = sorted(
+        set(re.findall(r"\bP(\d+)\b", body_without_headers, re.IGNORECASE))
+    )
+    if exposed_ids:
         errors.append(
-            "Deck has inconsistent pattern name reference(s): "
-            + ", ".join(sorted(set(mismatched_names)))
-            + "."
+            "Pattern IDs may appear only in H6 position metadata, not in titles, "
+            f"Mermaid nodes, tables, or prose: {exposed_ids}."
         )
 
     for map_title in ("Pattern map", "Pattern map revisited"):
-        map_match = find_slide(slides, map_title)
-        if map_match:
-            _index, map_slide = map_match
-            missing_ids = [
-                f"P{pattern_id}"
-                for pattern_id in expected_ids
-                if not re.search(rf"\bP{pattern_id}\b", map_slide)
-            ]
-            if missing_ids:
-                errors.append(
-                    f"{map_title} is missing pattern ID(s): {missing_ids}."
-                )
-            inconsistent_names = [
-                f"P{pattern_id} · {name}"
-                for pattern_id, name in pattern_names.items()
-                if not re.search(
-                    rf"\bP{pattern_id}\s+·\s+{re.escape(name)}\b",
-                    map_slide,
-                    re.IGNORECASE,
-                )
-            ]
-            if inconsistent_names:
-                errors.append(
-                    f"{map_title} is missing exact pattern name(s): "
-                    f"{inconsistent_names}."
-                )
-    pattern_map_match = find_slide(slides, "Pattern map")
-    if pattern_map_match:
-        _index, pattern_map_slide = pattern_map_match
-        missing_clusters = sorted(
-            {
-                cluster
-                for cluster in pattern_clusters.values()
-                if cluster.lower() not in pattern_map_slide.lower()
-            }
+        match = find_slide(slides, map_title)
+        if match is None:
+            continue
+        mermaid = [
+            content
+            for language, content in fenced_blocks(strip_comments(match[1]))
+            if language == "mermaid"
+        ]
+        if len(mermaid) != 1:
+            errors.append(f"{map_title} requires exactly one fenced Mermaid diagram.")
+            continue
+        labels = {label.lower() for label in mermaid_node_labels(mermaid[0]).values()}
+        missing_names = sorted(
+            name for name in pattern_names.values() if name.lower() not in labels
         )
-        if missing_clusters:
+        if missing_names:
+            errors.append(
+                f"{map_title} is missing exact pattern name(s): {missing_names}."
+            )
+        missing_clusters = sorted(
+            cluster
+            for cluster in set(pattern_clusters.values())
+            if cluster.lower() not in mermaid[0].lower()
+        )
+        if map_title == "Pattern map" and missing_clusters:
             errors.append(
                 f"Pattern map is missing pattern cluster(s): {missing_clusters}."
             )
 
-    first_map = find_slide(slides, "Pattern map")
     apply_slide_match = find_slide(slides, "Apply the patterns together")
-    if first_map and apply_slide_match and pattern_slides:
-        map_index = first_map[0] + 1
-        apply_index = apply_slide_match[0] + 1
-        misplaced = sorted(
-            pattern_id
-            for pattern_id, (index, _slide) in pattern_slides.items()
-            if not map_index < index < apply_index
-        )
-        if misplaced:
-            errors.append(
-                f"Pattern slides must appear between Pattern map and "
-                f"Apply the patterns together; misplaced IDs: {misplaced}."
-            )
-    close_slide_match = find_slide(slides, "Choose one pattern to try")
-    if close_slide_match and close_slide_match[0] != len(slides) - 1:
-        errors.append("Choose one pattern to try must be the final slide.")
-
-    invalid_relationships = sorted(
-        {
-            label
-            for label in relationship_labels(body)
-            if label not in SUPPORTED_RELATIONSHIPS
-        }
-    )
-    if invalid_relationships:
-        errors.append(
-            "Relationship labels must be one of "
-            + ", ".join(sorted(SUPPORTED_RELATIONSHIPS))
-            + f"; found {invalid_relationships}."
-        )
-    allowed_relationships = allowed_deck_relationships(
-        moc.parent,
-        expected_atomic,
-    )
-    claimed_relationships = deck_relationship_claims(
-        body,
-        pattern_sources,
-        pattern_slides,
-    )
-    unsupported_relationships = sorted(
-        f"{source} --{label}--> {target}"
-        for source, label, target in (
-            claimed_relationships - allowed_relationships
-        )
-    )
-    if unsupported_relationships:
-        errors.append(
-            "Deck claims relationship(s) not permitted by typed, directed "
-            f"atomic-note Relationships: {unsupported_relationships}."
-        )
-
-    apply_match = apply_slide_match
-    if apply_match:
-        _index, apply_slide = apply_match
+    if apply_slide_match is not None:
+        apply_slide = apply_slide_match[1]
         apply_visible = visible_slide(apply_slide)
+        if section(apply_visible, "Scenario") is not None:
+            errors.append(
+                "Apply the patterns together requires '## Scenario: <name>', "
+                "not a plain Scenario section."
+            )
         if not re.search(r"^##\s+Scenario:\s+\S", apply_visible, re.MULTILINE):
             errors.append("Apply the patterns together requires a named Scenario.")
+        mermaid = [
+            content
+            for language, content in fenced_blocks(strip_comments(apply_slide))
+            if language == "mermaid"
+        ]
+        if len(mermaid) != 1:
+            errors.append(
+                "Apply the patterns together requires exactly one fenced Mermaid flow."
+            )
+        else:
+            labels = {
+                label.lower() for label in mermaid_node_labels(mermaid[0]).values()
+            }
+            source_targets = local_markdown_targets(
+                note_field(speaker_notes(apply_slide), "Source") or ""
+            )
+            missing_names = sorted(
+                source_to_name[source]
+                for source in source_targets & expected_atomic
+                if source in source_to_name
+                and source_to_name[source].lower() not in labels
+            )
+            if missing_names:
+                errors.append(
+                    "Apply the patterns together Mermaid flow is missing "
+                    f"source-linked pattern name(s): {missing_names}."
+                )
         for label in ("Start with", "Then", "Watch for"):
             if not re.search(
                 rf"^\s*[-*+]\s+\*\*{re.escape(label)}:\*\*\s+\S",
@@ -892,43 +1198,196 @@ def main() -> int:
                     f"Apply the patterns together requires a '{label}' bullet."
                 )
 
+    first_map = find_slide(slides, "Pattern map")
+    if first_map and apply_slide_match and pattern_slides:
+        map_index = first_map[0] + 1
+        apply_index = apply_slide_match[0] + 1
+        misplaced = sorted(
+            pattern_id
+            for pattern_id, (index, _slide) in pattern_slides.items()
+            if not map_index < index < apply_index
+        )
+        if misplaced:
+            errors.append(
+                "Pattern slides must appear between Pattern map and "
+                f"Apply the patterns together; misplaced IDs: {misplaced}."
+            )
+
     changes_match = find_slide(slides, "What changes")
-    if changes_match:
-        _index, changes_slide = changes_match
-        changes_visible = visible_slide(changes_slide)
+    if changes_match is not None:
+        changes_visible = visible_slide(changes_match[1])
         if not re.search(
             r"^\|\s*Before\s*\|\s*Pattern\s*\|\s*After\s*\|",
             changes_visible,
             re.MULTILINE | re.IGNORECASE,
         ):
             errors.append("What changes requires a Before | Pattern | After table.")
-        if not re.search(
-            r"^\s*>\s+\*\*Remaining constraint:\*\*\s+\S",
-            changes_visible,
-            re.MULTILINE | re.IGNORECASE,
-        ):
-            errors.append("What changes requires a Remaining constraint.")
+        else:
+            rows = markdown_table_rows(changes_visible)
+            invalid_names = sorted(
+                {
+                    plain_cell(row[1])
+                    for row in rows[1:]
+                    if len(row) >= 3
+                    and plain_cell(row[1]).lower()
+                    not in {name.lower() for name in pattern_names.values()}
+                }
+            )
+            if invalid_names:
+                errors.append(
+                    "What changes Pattern column must use exact pattern short "
+                    f"names; found {invalid_names}."
+                )
 
     close_match = find_slide(slides, "Choose one pattern to try")
-    if close_match:
-        _index, close_slide = close_match
-        close_visible = visible_slide(close_slide)
+    if close_match is not None:
+        close_visible = visible_slide(close_match[1])
         for label in ("Signal", "Pattern", "Practice", "Review"):
             if not re.search(
                 rf"^\s*[-*+]\s+\*\*{label}:\*\*\s+\S",
                 close_visible,
                 re.MULTILINE | re.IGNORECASE,
             ):
+                errors.append(f"Choose one pattern to try requires a '{label}' bullet.")
+        pattern_choice = re.search(
+            r"^\s*[-*+]\s+\*\*Pattern:\*\*\s+(.+?)\s*$",
+            close_visible,
+            re.MULTILINE | re.IGNORECASE,
+        )
+        if pattern_choice is not None:
+            chosen_name = pattern_choice.group(1).strip().lower()
+            source_by_name = {
+                name.lower(): pattern_sources[pattern_id]
+                for pattern_id, name in pattern_names.items()
+                if pattern_id in pattern_sources
+            }
+            chosen_source = source_by_name.get(chosen_name)
+            if chosen_source is None:
                 errors.append(
-                    f"Choose one pattern to try requires a '{label}' bullet."
+                    "Choose one pattern to try must name an exact pattern short name."
                 )
+            else:
+                expected_targets = {chosen_source}
+                chosen_coach = f"{chosen_source[:-3]}.coach.md"
+                if chosen_coach in expected_coaches:
+                    expected_targets.add(chosen_coach)
+                if close_source_targets != expected_targets:
+                    errors.append(
+                        "Choose one pattern to try speaker-note Source must match "
+                        "the selected pattern and its available companion."
+                    )
+        if close_match[0] != len(slides) - 1:
+            errors.append("Choose one pattern to try must be the final slide.")
+
+    comparison_slides = [
+        (index, slide)
+        for index, slide in enumerate(slides, start=1)
+        if (slide_title(slide) or "").lower().startswith("choosing between ")
+    ]
+    if len(comparison_slides) > 1:
+        errors.append("Deck may contain at most one optional comparison slide.")
+    for index, slide in comparison_slides:
+        notes = speaker_notes(slide)
+        require_note_fields(
+            notes,
+            ("Selection rule", "Coach cue", "Related", "Source"),
+            f"Comparison slide {index}",
+            errors,
+        )
+        require_question(notes, "Coach cue", f"Comparison slide {index}", errors)
+        source_targets = strict_source_targets(
+            notes,
+            f"Comparison slide {index}",
+            errors,
+        )
+        atomic_sources = [target for target in source_targets if target in expected_atomic]
+        if len(set(atomic_sources)) != 2 or set(source_targets) != set(atomic_sources):
+            errors.append(
+                f"Comparison slide {index} Source requires exactly two atomic notes "
+                "and no other links."
+            )
+            continue
+        expected_names = {
+            source_to_name[source].lower()
+            for source in set(atomic_sources)
+            if source in source_to_name
+        }
+        title = slide_title(slide) or ""
+        title_match = re.fullmatch(
+            r"Choosing between (.+?) and (.+)",
+            title,
+            re.IGNORECASE,
+        )
+        title_names = (
+            {title_match.group(1).strip().lower(), title_match.group(2).strip().lower()}
+            if title_match is not None
+            else set()
+        )
+        if title_names != expected_names:
+            errors.append(
+                f"Comparison slide {index} title must use its two source-linked "
+                "pattern short names."
+            )
+        rows = markdown_table_rows(visible_slide(slide))
+        table_names = {
+            plain_cell(row[1]).lower()
+            for row in rows[1:]
+            if len(row) >= 2
+        }
+        if table_names != expected_names:
+            errors.append(
+                f"Comparison slide {index} table must use its two source-linked "
+                "pattern short names."
+            )
+
+    allowed_slide_indexes = (
+        {1}
+        | {index + 1 for index in core_locations}
+        | {index for index, _slide in pattern_slides.values()}
+        | {index for index, _slide in comparison_slides}
+    )
+    unexpected_slides = [
+        index
+        for index in range(1, len(slides) + 1)
+        if index not in allowed_slide_indexes
+    ]
+    if unexpected_slides:
+        errors.append(
+            "Deck contains slide(s) outside the template sequence: "
+            f"{unexpected_slides}."
+        )
+
+    claims = relationship_claims(
+        body,
+        slides,
+        pattern_sources,
+        pattern_names,
+        pattern_slides,
+        errors,
+    )
+    allowed_relationships = allowed_deck_relationships(moc.parent, expected_atomic)
+    unsupported_relationships = sorted(
+        f"{source} --{label}--> {target}"
+        for source, label, target in claims - allowed_relationships
+    )
+    if unsupported_relationships:
+        errors.append(
+            "Deck claims relationship(s) not permitted by typed, directed "
+            f"atomic-note Relationships: {unsupported_relationships}."
+        )
 
     for index, slide in enumerate(slides, start=1):
-        visible = re.sub(r"<!--.*?-->", "", slide, flags=re.DOTALL).strip()
+        visible = visible_slide(slide)
         visible_lines = [line for line in visible.splitlines() if line.strip()]
+        bullet_count = len(BULLET.findall(visible))
         if len(visible_lines) > 12:
             warnings.append(
-                f"Slide {index} has {len(visible_lines)} visible lines; review projection density."
+                f"Slide {index} has {len(visible_lines)} visible lines; "
+                "review projection density."
+            )
+        if bullet_count > 6:
+            warnings.append(
+                f"Slide {index} has {bullet_count} visible bullets; prefer no more than six."
             )
 
     without_comments = strip_comments(scan_body)
@@ -936,26 +1395,7 @@ def main() -> int:
     if HTML_TAG.search(without_autolinks):
         errors.append("Arbitrary HTML is not allowed; use Markdown and speaker-note comments.")
 
-    allowed_root = deck.parent.resolve()
-    for target in link_targets(scan_body):
-        normalized = normalize_target(target)
-        if not normalized or is_external(normalized):
-            continue
-        if normalized.endswith(".MD") or not normalized.endswith(".md"):
-            errors.append(
-                f"Internal link '{normalized}' must use the lowercase '.md' extension."
-            )
-            continue
-        if Path(normalized).name != normalized:
-            errors.append(f"Internal link '{normalized}' must be a flat filename.")
-            continue
-        resolved = resolve_target(deck.parent, normalized)
-        if resolved is None or resolved.parent != allowed_root:
-            errors.append(
-                f"Internal link '{normalized}' must stay in the knowledge directory."
-            )
-        elif not resolved.is_file():
-            errors.append(f"Internal link does not resolve: {normalized}")
+    validate_internal_links(scan_body, deck, errors)
 
     for warning in warnings:
         print(f"WARNING: {warning}")
@@ -964,12 +1404,11 @@ def main() -> int:
     if errors:
         return 1
     print(
-        "OK: domain Marp presentation is valid "
-        f"({len(slides)} slides, {len(expected_atomic)} atomic sources, "
-        f"{len(expected_coaches)} coaching sources)."
+        f"Validated {deck.name} against {moc.name}: {len(slides)} slides, "
+        f"{len(expected_atomic)} atomic sources, {len(expected_coaches)} coaching sources."
     )
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

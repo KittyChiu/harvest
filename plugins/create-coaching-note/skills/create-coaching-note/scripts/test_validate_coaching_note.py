@@ -485,6 +485,29 @@ class ValidateCoachingNoteTests(unittest.TestCase):
         )
         self.assert_invalid(coach, "Companion to")
 
+    def test_rejects_additional_companion_link(self) -> None:
+        coach = COACH.replace(
+            "Companion to: [Sharing knowledge creates reusable team memory](culture-sharing-creates-team-memory.md)",
+            "Companion to: [Sharing knowledge creates reusable team memory](culture-sharing-creates-team-memory.md) "
+            "[Another note](another-note.md)",
+        )
+        self.assert_invalid(coach, "exactly one link")
+
+    def test_rejects_additional_external_companion_link(self) -> None:
+        coach = COACH.replace(
+            "Companion to: [Sharing knowledge creates reusable team memory](culture-sharing-creates-team-memory.md)",
+            "Companion to: [Sharing knowledge creates reusable team memory](culture-sharing-creates-team-memory.md) "
+            "[External](https://example.com/pattern)",
+        )
+        self.assert_invalid(coach, "exactly one link")
+
+    def test_requires_title_to_match_atomic_pattern_title(self) -> None:
+        coach = COACH.replace(
+            "# Coaching companion: Sharing knowledge creates reusable team memory",
+            "# Coaching companion: A different pattern",
+        )
+        self.assert_invalid(coach, "match the atomic pattern title exactly")
+
     def test_requires_coaching_and_filter_tags(self) -> None:
         coach = COACH.replace(
             "#leadership #coaching #draft #private",

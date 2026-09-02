@@ -31,9 +31,10 @@ size: 16:9
 - Use the built-in `default` theme unless the user confirms another installed or built-in theme.
 - Use the selected theme's standard styling; do not add custom CSS by default.
 - Use standard Markdown for all visible slide content.
-- Mermaid rendering is not part of the documented conservative surface. Use a
-  fenced `mermaid` map only when the target setup is confirmed to render it;
-  otherwise use a fenced `text` map.
+- Mermaid rendering is not part of the documented conservative surface, but the
+  domain-presentation template requires fenced Mermaid maps and flows. Confirm
+  rendering before authoring. If the target setup does not render Mermaid, stop
+  rather than substituting a text map.
 - Treat URL autolinks such as `<https://example.com>` and email autolinks such as `<person@example.com>` as standard Markdown, not raw HTML.
 - Use Markdown image syntax rather than HTML image tags.
 - Keep images local when portability or offline presenting matters.
@@ -60,13 +61,13 @@ The plugin's syntax page describes square-bracket notes, but a bare Markdown blo
 Visible slide content.
 
 <!--
-Coach cue: Ask what changes when the audience applies this idea.
+Coach cue: What changes when the audience applies this idea?
 -->
 ```
 
 This is not arbitrary slide-body HTML. The compatibility restriction targets rendered HTML layout elements such as `<div>`, not Marp's comment-based directives or notes.
 
-Slides without coaching companions do not require speaker notes. When a pattern slide declares `Coach:`, its note block must contain one non-empty `Coach cue:` question ending in `?`.
+Speaker notes carry narrative and source metadata even when no coaching companion exists. Every pattern slide has one non-empty `Coach cue:` question ending in `?`; when a matching companion exists, link it under the note block's `Source:`.
 
 ## Density guardrails
 

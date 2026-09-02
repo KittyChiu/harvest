@@ -18,18 +18,18 @@ Move through:
 
 ## Assign stable pattern identities
 
-Give each atomic source a contiguous identifier (`P1` through `PN`), a short name, and a cluster. In update mode, preserve an existing pattern's ID unless the user approves a renumbering. Remove gaps after sources leave the MOC and update every map, comparison, scenario, and table consistently.
+Give each atomic source a contiguous internal identifier (`P1` through `PN`), a short name, and a cluster. In update mode, preserve an existing pattern's ID unless removing a source creates a gap; then minimally renumber the following patterns to restore contiguity. Use identifiers only in H6 position metadata and source matching; use short names in titles, Mermaid nodes, comparisons, scenarios, tables, and prose.
 
 One pattern slide contains:
 
-- its `Pn of N` position and cluster;
-- an assertion-led short name;
-- the atomic note's one-sentence Pattern;
-- observable Signals;
-- one to three concrete Practices;
-- one source link;
-- an optional supported relationship;
-- when a companion exists, one coach link and one question in a speaker-note comment.
+- its `p<n> of <N>` H6 position and cluster;
+- an assertion-led H1 short name;
+- one to three visible `Use when` signals;
+- one to three visible `Do` practices;
+- a speaker-note Pattern description;
+- one speaker-note Coach cue question;
+- an optional supported speaker-note relationship;
+- one atomic source link and, when available, its companion link under speaker-note `Source:`.
 
 Do not merge multiple atomic sources onto one pattern slide.
 
@@ -46,9 +46,11 @@ Atomic-note relationships are typed and directed. For a relationship declared by
 
 Do not reverse `Extension` or `Contrast` claims unless the other note declares its own relationship. Omit unsupported edges instead of completing a visually balanced graph.
 
-On a pattern slide, use `**Related:** P<n> · <name> through **<relationship>**`. Keep the `P<n>` target outside Markdown-link brackets so the relationship remains unambiguous and machine-checkable.
+On a pattern slide, put `Related:` in the speaker notes followed by `<target short name> (<relationship>)`. On system slides, use `<source short name> <relationship> <target short name>`. These names map through pattern-slide sources to the typed atomic relationships.
 
-Use Mermaid only when the user confirms that the target Marp setup renders it. Otherwise use a fenced `text` map with the same IDs and labels. The map is communication, not a new graph database.
+Omit `Related:` when no source-supported relationship exists. Do not use an empty field or a prose placeholder.
+
+Use fenced Mermaid for pattern maps and scenario flows. Mermaid nodes show exact pattern short names, never internal identifiers. If the target setup cannot render Mermaid, stop rather than substituting a text map.
 
 ## Apply without overstating
 
@@ -63,13 +65,18 @@ The before/after synthesis describes an expected direction, not a measured resul
 
 ## Use coaching companions
 
-Use a companion's Conversation section to select one open question for its pattern slide. Put the companion in `Coach:` and the question in an HTML comment:
+Every pattern slide has one open `Coach cue:` question in its speaker notes. When a companion exists, use its Conversation section to select the question and link the companion under `Source:`:
 
 ```markdown
-Coach: [Golden-path coaching](platform-golden-paths.coach.md)
-
 <!--
+Pattern description:
+When teams repeat setup decisions, provide a maintained path, because it removes avoidable choices.
+
 Coach cue: Where does repeated setup work consume the most attention?
+
+Source:
+[Golden paths](platform-golden-paths.md)
+[Golden-path coaching](platform-golden-paths.coach.md)
 -->
 ```
 
@@ -79,10 +86,10 @@ Do not turn Progress signals into targets or copy the companion into visible sli
 
 When the MOC changes:
 
-1. compare atomic sources with pattern slides;
+1. compare atomic sources with pattern-slide `Source:` fields;
 2. preserve IDs for retained patterns;
 3. add or remove pattern slides;
-4. make IDs contiguous and update every cross-reference;
+4. make internal IDs contiguous without adding them to visible titles or diagrams;
 5. revise clusters, maps, scenario, synthesis, and close;
 6. remove coach links for missing companions and add newly available ones;
 7. preserve confirmed configuration and useful unaffected content.

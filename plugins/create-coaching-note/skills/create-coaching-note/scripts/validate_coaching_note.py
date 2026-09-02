@@ -264,14 +264,18 @@ def main() -> int:
     if args.atomic_note.name.endswith(("-moc.md", ".coach.md", ".marp.md")):
         errors.append("Source must be an atomic note.")
 
+    atomic_titles = H1.findall(atomic)
     titles = H1.findall(coach)
+    if len(atomic_titles) != 1:
+        errors.append("Atomic note requires exactly one level-one title.")
     if len(titles) != 1:
         errors.append("Coaching note requires exactly one level-one title.")
-    elif not re.fullmatch(
-        r"Coaching companion:\s+\S.*", titles[0], re.IGNORECASE
+    elif len(atomic_titles) == 1 and titles[0] != (
+        f"Coaching companion: {atomic_titles[0]}"
     ):
         errors.append(
-            'Coaching-note title must use "Coaching companion: <atomic pattern title>".'
+            'Coaching-note title must use "Coaching companion: '
+            '<atomic pattern title>" and match the atomic pattern title exactly.'
         )
 
     atomic_parent = links(field(atomic, "Parent"))
@@ -280,8 +284,23 @@ def main() -> int:
         errors.append("Atomic note requires exactly one Parent MOC link.")
     if coach_parent != atomic_parent:
         errors.append("Coaching note must use the atomic note's Parent MOC.")
-    if args.atomic_note.name.lower() not in links(field(coach, "Companion to")):
-        errors.append("Coaching note must link to the atomic note in Companion to.")
+    companion_value = field(coach, "Companion to") or ""
+    companion_links = links(companion_value)
+    companion_link_count = len(WIKI_LINK.findall(companion_value)) + len(
+        MARKDOWN_LINK.findall(companion_value)
+    )
+    companion_remainder = WIKI_LINK.sub(
+        "",
+        MARKDOWN_LINK.sub("", companion_value),
+    ).strip()
+    if (
+        companion_links != {args.atomic_note.name.lower()}
+        or companion_link_count != 1
+        or companion_remainder
+    ):
+        errors.append(
+            "Coaching note Companion to must contain exactly one link to the atomic note."
+        )
 
     atomic_tags = field(atomic, "Tags")
     coach_tags = field(coach, "Tags")

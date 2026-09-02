@@ -14,6 +14,10 @@ VALIDATOR = Path(__file__).with_name("validate_atomic_note.py")
 TEMPLATE = (
     Path(__file__).parents[1] / "assets" / "atomic-note-template.md"
 ).read_text(encoding="utf-8")
+SKILL = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
+AUTHORING_GUIDE = (
+    Path(__file__).parents[1] / "references" / "graph-authoring.md"
+).read_text(encoding="utf-8")
 REQUIRED_SECTIONS = (
     "Pattern",
     "Practice",
@@ -142,6 +146,19 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         self.assertEqual(headings, list(REQUIRED_SECTIONS))
         self.assertTrue(TEMPLATE.endswith("\n"))
 
+    def test_contract_obfuscates_names_and_removes_sources(self) -> None:
+        self.assertIn(
+            "Replace customer, organization, and team names with neutral roles.",
+            TEMPLATE,
+        )
+        self.assertIn("Do not include source attribution", TEMPLATE)
+        self.assertIn("Obfuscate customer, organization, and team names", SKILL)
+        self.assertIn("`a customer`, `a product team`, or `an enablement group`", SKILL)
+        self.assertNotIn("customer ABC", SKILL)
+        self.assertNotIn("product team XYZ", SKILL)
+        self.assertIn("Obfuscate identities and remove sources", AUTHORING_GUIDE)
+        self.assertIn("Do not use reversible pseudonyms", AUTHORING_GUIDE)
+
     def test_template_is_scaffold_not_completed_note(self) -> None:
         result = run_validator(note=TEMPLATE)
         self.assertEqual(result.returncode, 1)
@@ -154,6 +171,89 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             "- Use concrete, observable behaviours.",
         )
         self.assert_invalid(note, "unreplaced template prompt(s)")
+
+    def test_rejects_source_attribution_field(self) -> None:
+        note = NOTE.replace(
+            "Tags: #platform #draft #private",
+            "Tags: #platform #draft #private\n"
+            "Source: Customer discovery interview",
+        )
+        self.assert_invalid(note, "must not include source, reference, citation")
+
+    def test_rejects_source_heading(self) -> None:
+        note = NOTE + "\n## Sources\n\nCustomer discovery notes.\n"
+        self.assert_invalid(note, "must not include source, reference, citation")
+
+    def test_rejects_bold_source_attribution(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Learning",
+            "A product team learned from repeated setup failures.\n\n"
+            "**Source:** Customer discovery interview.\n",
+        )
+        self.assert_invalid(note, "must not include source, reference, citation")
+
+    def test_rejects_attribution_field(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Learning",
+            "A product team learned from repeated setup failures.\n\n"
+            "Attribution: Customer discovery interview.\n",
+        )
+        self.assert_invalid(note, "must not include source, reference, citation")
+
+    def test_rejects_based_on_field(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Learning",
+            "A product team learned from repeated setup failures.\n\n"
+            "Based on: Customer discovery interview.\n",
+        )
+        self.assert_invalid(note, "must not include source, reference, citation")
+
+    def test_rejects_external_source_url(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Learning",
+            "A product team adopted maintained defaults after repeated setup "
+            "failures documented at https://example.com/customer-report.\n",
+        )
+        self.assert_invalid(note, "must not include external source URLs")
+
+    def test_rejects_external_source_url_inside_fenced_content(self) -> None:
+        note = replace_section_body(
+            NOTE,
+            "Learning",
+            "A product team learned from repeated setup failures.\n\n"
+            "```text\nhttps://example.com/customer-report\n```\n",
+        )
+        self.assert_invalid(note, "must not include external source URLs")
+
+    def test_rejects_external_source_url_in_moc_entry(self) -> None:
+        moc = MOC.replace(
+            "— Decide when a maintained default can remove repeated delivery choices.",
+            "— Decide when a maintained default can remove repeated delivery choices "
+            "from https://example.com/customer-report.",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "MOC entry for the atomic note must not include external source URLs",
+            result.stdout,
+        )
+
+    def test_rejects_source_attribution_in_moc_entry(self) -> None:
+        moc = MOC.replace(
+            "— Decide when a maintained default can remove repeated delivery choices.",
+            "— Decide when a maintained default can remove repeated delivery choices. "
+            "Based on: customer interview.",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "MOC entry for the atomic note must not include source attribution",
+            result.stdout,
+        )
 
     def test_rejects_each_missing_required_section(self) -> None:
         for section in REQUIRED_SECTIONS:
@@ -370,6 +470,13 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("visibility tag", result.stdout)
         self.assertIn("domain tag", result.stdout)
+
+    def test_does_not_treat_coaching_as_a_domain_tag(self) -> None:
+        note = NOTE.replace(
+            "#platform #draft #private",
+            "#coaching #draft #private",
+        )
+        self.assert_invalid(note, "domain tag")
 
     def test_rejects_multiple_workflow_tags(self) -> None:
         note = NOTE.replace(

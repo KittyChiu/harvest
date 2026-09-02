@@ -10,29 +10,79 @@ description: Present a domain as a connected system of reusable patterns and pra
 <!-- markdownlint-disable MD001 MD024 MD025 -->
 
 <!--
-Use the domain MOC, atomic pattern notes, and coaching companions.
+INPUTS
 
-Rules:
-- Assign each pattern a stable identifier: P1, P2, P3, and so on.
+Use:
+- The domain MOC
+- Atomic pattern notes
+- Coaching companions
+
+AUTHORING RULES
+
+Patterns:
+- Assign stable internal identifiers: P1, p2, p3, and so on.
 - Give each pattern a short, memorable name.
 - Present one pattern per slide.
-- State each pattern as: "When X, do Y, because Z."
-- Separate the pattern from its practices.
-- Only show relationships supported by the source notes.
-- Label relationships: enables, precedes, informs, complements, contrasts with,
-  or depends on.
-- Put coaching questions in presenter comments.
-- Replace the text maps with Mermaid only when rendering support is confirmed.
+- Do not show identifiers in slide titles or Mermaid nodes.
+- Use identifiers only in H6 position metadata and when matching patterns to source notes.
+- State the complete pattern in speaker notes:
+  When X, do Y, because Z.
+
+Slides:
+- Keep slides concise and presentation-focused.
+- Use H6 for lightweight metadata:
+  p2 of 6 · Cluster name
+- Show only signals, practices, comparisons, and diagrams.
+- Prefer no more than six bullets on a slide.
+- Use short pattern names throughout the visible deck.
+- Use Mermaid for pattern maps and flows.
+- Do not replace Mermaid diagrams with text maps.
+
+Speaker notes:
+- Move narrative and supporting metadata into speaker notes.
+- For pattern slides, use this order:
+  1. Pattern description
+  2. Coach cue
+  3. Related
+  4. Source
+- Include a Coach cue on every pattern slide.
+- Link a coaching companion under Source only when one exists.
+- Omit Related when no source-supported relationship exists.
+- Also move domain questions, domain takeaways, selection rationale,
+  evidence qualifiers, and remaining constraints into speaker notes.
+
+Relationships:
+- Show only relationships supported by source notes.
+- Use:
+  enables
+  precedes
+  informs
+  complements
+  contrasts with
+  depends on
 -->
 
 # [Domain name]
 
 ## [One-line domain promise]
 
-[Describe the outcome this domain helps people achieve.]
+[Outcome this domain helps people achieve.]
 
-MOC: [Domain name](domain-moc.md)
+<!--
+
+Narrative:
+[Why this domain matters and what the audience will learn.]
+
+Domain question:
+[What do these patterns collectively help answer?]
+
+Source:
+[Domain MOC](domain-moc.md)
+
+Metadata:
 Tags: #domain #slides #draft #private
+
+-->
 
 ---
 
@@ -50,97 +100,131 @@ Tags: #domain #slides #draft #private
 - [Capability the domain can enable]
 - [Value of connecting the patterns]
 
-> **Domain question:** [What do the patterns collectively help answer?]
+<!--
+
+Narrative:
+[Explain the tension between the challenges and opportunities.]
+
+Domain question:
+[What do these patterns collectively help answer?]
+
+Source:
+[Domain MOC](domain-moc.md)
+
+-->
 
 ---
 
 # Pattern map
 
-```text
-[Domain name]
-├── [Cluster 1]
-│   ├── P1 · [Pattern name]
-│   └── P2 · [Pattern name]
-├── [Cluster 2]
-│   └── P3 · [Pattern name]
-└── [Cluster 3]
-    └── P4 · [Pattern name]
+```mermaid
+flowchart LR
+    subgraph C1["[Cluster 1]"]
+        A["[Pattern name]"]
+        B["[Pattern name]"]
+    end
 
-P1 · [Pattern name] --[relationship]--> P3 · [Pattern name]
-P2 · [Pattern name] --[relationship]--> P3 · [Pattern name]
-P3 · [Pattern name] --[relationship]--> P4 · [Pattern name]
+    subgraph C2["[Cluster 2]"]
+        C["[Pattern name]"]
+        D["[Pattern name]"]
+    end
+
+    subgraph C3["[Cluster 3]"]
+        E["[Pattern name]"]
+    end
+
+    A -.->|contrasts with| B
+    C -->|enables| D
+    D -->|precedes| E
+    B -->|complements| E
 ```
 
----
-
-<!-- Repeat one slide for each pattern. -->
-
-###### PATTERN P1 OF [N] · [CLUSTER]
-
-# P1 · [Short pattern name]
-
-> **When [condition], [action], because [mechanism].**
-
-## Use it when
-
-- [Observable signal]
-- [Recurring situation]
-
-## Practices
-
-1. [Concrete action]
-2. [Concrete action]
-3. [Optional concrete action]
-
-**Related:** [P2 · Pattern name] through **[relationship]**
-
-Source: [Atomic pattern](domain-atomic-note.md)
-Coach: [Coaching companion](domain-atomic-note.coach.md)
-
 <!--
-Coach cue: [One question that helps the audience discover or apply the pattern.]
+
+Narrative:
+[Explain the clusters and the most important relationships.]
+
+Domain question:
+[What should the audience notice about the map?]
+
+Related:
+- [Pattern name] [relationship] [Pattern name]
+- [Pattern name] [relationship] [Pattern name]
+- [Pattern name] [relationship] [Pattern name]
+
+Source:
+[Domain MOC](domain-moc.md)
+
 -->
 
 ---
 
-###### PATTERN P2 OF [N] · [CLUSTER]
+<!--
+PATTERN SLIDE
 
-# P2 · [Short pattern name]
+Duplicate this slide once for each pattern.
+Replace the position, total, cluster, name, signals, practices, and notes.
+-->
 
-> **When [condition], [action], because [mechanism].**
+###### P[1] of [N] · [Cluster]
 
-## Use it when
+# [Short pattern name]
+
+### Use when
 
 - [Observable signal]
 - [Recurring situation]
 
-## Practices
+### Do
 
-1. [Concrete action]
-2. [Concrete action]
-3. [Optional concrete action]
-
-**Related:** [P1 · Pattern name] through **[relationship]**
-
-Source: [Atomic pattern](domain-atomic-note.md)
-Coach: [Coaching companion](domain-atomic-note.coach.md)
+- [Concrete practice]
+- [Concrete practice]
+- [Optional concrete practice]
 
 <!--
-Coach cue: [One question that helps the audience discover or apply the pattern.]
+
+Pattern description:
+When [condition], [action], because [mechanism].
+
+Coach cue:
+[Question that helps the audience discover or apply the pattern.]
+
+Related:
+[Short pattern name] ([relationship])
+
+Source:
+[Atomic pattern](domain-atomic-note.md)
+[Coaching companion](domain-atomic-note.coach.md)
+
 -->
 
 ---
 
-<!-- Optional: use when two patterns are alternatives. -->
+<!-- Optional: use only when two patterns are genuine alternatives. -->
 
-# Choosing between P1 and P2
+# Choosing between [pattern] and [pattern]
 
-| Situation   | Use                     |
-| ----------- | ----------------------- |
-| [Condition] | **P1 · [Pattern name]** |
-| [Condition] | **P2 · [Pattern name]** |
+| Situation | Use |
+| --- | --- |
+| [Condition] | **[Short pattern name]** |
+| [Condition] | **[Short pattern name]** |
 
-> **Selection rule:** When [condition], prefer [pattern], because [reason].
+<!--
+
+Selection rule:
+When [condition], prefer [pattern name], because [reason].
+
+Coach cue:
+Which observable condition distinguishes these choices?
+
+Related:
+[Pattern name] contrasts with [Pattern name]
+
+Source:
+[First atomic pattern](domain-atomic-note.md)
+[Second atomic pattern](domain-atomic-note.md)
+
+-->
 
 ---
 
@@ -148,58 +232,140 @@ Coach cue: [One question that helps the audience discover or apply the pattern.]
 
 ## Scenario: [Realistic situation]
 
-```text
-[Observed signal]
-       ↓
-P1 · [Pattern name]
-       ↓ [relationship]
-P3 · [Pattern name]
-       ↓ [relationship]
-P4 · [Pattern name]
-       ↓
-[Expected outcome]
+```mermaid
+flowchart LR
+    S["[Observed signal]"]
+    A["[Pattern name]"]
+    B["[Pattern name]"]
+    C["[Pattern name]"]
+    O["[Expected outcome]"]
+
+    S --> A
+    A -->|[relationship]| B
+    B -->|[relationship]| C
+    C --> O
 ```
 
 - **Start with:** [First practice]
 - **Then:** [Next practice]
 - **Watch for:** [Constraint or failure condition]
 
+<!--
+
+Narrative:
+[Explain why this sequence fits the scenario.]
+
+Coach cue:
+Where might this sequence branch or fail?
+
+Related:
+- [Pattern name] [relationship] [Pattern name]
+- [Pattern name] [relationship] [Pattern name]
+
+Source:
+[Domain MOC](domain-moc.md)
+[Relevant atomic pattern](domain-atomic-note.md)
+
+-->
+
 ---
 
 # What changes
 
-| Before              | Pattern | After                |
-| ------------------- | ------- | -------------------- |
-| [Current behaviour] | **P1**  | [Improved behaviour] |
-| [Current behaviour] | **P3**  | [Improved behaviour] |
-| [Current behaviour] | **P4**  | [Improved behaviour] |
+| Before | Pattern | After |
+| --- | --- | --- |
+| [Current behaviour] | **[Pattern name]** | [Improved behaviour] |
+| [Current behaviour] | **[Pattern name]** | [Improved behaviour] |
+| [Current behaviour] | **[Pattern name]** | [Improved behaviour] |
 
-> **Remaining constraint:** [What these patterns do not solve.]
+<!--
+
+Narrative:
+[Explain the expected direction of change.]
+
+Evidence:
+[State whether these are measured results, observed outcomes,
+hypotheses, or presentation synthesis.]
+
+Coach cue:
+Which change would provide the earliest useful evidence?
+
+Remaining constraint:
+[What these patterns do not solve.]
+
+Source:
+[Domain MOC](domain-moc.md)
+[Relevant evidence or atomic notes](domain-atomic-note.md)
+
+-->
 
 ---
 
 # Pattern map revisited
 
-```text
-[Domain name]
-├── P1 · [Pattern name]
-├── P2 · [Pattern name]
-├── P3 · [Pattern name]
-└── P4 · [Pattern name]
+```mermaid
+flowchart LR
+    subgraph C1["[Cluster 1]"]
+        A["[Pattern name]"]
+        B["[Pattern name]"]
+    end
 
-P1 · [Pattern name] --[relationship]--> P3 · [Pattern name]
-P3 · [Pattern name] --[relationship]--> P4 · [Pattern name]
+    subgraph C2["[Cluster 2]"]
+        C["[Pattern name]"]
+        D["[Pattern name]"]
+    end
+
+    subgraph C3["[Cluster 3]"]
+        E["[Pattern name]"]
+    end
+
+    A -.->|contrasts with| B
+    C -->|enables| D
+    D -->|precedes| E
+    B -->|complements| E
 ```
 
-> **Domain takeaway:** [Explain how the patterns work as a system.]
+<!--
+
+Domain takeaway:
+[Explain how the patterns work as a system.]
+
+Coach cue:
+Which relationship should the audience retain?
+
+Related:
+- [Pattern name] [relationship] [Pattern name]
+- [Pattern name] [relationship] [Pattern name]
+- [Pattern name] [relationship] [Pattern name]
+
+Source:
+[Domain MOC](domain-moc.md)
+
+-->
 
 ---
 
 # Choose one pattern to try
 
 - **Signal:** [Something observable]
-- **Pattern:** P[ ] · [Pattern name]
+- **Pattern:** [Short pattern name]
 - **Practice:** [One small action]
 - **Review:** [How the result will be discussed]
 
-> Start with the pattern that addresses the clearest signal.
+<!--
+
+Narrative:
+Start with the pattern that addresses the clearest observable signal.
+Apply one practice rather than adopting the entire system.
+
+Coach cue:
+What is the smallest action that could produce useful evidence?
+
+Related:
+[Pattern name] ([relationship, if applicable])
+
+Source:
+[Atomic pattern](domain-atomic-note.md)
+[Coaching companion](domain-atomic-note.coach.md)
+
+-->

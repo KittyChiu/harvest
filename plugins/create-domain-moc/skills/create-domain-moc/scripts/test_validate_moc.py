@@ -180,6 +180,13 @@ class ValidateMocTests(unittest.TestCase):
         self.assertIn("visibility tag", result.stdout)
         self.assertIn("domain tag", result.stdout)
 
+    def test_does_not_treat_slides_as_a_domain_tag(self) -> None:
+        result = run_validator(
+            moc=EMPTY_MOC.replace("#ai #moc #draft #private", "#slides #moc #draft #private")
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("domain tag", result.stdout)
+
     def test_requires_scope_and_notes(self) -> None:
         result = run_validator(
             moc=EMPTY_MOC.replace("## Scope", "## Purpose").replace(
@@ -274,6 +281,26 @@ Reusable ideas about AI engineering. Product setup belongs elsewhere.
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("cannot combine", result.stdout)
+
+    def test_rejects_arbitrary_notes_prose_without_atomic_links(self) -> None:
+        result = run_validator(
+            moc=EMPTY_MOC.replace(
+                "No atomic notes yet.",
+                "Patterns will be added after the next workshop.",
+            )
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must contain atomic-note links or exactly", result.stdout)
+
+    def test_rejects_modified_empty_state(self) -> None:
+        result = run_validator(
+            moc=EMPTY_MOC.replace(
+                "No atomic notes yet.",
+                "No atomic notes yet. Add one soon.",
+            )
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must contain atomic-note links or exactly", result.stdout)
 
 
 if __name__ == "__main__":

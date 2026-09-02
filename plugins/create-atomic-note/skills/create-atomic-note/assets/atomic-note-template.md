@@ -38,9 +38,11 @@ Apply this pattern when:
 
 ## Learning
 
-Record the observation, experience, failure, article, conversation, or analysis that led to discovering this pattern.
+Record the de-identified observation, experience, failure, or analysis that led to discovering this pattern.
 
 Write what was learned, not what should be done.
+Replace customer, organization, and team names with neutral roles.
+Do not include source attribution, citations, references, or external source URLs.
 
 ## Constraints
 

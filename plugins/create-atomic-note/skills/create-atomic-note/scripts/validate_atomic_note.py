@@ -19,7 +19,7 @@ TAG = re.compile(r"(?<!\w)#([a-z0-9][a-z0-9-]*)", re.IGNORECASE)
 WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9'-]*")
 WORKFLOW_TAGS = {"draft", "review", "publish"}
 VISIBILITY_TAGS = {"private", "public"}
-RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc"}
+RESERVED_TAGS = WORKFLOW_TAGS | VISIBILITY_TAGS | {"moc", "coaching", "slides"}
 REQUIRED_SECTIONS = (
     "pattern",
     "practice",
@@ -48,6 +48,29 @@ TYPED_RELATIONSHIP = re.compile(
 NO_RELATIONSHIPS = re.compile(
     r"\bno supported relationships?(?: exist)?(?: yet)?\b", re.IGNORECASE
 )
+SOURCE_ATTRIBUTION = re.compile(
+    r"^\s*(?:[-*+]\s+|#{1,6}\s+)?"
+    r"(?:\*\*|__)?(?:sources?|references?|citations?|attributions?|based on)"
+    r"(?:(?:\*\*|__)?:|:(?:\*\*|__)?)"
+    r"(?:\s|\Z)",
+    re.MULTILINE | re.IGNORECASE,
+)
+SOURCE_HEADING = re.compile(
+    r"^#{1,6}\s+(?:\*\*|__)?"
+    r"(?:sources?|references?|citations?|attributions?|based on)"
+    r"(?:\*\*|__)?\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+EXTERNAL_SOURCE_URL = re.compile(
+    r"(?<![\w.-])(?:https?://|www\.)[^\s<>()]+",
+    re.IGNORECASE,
+)
+MOC_SOURCE_ATTRIBUTION = re.compile(
+    r"\b(?:source|attribution|references?|citations?|based on)\s*:"
+    r"|\b(?:based on|derived from)\s+(?:an?\s+|the\s+)?"
+    r"(?:customer|client|team|interview|meeting|transcript|article|report)\b",
+    re.IGNORECASE,
+)
 TEMPLATE_PROMPTS = {
     "# Atomic reusable pattern",
     "State the reusable rule in a single sentence.",
@@ -65,8 +88,10 @@ TEMPLATE_PROMPTS = {
     "- Recurring situation",
     "- Trigger condition",
     "- Common failure mode",
-    "Record the observation, experience, failure, article, conversation, or analysis that led to discovering this pattern.",
+    "Record the de-identified observation, experience, failure, or analysis that led to discovering this pattern.",
     "Write what was learned, not what should be done.",
+    "Replace customer, organization, and team names with neutral roles.",
+    "Do not include source attribution, citations, references, or external source URLs.",
     "- When the pattern does not apply.",
     "- Trade-offs, assumptions, or costs.",
     "- Conditions that would make the pattern ineffective.",
@@ -239,8 +264,10 @@ def main() -> int:
         return 2
 
     errors: list[str] = []
-    note = strip_fenced_blocks(args.note.read_text(encoding="utf-8"))
-    moc = strip_fenced_blocks(args.moc.read_text(encoding="utf-8"))
+    raw_note = args.note.read_text(encoding="utf-8")
+    raw_moc = args.moc.read_text(encoding="utf-8")
+    note = strip_fenced_blocks(raw_note)
+    moc = strip_fenced_blocks(raw_moc)
 
     if TRANSCLUSION.search(note) or TRANSCLUSION.search(moc):
         errors.append("Atomic note and MOC must not use tool-specific wiki transclusions.")
@@ -250,6 +277,13 @@ def main() -> int:
             "Atomic note contains unreplaced template prompt(s): "
             + ", ".join(remaining_prompts)
         )
+    if SOURCE_ATTRIBUTION.search(raw_note) or SOURCE_HEADING.search(raw_note):
+        errors.append(
+            "Atomic note must not include source, reference, citation, "
+            "attribution, or based-on fields or headings."
+        )
+    if EXTERNAL_SOURCE_URL.search(raw_note):
+        errors.append("Atomic note must not include external source URLs.")
     if args.note.parent.resolve() != args.moc.parent.resolve():
         errors.append("Atomic note and MOC must be in the same knowledge directory.")
     if not args.note.name.endswith(".md") or args.note.name.endswith(
@@ -373,6 +407,12 @@ def main() -> int:
         errors.append("MOC must link to the atomic note.")
     elif not any(has_descriptive_link(line, args.note.name) for line in moc_link_lines):
         errors.append("MOC entry for the atomic note requires a navigation description.")
+    if EXTERNAL_SOURCE_URL.search("\n".join(moc_link_lines)):
+        errors.append("MOC entry for the atomic note must not include external source URLs.")
+    if MOC_SOURCE_ATTRIBUTION.search("\n".join(moc_link_lines)):
+        errors.append(
+            "MOC entry for the atomic note must not include source attribution."
+        )
     if moc_link_lines and EMPTY_MOC.search(moc_notes):
         errors.append(
             'MOC Notes cannot combine "No atomic notes yet." with atomic-note links.'

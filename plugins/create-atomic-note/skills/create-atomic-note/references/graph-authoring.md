@@ -19,6 +19,17 @@ When reading a source:
 4. Distinguish learning present in the source from recommendations synthesized for the note.
 5. Propose no more than three patterns and write only the selected one.
 
+## Obfuscate identities and remove sources
+
+Use the source as read-only grounding, not as content to reproduce or cite. Before proposing candidates or drafting the note:
+
+1. Replace customer, organization, account, and team names with stable neutral roles such as `a customer`, `a product team`, or `an enablement group`.
+2. Remove project codenames, locations, dates, organizational details, and combinations of facts that could identify the source when those details are not essential to the pattern.
+3. Generalize examples enough to be reusable while preserving the situation, mechanism, uncertainty, and constraint that make the learning valid.
+4. Remove source names, filenames, meeting and transcript references, citations, attribution fields, and external source URLs.
+
+Do not use reversible pseudonyms or labels such as `Customer A` when a neutral role works. Keep the same neutral role throughout the note when several statements refer to the same actor. The MOC entry describes the decision the pattern supports; it does not identify or cite the source.
+
 ## Test the causal chain
 
 Check the proposed note in both directions:
@@ -67,6 +78,8 @@ Before completion, confirm:
 
 - the note contains one reusable pattern rather than a topic;
 - source learning and synthesized recommendations remain distinguishable;
+- customer and team identities are obfuscated with neutral roles;
+- no source attribution, citation, reference, or external source URL remains;
 - the causal chain works in both directions;
 - the MOC is the correct navigation home;
 - every relationship has the right type and a supported explanation;
