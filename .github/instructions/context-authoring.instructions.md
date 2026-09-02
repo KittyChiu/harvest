@@ -1,9 +1,11 @@
 ---
-name: Instruction Artifact Authoring
+name: Context Authoring
 description: "Use when creating, reviewing, or revising SKILL.md, custom agent, prompt, or custom instruction files. Uses the context sandwich to make instructions focused, actionable, and verifiable."
-applyTo: "**/SKILL.md, **/*.agent.md, **/*.prompt.md, **/*.instructions.md"
+applyTo: "**/SKILL.md, **/*.agent.md, **/*.prompt.md, **/*.instructions.md, **/copilot-instructions.md"
 ---
-# Instruction Artifact Authoring
+# Context Authoring
+
+This instruction governs how instructional content communicates behavior. It does not define primitive architecture or prove behavioral reliability.
 
 ## Core Frame: Context Sandwich
 

@@ -1,9 +1,9 @@
 ---
-name: Copilot Skill and Plugin Design
+name: Skill and Plugin Design
 description: "Use when creating, reviewing, or refactoring Copilot skills, plugins, SKILL.md files, validators, references, scripts, or bundled assets. Enforces atomic capabilities, loose coupling, deterministic components, reuse, and concise maintenance."
 applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .claude/skills/**"
 ---
-# Copilot Skill and Plugin Design
+# Skill and Plugin Design
 
 ## Core Model
 
@@ -62,7 +62,7 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 
 - Test or validate every deterministic behavior, including contracts, permissions, assets, parsing, transformations, naming, and artifacts.
 - Cover both compliant cases and representative violations. Do not include prompt-driven behavior in deterministic tests.
-- Validate representative generated output against the approved source and intended outcome; passing structural checks alone is not sufficient.
+- Use [Primitive Review](../prompts/primitive-review.prompt.md) to evaluate whether prompt-driven output achieves the intended behavioral outcome; do not infer behavioral reliability from structural checks.
 - Run the skill's declared or bundled test suite from its source directory.
 - After installation, run integration or smoke tests against the installed skill path.
 
