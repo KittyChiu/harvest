@@ -1,0 +1,18 @@
+{
+  "name": "create-atomic-note",
+  "description": "Create or revise one atomic note and connect it to a domain Map of Content with meaningful internal links and filtering tags.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Kitty Chiu",
+    "url": "https://github.com/KittyChiu"
+  },
+  "homepage": "https://github.com/KittyChiu/harvest",
+  "repository": "https://github.com/KittyChiu/harvest",
+  "license": "MIT",
+  "keywords": [
+    "knowledge-graph",
+    "atomic-notes",
+    "pkm"
+  ],
+  "skills": "skills/"
+}

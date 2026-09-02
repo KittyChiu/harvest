@@ -25,7 +25,7 @@ python3 -m unittest discover -s .github/plugin/scripts -p 'test_*.py'
 Run all skill validator tests:
 
 ```bash
-for skill in create-knowledge-note create-learning-module create-obsidian-marp; do
+for skill in create-domain-moc create-atomic-note create-coaching-note create-obsidian-marp-slides; do
   python3 -m unittest discover -s "plugins/$skill/skills/$skill/scripts" -p 'test_*.py'
 done
 ```
@@ -33,7 +33,7 @@ done
 Load an affected plugin directly:
 
 ```bash
-copilot --plugin-dir ./plugins/create-knowledge-note plugin list
+copilot --plugin-dir ./plugins/create-atomic-note plugin list
 ```
 
 When changing a plugin version or metadata, update both its `plugin.json` and

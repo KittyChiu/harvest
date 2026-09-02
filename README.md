@@ -3,17 +3,30 @@
 [![CI](https://github.com/KittyChiu/harvest/actions/workflows/ci.yml/badge.svg)](https://github.com/KittyChiu/harvest/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A GitHub Copilot CLI plugin marketplace for turning source material into reusable knowledge and learning experiences.
+A GitHub Copilot CLI plugin marketplace for building a portable personal knowledge management (PKM) graph from domain Maps of Content, atomic notes, meaningful internal links, and filtering tags.
 
 ## Available plugins
 
 | Plugin | Capability |
 | --- | --- |
-| `create-knowledge-note` | Create or revise a concise second-brain knowledge note. |
-| `create-learning-module` | Create paired participant and coach guides for a self-paced module. |
-| `create-obsidian-marp` | Create a narrative Marp deck for the Obsidian Marp Slides plugin. |
+| `create-domain-moc` | Define one domain and create its navigation MOC. |
+| `create-atomic-note` | Create one atomic note and connect it to a domain MOC. |
+| `create-coaching-note` | Create the atomic note's supportive coaching companion. |
+| `create-obsidian-marp-slides` | Create or update the domain's single Obsidian Marp presentation, with speaker notes when coaching companions exist. |
 
-The skills include Python validators, so Python 3.10 or later is required when generating or validating an artifact.
+Together, the plugins use one flat directory in any file-based PKM tool:
+
+```text
+<knowledge-directory>/
+├── <domain>-moc.md
+├── <domain>-<idea>.md
+├── <domain>-<idea>.coach.md
+└── <domain>.marp.md
+```
+
+Portable relative Markdown links are the default. Wiki-style internal links are also accepted for PKM tools that use them. Each domain has at most one Marp presentation, which draws from the atomic notes linked by its MOC. Only `create-obsidian-marp-slides` is tool-specific because its output depends on the Obsidian Marp Slides plugin.
+
+Each plugin remains independently installable. The skills include Python validators, so Python 3.10 or later is required when generating or validating an artifact.
 
 ## Add the marketplace
 
@@ -27,9 +40,10 @@ copilot plugin marketplace browse harvest
 Install only the capabilities you need:
 
 ```bash
-copilot plugin install create-knowledge-note@harvest
-copilot plugin install create-learning-module@harvest
-copilot plugin install create-obsidian-marp@harvest
+copilot plugin install create-domain-moc@harvest
+copilot plugin install create-atomic-note@harvest
+copilot plugin install create-coaching-note@harvest
+copilot plugin install create-obsidian-marp-slides@harvest
 ```
 
 Restart an active Copilot CLI session after installation, then use `/skills list` to verify that the installed skill is available.
@@ -38,17 +52,17 @@ Restart an active Copilot CLI session after installation, then use `/skills list
 
 ```bash
 copilot plugin marketplace update harvest
-copilot plugin update create-knowledge-note
+copilot plugin update create-atomic-note
 ```
 
-Replace `create-knowledge-note` with the installed plugin you want to update.
+Replace `create-atomic-note` with the installed plugin you want to update.
 
 ## Local development
 
 Load a plugin directly from the repository without installing it:
 
 ```bash
-copilot --plugin-dir ./plugins/create-knowledge-note plugin list
+copilot --plugin-dir ./plugins/create-atomic-note plugin list
 ```
 
 Each directory under `plugins/` is an independent plugin. The marketplace catalog is defined in `.github/plugin/marketplace.json`.

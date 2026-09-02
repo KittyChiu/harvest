@@ -1,0 +1,18 @@
+{
+  "name": "create-coaching-note",
+  "description": "Create or revise a supportive coaching companion for one atomic knowledge note.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Kitty Chiu",
+    "url": "https://github.com/KittyChiu"
+  },
+  "homepage": "https://github.com/KittyChiu/harvest",
+  "repository": "https://github.com/KittyChiu/harvest",
+  "license": "MIT",
+  "keywords": [
+    "coaching",
+    "atomic-notes",
+    "knowledge-graph"
+  ],
+  "skills": "skills/"
+}

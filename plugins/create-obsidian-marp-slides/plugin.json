@@ -1,0 +1,19 @@
+{
+  "name": "create-obsidian-marp-slides",
+  "description": "Create or update one domain's shared Obsidian Marp presentation from its MOC and atomic notes, adding speaker notes when coaching companions exist.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Kitty Chiu",
+    "url": "https://github.com/KittyChiu"
+  },
+  "homepage": "https://github.com/KittyChiu/harvest",
+  "repository": "https://github.com/KittyChiu/harvest",
+  "license": "MIT",
+  "keywords": [
+    "marp",
+    "obsidian",
+    "coaching",
+    "domain-moc"
+  ],
+  "skills": "skills/"
+}

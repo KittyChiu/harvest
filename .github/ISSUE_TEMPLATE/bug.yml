@@ -9,9 +9,10 @@ body:
     attributes:
       label: Plugin
       options:
-        - create-knowledge-note
-        - create-learning-module
-        - create-obsidian-marp
+        - create-domain-moc
+        - create-atomic-note
+        - create-coaching-note
+        - create-obsidian-marp-slides
         - Marketplace or installation
     validations:
       required: true

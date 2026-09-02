@@ -62,7 +62,7 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 
 - Test or validate every deterministic behavior, including contracts, permissions, assets, parsing, transformations, naming, and artifacts.
 - Cover both compliant cases and representative violations. Do not include prompt-driven behavior in deterministic tests.
-- Use [Primitive Review](../prompts/primitive-review.prompt.md) to evaluate whether prompt-driven output achieves the intended behavioral outcome; do not infer behavioral reliability from structural checks.
+- Use [Review Primitive](../prompts/review-primitive.prompt.md) to evaluate whether prompt-driven output achieves the intended behavioral outcome; do not infer behavioral reliability from structural checks.
 - Run the skill's declared or bundled test suite from its source directory.
 - After installation, run integration or smoke tests against the installed skill path.
 

@@ -4,30 +4,37 @@
     "name": "Kitty Chiu"
   },
   "metadata": {
-    "description": "Plugins for turning source material into reusable knowledge and learning experiences.",
-    "version": "1.0.0"
+    "description": "Plugins for building a portable PKM knowledge graph from MOCs, atomic notes, meaningful internal links, tags, and companion coaching assets.",
+    "version": "2.0.0"
   },
   "plugins": [
     {
-      "name": "create-knowledge-note",
-      "description": "Create or revise a concise, self-contained second-brain knowledge note from transcripts, notes, research, or existing thought-leadership material.",
+      "name": "create-domain-moc",
+      "description": "Create or revise one domain Map of Content that defines scope and provides descriptive navigation to atomic notes.",
       "version": "1.0.0",
       "license": "MIT",
-      "source": "./plugins/create-knowledge-note"
+      "source": "./plugins/create-domain-moc"
     },
     {
-      "name": "create-learning-module",
-      "description": "Create a modular self-paced learning experience with complementary participant and coach guides.",
+      "name": "create-atomic-note",
+      "description": "Create or revise one atomic note and connect it to a domain Map of Content with meaningful internal links and filtering tags.",
       "version": "1.0.0",
       "license": "MIT",
-      "source": "./plugins/create-learning-module"
+      "source": "./plugins/create-atomic-note"
     },
     {
-      "name": "create-obsidian-marp",
-      "description": "Create a narrative Marp presentation with speaker notes for the Obsidian Marp Slides plugin.",
+      "name": "create-coaching-note",
+      "description": "Create or revise a supportive coaching companion for one atomic knowledge note.",
       "version": "1.0.0",
       "license": "MIT",
-      "source": "./plugins/create-obsidian-marp"
+      "source": "./plugins/create-coaching-note"
+    },
+    {
+      "name": "create-obsidian-marp-slides",
+      "description": "Create or update one domain's shared Obsidian Marp presentation from its MOC and atomic notes, adding speaker notes when coaching companions exist.",
+      "version": "1.0.0",
+      "license": "MIT",
+      "source": "./plugins/create-obsidian-marp-slides"
     }
   ]
 }
