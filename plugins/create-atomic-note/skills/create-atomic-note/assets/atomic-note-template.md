@@ -1,7 +1,28 @@
-# Atomic reusable pattern
+---
+type: Reusable Pattern
+title: "<Pattern title>"
+description: "<One-sentence decision summary>"
+tags:
+  - <domain-tag>
+  - draft
+  - private
+status: draft
+sources:
+  - id: source-learning
+    resource: "<Approved URI, bundle path, or non-identifying scope descriptor>"
+    title: "<De-identified source label>"
+generated:
+  by: create-atomic-note/1.1.0
+  at: "<Generation timestamp with UTC offset>"
+verified:
+  - by: "<Verifier actor; remove the verified field when not confirmed>"
+    at: "<Verification timestamp; remove the verified field when not confirmed>"
+stale_after: "<Expiration timestamp; remove when no evidence-backed expiry exists>"
+---
+
+# Pattern title
 
 Parent: [Domain name](domain-moc.md)
-Tags: #domain #draft #private
 
 ## Pattern
 
@@ -42,7 +63,7 @@ Record the de-identified observation, experience, failure, or analysis that led 
 
 Write what was learned, not what should be done.
 Replace customer, organization, and team names with neutral roles.
-Do not include source attribution, citations, references, or external source URLs.
+Keep source identities and sensitive details out of the body.
 
 ## Constraints
 

@@ -17,15 +17,15 @@
     },
     {
       "name": "create-atomic-note",
-      "description": "Create or revise one reusable knowledge pattern and connect it to a domain Map of Content with practical signals, learning, constraints, links, and tags.",
-      "version": "1.0.0",
+      "description": "Create or revise one OKF-compatible reusable knowledge pattern with provenance, lifecycle, trust, freshness, and domain graph links.",
+      "version": "1.1.0",
       "license": "MIT",
       "source": "./plugins/create-atomic-note"
     },
     {
       "name": "create-coaching-note",
       "description": "Create or revise a coaching companion with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "license": "MIT",
       "source": "./plugins/create-coaching-note"
     },

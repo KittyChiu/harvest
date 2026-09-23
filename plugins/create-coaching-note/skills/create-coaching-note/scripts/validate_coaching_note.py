@@ -86,6 +86,41 @@ def field(text: str, name: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
+def split_frontmatter(text: str) -> tuple[list[str], str]:
+    lines = text.splitlines()
+    if not lines or lines[0] != "---":
+        return [], text
+    try:
+        end = lines.index("---", 1)
+    except ValueError:
+        return [], text
+    return lines[1:end], "\n".join(lines[end + 1 :]).lstrip("\n")
+
+
+def frontmatter_tags(lines: list[str]) -> list[str]:
+    for index, line in enumerate(lines):
+        match = re.fullmatch(r"tags:\s*(.*?)\s*", line)
+        if match is None:
+            continue
+        inline = match.group(1)
+        if inline.startswith("[") and inline.endswith("]"):
+            contents = inline[1:-1].strip()
+            return [
+                value.strip().strip("\"'")
+                for value in contents.split(",")
+                if value.strip()
+            ]
+        tags: list[str] = []
+        for nested in lines[index + 1 :]:
+            if nested and not nested[0].isspace():
+                break
+            item = re.fullmatch(r"\s{2}-\s+(.+?)\s*", nested)
+            if item:
+                tags.append(item.group(1).strip().strip("\"'"))
+        return tags
+    return []
+
+
 def markdown_link_target(destination: str) -> str | None:
     destination = destination.strip("<>")
     if (
@@ -244,7 +279,9 @@ def main() -> int:
             fail(f"File not found: {path}")
         return 2
 
-    atomic = strip_fenced_blocks(args.atomic_note.read_text(encoding="utf-8"))
+    raw_atomic = args.atomic_note.read_text(encoding="utf-8")
+    atomic_frontmatter, atomic_body = split_frontmatter(raw_atomic)
+    atomic = strip_fenced_blocks(atomic_body)
     coach = strip_fenced_blocks(args.coach_note.read_text(encoding="utf-8"))
     errors: list[str] = []
 
@@ -302,7 +339,12 @@ def main() -> int:
             "Coaching note Companion to must contain exactly one link to the atomic note."
         )
 
-    atomic_tags = field(atomic, "Tags")
+    okf_tags = frontmatter_tags(atomic_frontmatter)
+    atomic_tags = (
+        " ".join(f"#{tag}" for tag in okf_tags)
+        if okf_tags
+        else field(atomic, "Tags")
+    )
     coach_tags = field(coach, "Tags")
     atomic_domains = domain_tags(atomic_tags)
     if not atomic_domains:

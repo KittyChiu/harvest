@@ -10,7 +10,7 @@ A GitHub Copilot CLI plugin marketplace for building a portable personal knowled
 | Plugin | Capability |
 | --- | --- |
 | `create-domain-moc` | Define one domain and create its navigation MOC. |
-| `create-atomic-note` | Create one reusable knowledge pattern and connect it to a domain MOC. |
+| `create-atomic-note` | Create one OKF v0.2 reusable knowledge pattern and connect it to a domain MOC. |
 | `create-coaching-note` | Turn one atomic pattern into a supportive coaching experience. |
 | `create-obsidian-marp-slides` | Present the domain as one connected system of patterns, practices, and optional coaching companions. |
 
@@ -24,7 +24,9 @@ Together, the plugins use one flat directory in any file-based PKM tool:
 └── <domain>.marp.md
 ```
 
-Portable relative Markdown links are the default. Wiki-style internal links are also accepted for PKM tools that use them. Each domain has at most one Marp presentation, which draws from the atomic notes linked by its MOC. Only `create-obsidian-marp-slides` is tool-specific because its output depends on the Obsidian Marp Slides plugin.
+Portable relative Markdown links are the default and are required in OKF atomic notes. Other artifacts also accept wiki-style internal links for PKM tools that use them. Each domain has at most one Marp presentation, which draws from the atomic notes linked by its MOC. Only `create-obsidian-marp-slides` is tool-specific because its output depends on the Obsidian Marp Slides plugin.
+
+Atomic notes use [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md): Markdown with YAML frontmatter for metadata, tags, provenance, lifecycle, trust, and freshness.
 
 Each plugin remains independently installable. The skills include Python validators, so Python 3.10 or later is required when generating or validating an artifact.
 

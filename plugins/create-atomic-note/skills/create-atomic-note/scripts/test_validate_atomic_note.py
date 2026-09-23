@@ -28,10 +28,29 @@ REQUIRED_SECTIONS = (
     "Relationships",
 )
 
-NOTE = """# Golden paths reduce cognitive load
+TAG_BLOCK = """tags:
+  - platform
+  - draft
+  - private"""
+
+NOTE = f"""---
+type: Reusable Pattern
+title: Golden paths reduce cognitive load
+description: Provide a maintained default when repeated delivery choices consume attention.
+{TAG_BLOCK}
+status: draft
+sources:
+  - id: source-learning
+    resource: private source material supplied for pattern extraction
+    title: De-identified learning source
+generated:
+  by: create-atomic-note/1.1.0
+  at: 2026-09-23T13:00:00Z
+---
+
+# Golden paths reduce cognitive load
 
 Parent: [Platform](platform-moc.md)
-Tags: #platform #draft #private
 
 ## Pattern
 
@@ -136,6 +155,15 @@ def replace_section_body(note: str, section: str, body: str) -> str:
     )
 
 
+def remove_frontmatter_field(note: str, field: str) -> str:
+    return re.sub(
+        rf"^{re.escape(field)}:[^\n]*\n(?:^[ ]+.*\n)*",
+        "",
+        note,
+        flags=re.MULTILINE,
+    )
+
+
 class ValidateAtomicNoteTests(unittest.TestCase):
     def assert_invalid(self, note: str, message: str, **kwargs: object) -> None:
         result = run_validator(note=note, **kwargs)
@@ -157,19 +185,25 @@ class ValidateAtomicNoteTests(unittest.TestCase):
     def test_template_defines_exact_section_schema(self) -> None:
         headings = re.findall(r"^##\s+(.+?)\s*$", TEMPLATE, re.MULTILINE)
         self.assertEqual(headings, list(REQUIRED_SECTIONS))
+        self.assertTrue(TEMPLATE.startswith("---\ntype: Reusable Pattern\n"))
         self.assertTrue(TEMPLATE.endswith("\n"))
 
-    def test_contract_obfuscates_names_and_removes_sources(self) -> None:
+    def test_contract_obfuscates_names_and_records_safe_provenance(self) -> None:
         self.assertIn(
             "Replace customer, organization, and team names with neutral roles.",
             TEMPLATE,
         )
-        self.assertIn("Do not include source attribution", TEMPLATE)
+        self.assertIn("sources:", TEMPLATE)
+        self.assertIn("Keep source identities and sensitive details", TEMPLATE)
         self.assertIn("Obfuscate customer, organization, and team names", SKILL)
         self.assertIn("`a customer`, `a product team`, or `an enablement group`", SKILL)
+        self.assertIn("non-identifying scope descriptor", SKILL)
+        self.assertIn("generated.by", SKILL)
+        self.assertIn("stale_after", SKILL)
         self.assertNotIn("customer ABC", SKILL)
         self.assertNotIn("product team XYZ", SKILL)
-        self.assertIn("Obfuscate identities and remove sources", AUTHORING_GUIDE)
+        self.assertIn("Obfuscate identities and record safe provenance", AUTHORING_GUIDE)
+        self.assertIn("Apply OKF metadata", AUTHORING_GUIDE)
         self.assertIn("Do not use reversible pseudonyms", AUTHORING_GUIDE)
 
     def test_template_is_scaffold_not_completed_note(self) -> None:
@@ -185,17 +219,53 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         )
         self.assert_invalid(note, "unreplaced template prompt(s)")
 
+    def test_requires_yaml_frontmatter(self) -> None:
+        note = NOTE.split("---\n", 2)[2]
+        self.assert_invalid(note, "must start with YAML frontmatter")
+
+    def test_requires_each_okf_frontmatter_field(self) -> None:
+        for field in (
+            "type",
+            "title",
+            "description",
+            "tags",
+            "status",
+            "sources",
+            "generated",
+        ):
+            with self.subTest(field=field):
+                note = remove_frontmatter_field(NOTE, field)
+                self.assert_invalid(note, "missing required OKF frontmatter")
+
+    def test_requires_reusable_pattern_type(self) -> None:
+        note = NOTE.replace("type: Reusable Pattern", "type: Playbook")
+        self.assert_invalid(note, 'type must be "Reusable Pattern"')
+
+    def test_requires_frontmatter_title_to_match_h1(self) -> None:
+        note = NOTE.replace(
+            "title: Golden paths reduce cognitive load",
+            "title: A different title",
+        )
+        self.assert_invalid(note, "title must match the H1")
+
+    def test_requires_one_sentence_description(self) -> None:
+        note = NOTE.replace(
+            "description: Provide a maintained default when repeated delivery choices consume attention.",
+            "description: Provide a default. Preserve escape hatches.",
+        )
+        self.assert_invalid(note, "description must be one sentence")
+
     def test_rejects_source_attribution_field(self) -> None:
         note = NOTE.replace(
-            "Tags: #platform #draft #private",
-            "Tags: #platform #draft #private\n"
+            "Parent: [Platform](platform-moc.md)",
+            "Parent: [Platform](platform-moc.md)\n"
             "Source: Customer discovery interview",
         )
-        self.assert_invalid(note, "must not include source, reference, citation")
+        self.assert_invalid(note, "use frontmatter sources")
 
     def test_rejects_source_heading(self) -> None:
         note = NOTE + "\n## Sources\n\nCustomer discovery notes.\n"
-        self.assert_invalid(note, "must not include source, reference, citation")
+        self.assert_invalid(note, "use frontmatter sources")
 
     def test_rejects_bold_source_attribution(self) -> None:
         note = replace_section_body(
@@ -204,7 +274,7 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             "A product team learned from repeated setup failures.\n\n"
             "**Source:** Customer discovery interview.\n",
         )
-        self.assert_invalid(note, "must not include source, reference, citation")
+        self.assert_invalid(note, "use frontmatter sources")
 
     def test_rejects_attribution_field(self) -> None:
         note = replace_section_body(
@@ -213,7 +283,7 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             "A product team learned from repeated setup failures.\n\n"
             "Attribution: Customer discovery interview.\n",
         )
-        self.assert_invalid(note, "must not include source, reference, citation")
+        self.assert_invalid(note, "use frontmatter sources")
 
     def test_rejects_based_on_field(self) -> None:
         note = replace_section_body(
@@ -222,7 +292,79 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             "A product team learned from repeated setup failures.\n\n"
             "Based on: Customer discovery interview.\n",
         )
-        self.assert_invalid(note, "must not include source, reference, citation")
+        self.assert_invalid(note, "use frontmatter sources")
+
+    def test_accepts_approved_external_provenance_resource(self) -> None:
+        note = NOTE.replace(
+            "resource: private source material supplied for pattern extraction",
+            "resource: https://example.com/public-guidance",
+        )
+        result = run_validator(note=note)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_requires_source_id_and_resource(self) -> None:
+        note = NOTE.replace("  - id: source-learning\n", "  - title: Source\n")
+        self.assert_invalid(note, 'source requires an "id"')
+        note = NOTE.replace(
+            "    resource: private source material supplied for pattern extraction\n",
+            "",
+        )
+        self.assert_invalid(note, 'source requires a "resource"')
+
+    def test_requires_generated_actor_and_timestamp(self) -> None:
+        note = NOTE.replace(
+            "  by: create-atomic-note/1.1.0",
+            "  by: invalid actor",
+        )
+        self.assert_invalid(note, "producer/version")
+        note = NOTE.replace(
+            "  at: 2026-09-23T13:00:00Z",
+            "  at: 2026-09-23T13:00:00",
+        )
+        self.assert_invalid(note, "with a UTC offset")
+
+    def test_accepts_verified_trust_event(self) -> None:
+        note = NOTE.replace(
+            "---\n\n# Golden paths",
+            "verified:\n"
+            "  - by: human:reviewer\n"
+            "    at: 2026-09-23T14:00:00Z\n"
+            "---\n\n# Golden paths",
+        )
+        result = run_validator(note=note)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_rejects_unverifiable_trust_event(self) -> None:
+        note = NOTE.replace(
+            "---\n\n# Golden paths",
+            "verified:\n"
+            "  - by: reviewer\n"
+            "    at: yesterday\n"
+            "---\n\n# Golden paths",
+        )
+        self.assert_invalid(note, "producer/version")
+        self.assert_invalid(note, "with a UTC offset")
+
+    def test_validates_optional_freshness_timestamp(self) -> None:
+        note = NOTE.replace(
+            "---\n\n# Golden paths",
+            "stale_after: 2027-01-01T00:00:00Z\n"
+            "---\n\n# Golden paths",
+        )
+        result = run_validator(note=note)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        invalid = note.replace(
+            "stale_after: 2027-01-01T00:00:00Z",
+            "stale_after: someday",
+        )
+        self.assert_invalid(invalid, "with a UTC offset")
+
+    def test_requires_lifecycle_to_match_workflow(self) -> None:
+        note = NOTE.replace("status: draft", "status: stable")
+        self.assert_invalid(note, "Stable status requires the publish workflow tag")
+        published = note.replace("  - draft", "  - publish")
+        result = run_validator(note=published)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_rejects_external_source_url(self) -> None:
         note = replace_section_body(
@@ -460,7 +602,7 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         )
         self.assert_invalid(note, "flat lowercase kebab-case")
 
-    def test_accepts_wiki_style_links_for_compatible_pkm_tools(self) -> None:
+    def test_rejects_wiki_style_links_in_okf_atomic_note(self) -> None:
         note = NOTE.replace("[Platform](platform-moc.md)", "[[platform-moc]]").replace(
             "[Platform teams as products](platform-team-as-a-product.md)",
             "[[platform-team-as-a-product|Platform teams as products]]",
@@ -470,7 +612,8 @@ class ValidateAtomicNoteTests(unittest.TestCase):
             "[[platform-golden-paths-reduce-cognitive-load|Golden paths reduce cognitive load]]",
         )
         result = run_validator(note=note, moc=moc)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must use standard Markdown links", result.stdout)
 
     def test_rejects_tool_specific_wiki_transclusions(self) -> None:
         note = NOTE.replace(
@@ -529,24 +672,29 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         )
 
     def test_requires_tag_categories(self) -> None:
-        note = NOTE.replace("#platform #draft #private", "#draft")
+        note = NOTE.replace(TAG_BLOCK, "tags:\n  - draft")
         result = run_validator(note=note)
         self.assertEqual(result.returncode, 1)
-        self.assertIn("visibility tag", result.stdout)
-        self.assertIn("domain tag", result.stdout)
+        self.assertIn("visibility value", result.stdout)
+        self.assertIn("domain value", result.stdout)
 
     def test_does_not_treat_coaching_as_a_domain_tag(self) -> None:
         note = NOTE.replace(
-            "#platform #draft #private",
-            "#coaching #draft #private",
+            TAG_BLOCK,
+            "tags:\n  - coaching\n  - draft\n  - private",
         )
-        self.assert_invalid(note, "domain tag")
+        self.assert_invalid(note, "domain value")
 
     def test_rejects_multiple_workflow_tags(self) -> None:
         note = NOTE.replace(
-            "#platform #draft #private", "#platform #draft #review #private"
+            TAG_BLOCK,
+            "tags:\n  - platform\n  - draft\n  - review\n  - private",
         )
-        self.assert_invalid(note, "exactly one workflow")
+        self.assert_invalid(note, "exactly one workflow value")
+
+    def test_rejects_hash_prefixed_frontmatter_tags(self) -> None:
+        note = NOTE.replace("  - platform", "  - '#platform'")
+        self.assert_invalid(note, "without #")
 
     def test_requires_moc_filter_tags(self) -> None:
         result = run_validator(moc=MOC.replace(" #draft #private", ""))

@@ -1,7 +1,7 @@
 {
   "name": "create-atomic-note",
-  "description": "Create or revise one reusable knowledge pattern and connect it to a domain Map of Content with practical signals, learning, constraints, links, and tags.",
-  "version": "1.0.0",
+  "description": "Create or revise one OKF-compatible reusable knowledge pattern with provenance, lifecycle, trust, freshness, and domain graph links.",
+  "version": "1.1.0",
   "author": {
     "name": "Kitty Chiu",
     "url": "https://github.com/KittyChiu"
@@ -12,6 +12,8 @@
   "keywords": [
     "knowledge-graph",
     "atomic-notes",
+    "open-knowledge-format",
+    "okf",
     "pkm"
   ],
   "skills": "skills/"

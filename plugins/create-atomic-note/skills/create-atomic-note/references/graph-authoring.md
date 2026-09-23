@@ -19,16 +19,33 @@ When reading a source:
 4. Distinguish learning present in the source from recommendations synthesized for the note.
 5. Propose no more than three patterns and write only the selected one.
 
-## Obfuscate identities and remove sources
+## Obfuscate identities and record safe provenance
 
-Use the source as read-only grounding, not as content to reproduce or cite. Before proposing candidates or drafting the note:
+Use the source as read-only grounding, not as body content to reproduce or cite. Before proposing candidates or drafting the note:
 
 1. Replace customer, organization, account, and team names with stable neutral roles such as `a customer`, `a product team`, or `an enablement group`.
 2. Remove project codenames, locations, dates, organizational details, and combinations of facts that could identify the source when those details are not essential to the pattern.
 3. Generalize examples enough to be reusable while preserving the situation, mechanism, uncertainty, and constraint that make the learning valid.
-4. Remove source names, filenames, meeting and transcript references, citations, attribution fields, and external source URLs.
+4. Remove source names, filenames, meeting and transcript references, citations, attribution prose, and external source URLs from the body and MOC entry.
+5. Record provenance in frontmatter `sources`. Use a non-identifying scope descriptor by default; use a path or URL only when the user explicitly approves exposing it.
 
-Do not use reversible pseudonyms or labels such as `Customer A` when a neutral role works. Keep the same neutral role throughout the note when several statements refer to the same actor. The MOC entry describes the decision the pattern supports; it does not identify or cite the source.
+Each source requires a lowercase kebab-case `id` and a `resource` accepted by OKF: an approved absolute URL, a bundle-relative path, or a scope descriptor. An optional `title` must be de-identified. Do not use reversible pseudonyms or labels such as `Customer A` when a neutral role works. Keep the same neutral role throughout the note when several statements refer to the same actor. The MOC entry describes the decision the pattern supports; it does not identify or cite the source.
+
+## Apply OKF metadata
+
+Use OKF v0.2 YAML frontmatter:
+
+- `type`: always `Reusable Pattern`;
+- `title`: exactly the H1 title;
+- `description`: one sentence describing the supported decision;
+- `tags`: domain, workflow, and visibility values without `#`;
+- `status`: `draft`, `stable`, or `deprecated`;
+- `sources`: de-identified provenance;
+- `generated`: the producer actor and meaningful-change timestamp.
+
+Use `status: draft` with the `draft` or `review` workflow tag. Use `status: stable` with `publish`. Reserve `deprecated` for a retained, formerly published pattern and keep the `publish` workflow tag.
+
+`generated` describes production, not confirmation. Add `verified` only for a real verification event. Its absence explicitly means unverified. Add `stale_after` only when a source or approved policy establishes an expiry; absence means that no expiry is scheduled, not that the pattern is permanently true.
 
 ## Test the causal chain
 
@@ -62,17 +79,17 @@ Choose a relationship type by the role the linked note plays:
 
 Explain the connection in the same list item. Do not add a link because two notes share a topic. Prefer an explicit no-relationship state over planned, dangling, or decorative links.
 
-Use portable relative Markdown links by default. Wiki-style links are acceptable when the selected PKM tool prefers them. Every target must already exist in the approved knowledge directory.
+Use standard relative Markdown links. OKF relationships are directed links whose type and meaning come from the surrounding prose. Do not use wiki-style links or transclusions. Every target must already exist in the approved knowledge directory.
 
 ## Apply graph tags
 
-Use inline tags for three independent filtering dimensions:
+Use frontmatter `tags` YAML list values for three independent filtering dimensions:
 
-- domain: one or more subject tags;
-- workflow: exactly one of `#draft`, `#review`, or `#publish`;
-- visibility: exactly one of `#private` or `#public`.
+- domain: one or more lowercase kebab-case subject tags;
+- workflow: exactly one of `draft`, `review`, or `publish`;
+- visibility: exactly one of `private` or `public`.
 
-Tags do not replace MOC membership or relationship prose. Do not add tool-specific front matter, properties, queries, transclusions, or plugins unless explicitly requested.
+Tags do not replace MOC membership or relationship prose. Do not add tool-specific properties, queries, transclusions, or plugins.
 
 ## Review
 
@@ -81,7 +98,8 @@ Before completion, confirm:
 - the note contains one reusable pattern rather than a topic;
 - source learning and synthesized recommendations remain distinguishable;
 - customer and team identities are obfuscated with neutral roles;
-- no source attribution, citation, reference, or external source URL remains;
+- provenance is recorded in frontmatter without exposing unapproved identities or locations;
+- lifecycle, production, verification, and expiry metadata are truthful;
 - the causal chain works in both directions;
 - the MOC is the correct navigation home;
 - every relationship has the right type and a supported explanation;

@@ -1,7 +1,7 @@
 {
   "name": "create-coaching-note",
   "description": "Create or revise a coaching companion with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Kitty Chiu",
     "url": "https://github.com/KittyChiu"

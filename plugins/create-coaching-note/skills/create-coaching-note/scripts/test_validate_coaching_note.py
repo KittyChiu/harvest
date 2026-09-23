@@ -25,10 +25,26 @@ REQUIRED_SECTIONS = (
 )
 ADOPTION_SUBSECTIONS = ("Start", "Continue", "Stop")
 
-ATOMIC = """# Sharing knowledge creates reusable team memory
+ATOMIC = """---
+type: Reusable Pattern
+title: Sharing knowledge creates reusable team memory
+description: Capture reusable decisions when teams repeatedly rediscover knowledge.
+tags:
+  - leadership
+  - draft
+  - private
+status: draft
+sources:
+  - id: source-learning
+    resource: private source material
+generated:
+  by: create-atomic-note/1.1.0
+  at: 2026-09-23T13:00:00Z
+---
+
+# Sharing knowledge creates reusable team memory
 
 Parent: [Culture](culture-moc.md)
-Tags: #leadership #draft #private
 
 ## Pattern
 
@@ -181,6 +197,15 @@ class ValidateCoachingNoteTests(unittest.TestCase):
         result = run_validator(coach=coach, **kwargs)
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn(message, result.stdout)
+
+    def test_accepts_legacy_atomic_body_tags(self) -> None:
+        legacy_atomic = ATOMIC.split("---\n", 2)[2].replace(
+            "Parent: [Culture](culture-moc.md)",
+            "Parent: [Culture](culture-moc.md)\n"
+            "Tags: #leadership #draft #private",
+        )
+        result = run_validator(atomic=legacy_atomic)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_accepts_completed_coaching_companion(self) -> None:
         result = run_validator()
