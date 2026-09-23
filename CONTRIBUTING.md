@@ -38,6 +38,8 @@ copilot --plugin-dir ./plugins/create-atomic-note plugin list
 
 When changing a plugin version or metadata, update both its `plugin.json` and
 the matching entry in `.github/plugin/marketplace.json`.
+The marketplace root `metadata.version` tracks catalog structure, not
+individual plugin releases.
 
 ## Pull requests
 

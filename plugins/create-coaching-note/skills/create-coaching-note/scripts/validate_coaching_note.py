@@ -17,6 +17,7 @@ MARKDOWN_LINK = re.compile(
     r"(?<!!)\[[^\]]+\]\(\s*(<?[^)\s>]+>?)\s*(?:[\"'][^)]*[\"'])?\)"
 )
 TAG = re.compile(r"(?<!\w)#([a-z0-9][a-z0-9-]*)", re.IGNORECASE)
+OKF_TAG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9'-]*")
 WORKFLOW_TAGS = {"draft", "review", "publish"}
 VISIBILITY_TAGS = {"private", "public"}
@@ -86,24 +87,33 @@ def field(text: str, name: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
-def split_frontmatter(text: str) -> tuple[list[str], str]:
+def split_frontmatter(
+    text: str,
+) -> tuple[list[str], str, str | None]:
     lines = text.splitlines()
     if not lines or lines[0] != "---":
-        return [], text
+        return [], text, "Atomic note must start with YAML frontmatter."
     try:
         end = lines.index("---", 1)
     except ValueError:
-        return [], text
-    return lines[1:end], "\n".join(lines[end + 1 :]).lstrip("\n")
+        return [], text, "Atomic note YAML frontmatter is not closed."
+    return (
+        lines[1:end],
+        "\n".join(lines[end + 1 :]).lstrip("\n"),
+        None,
+    )
 
 
-def frontmatter_tags(lines: list[str]) -> list[str]:
+def frontmatter_tags(lines: list[str], errors: list[str]) -> list[str] | None:
     for index, line in enumerate(lines):
         match = re.fullmatch(r"tags:\s*(.*?)\s*", line)
         if match is None:
             continue
         inline = match.group(1)
-        if inline.startswith("[") and inline.endswith("]"):
+        if inline:
+            if not (inline.startswith("[") and inline.endswith("]")):
+                errors.append("OKF atomic-note tags must be a YAML list.")
+                return []
             contents = inline[1:-1].strip()
             return [
                 value.strip().strip("\"'")
@@ -117,8 +127,43 @@ def frontmatter_tags(lines: list[str]) -> list[str]:
             item = re.fullmatch(r"\s{2}-\s+(.+?)\s*", nested)
             if item:
                 tags.append(item.group(1).strip().strip("\"'"))
+            elif nested.strip():
+                errors.append(
+                    "OKF atomic-note tags must contain only YAML list items."
+                )
+                return []
         return tags
-    return []
+    return None
+
+
+def okf_domain_tags(lines: list[str], errors: list[str]) -> set[str]:
+    tags = frontmatter_tags(lines, errors)
+    if tags is None:
+        errors.append("OKF atomic note requires frontmatter tags.")
+        return set()
+    if not tags:
+        errors.append("OKF atomic-note tags must include at least one value.")
+        return set()
+
+    normalized = [tag.lower() for tag in tags]
+    invalid = sorted(
+        {
+            tag
+            for tag in normalized
+            if tag.startswith("#") or not OKF_TAG.fullmatch(tag)
+        }
+    )
+    if invalid:
+        errors.append(
+            "OKF atomic-note tags must be lowercase kebab-case values without #: "
+            + ", ".join(invalid)
+            + "."
+        )
+    return {
+        tag
+        for tag in normalized
+        if OKF_TAG.fullmatch(tag) and tag not in RESERVED_TAGS
+    }
 
 
 def markdown_link_target(destination: str) -> str | None:
@@ -280,11 +325,22 @@ def main() -> int:
         return 2
 
     raw_atomic = args.atomic_note.read_text(encoding="utf-8")
-    atomic_frontmatter, atomic_body = split_frontmatter(raw_atomic)
+    (
+        atomic_frontmatter,
+        atomic_body,
+        frontmatter_error,
+    ) = split_frontmatter(raw_atomic)
     atomic = strip_fenced_blocks(atomic_body)
     coach = strip_fenced_blocks(args.coach_note.read_text(encoding="utf-8"))
     errors: list[str] = []
 
+    if frontmatter_error:
+        errors.append(frontmatter_error)
+    if WIKI_LINK.search(atomic):
+        errors.append(
+            "OKF atomic notes must use standard Markdown links, "
+            "not wiki-style links."
+        )
     if TRANSCLUSION.search(atomic) or TRANSCLUSION.search(coach):
         errors.append("Atomic and coaching notes must not use tool-specific wiki transclusions.")
     remaining_prompts = template_prompts(coach)
@@ -339,14 +395,8 @@ def main() -> int:
             "Coaching note Companion to must contain exactly one link to the atomic note."
         )
 
-    okf_tags = frontmatter_tags(atomic_frontmatter)
-    atomic_tags = (
-        " ".join(f"#{tag}" for tag in okf_tags)
-        if okf_tags
-        else field(atomic, "Tags")
-    )
+    atomic_domains = okf_domain_tags(atomic_frontmatter, errors)
     coach_tags = field(coach, "Tags")
-    atomic_domains = domain_tags(atomic_tags)
     if not atomic_domains:
         errors.append("Atomic note requires at least one domain tag.")
     validate_tags(coach_tags, errors)

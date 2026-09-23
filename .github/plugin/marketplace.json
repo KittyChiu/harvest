@@ -24,8 +24,8 @@
     },
     {
       "name": "create-coaching-note",
-      "description": "Create or revise a coaching companion with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
-      "version": "1.0.1",
+      "description": "Create or revise a coaching companion for an OKF atomic note with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
+      "version": "2.0.0",
       "license": "MIT",
       "source": "./plugins/create-coaching-note"
     },

@@ -198,14 +198,65 @@ class ValidateCoachingNoteTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn(message, result.stdout)
 
-    def test_accepts_legacy_atomic_body_tags(self) -> None:
-        legacy_atomic = ATOMIC.split("---\n", 2)[2].replace(
+    def test_requires_okf_atomic_frontmatter(self) -> None:
+        atomic = re.sub(
+            r"\A---\n.*?\n---\n\n",
+            "",
+            ATOMIC,
+            flags=re.DOTALL,
+        )
+        result = run_validator(atomic=atomic)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("must start with YAML frontmatter", result.stdout)
+
+    def test_requires_frontmatter_tags_even_when_body_tags_exist(self) -> None:
+        atomic = ATOMIC.replace(
+            "tags:\n  - leadership\n  - draft\n  - private\n",
+            "",
+        ).replace(
             "Parent: [Culture](culture-moc.md)",
             "Parent: [Culture](culture-moc.md)\n"
             "Tags: #leadership #draft #private",
         )
-        result = run_validator(atomic=legacy_atomic)
+        result = run_validator(atomic=atomic)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("requires frontmatter tags", result.stdout)
+
+    def test_rejects_scalar_tags_for_okf_atomic_note(self) -> None:
+        atomic = ATOMIC.replace(
+            "tags:\n  - leadership\n  - draft\n  - private\n",
+            "tags: leadership\n",
+        )
+        result = run_validator(atomic=atomic)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("tags must be a YAML list", result.stdout)
+
+    def test_accepts_inline_okf_tags(self) -> None:
+        atomic = ATOMIC.replace(
+            "tags:\n  - leadership\n  - draft\n  - private\n",
+            "tags: [leadership, draft, private]\n",
+        )
+        result = run_validator(atomic=atomic)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_rejects_empty_okf_tags(self) -> None:
+        atomic = ATOMIC.replace(
+            "tags:\n  - leadership\n  - draft\n  - private\n",
+            "tags: []\n",
+        )
+        result = run_validator(atomic=atomic)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("tags must include at least one value", result.stdout)
+
+    def test_rejects_unclosed_okf_frontmatter(self) -> None:
+        atomic = ATOMIC.replace(
+            "\n---\n\n# Sharing knowledge creates reusable team memory",
+            "\n\n# Sharing knowledge creates reusable team memory",
+            1,
+        )
+        result = run_validator(atomic=atomic)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("frontmatter is not closed", result.stdout)
 
     def test_accepts_completed_coaching_companion(self) -> None:
         result = run_validator()
@@ -444,14 +495,21 @@ class ValidateCoachingNoteTests(unittest.TestCase):
         )
         self.assert_invalid(coach, "flat lowercase kebab-case")
 
-    def test_accepts_wiki_style_links_for_compatible_pkm_tools(self) -> None:
-        atomic = ATOMIC.replace("[Culture](culture-moc.md)", "[[culture-moc]]")
+    def test_accepts_wiki_style_links_in_coaching_note(self) -> None:
         coach = COACH.replace("[Culture](culture-moc.md)", "[[culture-moc]]").replace(
             "[Sharing knowledge creates reusable team memory](culture-sharing-creates-team-memory.md)",
             "[[culture-sharing-creates-team-memory|Sharing knowledge creates reusable team memory]]",
         )
-        result = run_validator(atomic=atomic, coach=coach)
+        result = run_validator(coach=coach)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_rejects_wiki_links_in_okf_atomic_note(self) -> None:
+        atomic = ATOMIC.replace(
+            "[Culture](culture-moc.md)", "[[culture-moc]]"
+        )
+        result = run_validator(atomic=atomic)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("must use standard Markdown links", result.stdout)
 
     def test_accepts_full_marp_markdown_link(self) -> None:
         coach = COACH.replace(

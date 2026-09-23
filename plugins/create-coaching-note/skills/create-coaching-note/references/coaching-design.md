@@ -2,7 +2,7 @@
 
 ## Ground the companion
 
-Use the approved atomic note as the complete knowledge boundary. Preserve its pattern, mechanism, signals, learning, and constraints. Do not reopen original sources or convert uncertainty into certainty.
+Use the approved OKF atomic note as the complete knowledge boundary. Preserve its pattern, mechanism, signals, learning, and constraints. Do not reopen original sources or convert uncertainty into certainty. If it lacks valid OKF frontmatter or uses wiki links, return it for migration rather than normalizing it inside the coaching workflow.
 
 The atomic note explains reusable knowledge. The companion turns that knowledge into a supportive coaching experience. It is not a lesson transcript, participant workbook, rollout plan, compliance policy, or duplicate explanation.
 
@@ -36,7 +36,8 @@ The coaching companion:
 - links back to the atomic note;
 - includes the atomic note's domain tags, `#coaching`, one workflow tag, and one visibility tag;
 - may use meaningful internal links but never a decorative related-links list;
-- defaults to portable relative Markdown links while allowing wiki-style links for compatible PKM tools.
+- defaults to portable relative Markdown links in the coaching note while allowing wiki-style coaching-note links for compatible PKM tools;
+- requires the source atomic note to use valid OKF frontmatter and standard Markdown links, reading domain tags only from frontmatter.
 
 ## Review
 

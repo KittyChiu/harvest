@@ -1,8 +1,8 @@
 ---
 name: create-coaching-note
-description: Create or revise the coaching companion for one approved atomic pattern. Use when a coach needs concise teaching, recognition signals, discovery questions, an experiential exercise, adoption practices, progress signals, and resistance support.
+description: Create or revise the coaching companion for one approved OKF atomic pattern. Use when a coach needs concise teaching, recognition signals, discovery questions, an experiential exercise, adoption practices, progress signals, and resistance support.
 license: MIT
-compatibility: Produces portable Markdown for file-based PKM tools. Python 3 is required for validation.
+compatibility: Consumes Open Knowledge Format v0.2 atomic notes and produces portable Markdown for file-based PKM tools. Python 3 is required for validation.
 ---
 
 # Create Coaching Note
@@ -25,6 +25,7 @@ Use [assets/coaching-note-template.md](assets/coaching-note-template.md) as the 
 Before analysis, confirm:
 
 - the authoritative atomic note;
+- that the atomic note has valid OKF frontmatter and standard Markdown links;
 - the atomic note and MOC as read-only inputs;
 - create or revise mode;
 - the intended coaching audience and context;
@@ -32,7 +33,7 @@ Before analysis, confirm:
 - the exact `<atomic-stem>.coach.md` output filename;
 - the coaching note as the only file permitted to change.
 
-If no approved atomic note exists, offer an available atomic-note specialist or stop. Invoke another skill only with explicit consent. Never create or revise the atomic note inside this skill.
+If no approved atomic note exists, offer an available atomic-note specialist or stop. If the atomic note lacks valid OKF frontmatter or uses wiki links, stop and offer an available atomic-note specialist to migrate it. Invoke another skill only with explicit consent. Never create or revise the atomic note inside this skill.
 
 ## Workflow
 
@@ -64,7 +65,8 @@ Do not ask for information already supplied. Combine confirmations when the user
 - Invite reflection and choice. Prefer enabling conditions, recognition, examples, and small experiments over mandates, surveillance, punishment, or shame.
 - Include the atomic note's domain tags, `#coaching`, exactly one workflow tag, and exactly one visibility tag.
 - Keep the parent MOC and companion links explicit.
-- Use portable relative Markdown links by default. Wiki-style links are allowed when the selected PKM tool uses them.
+- Use portable relative Markdown links by default in the coaching note. Wiki-style links are allowed in the coaching note when the selected PKM tool uses them.
+- Read source domain tags only from OKF frontmatter.
 - Use the template's sections and adoption subsections once each and in their defined order. Replace every instructional prompt and placeholder.
 - Do not invent learning, evidence, outcomes, quotes, causality, or certainty.
 
