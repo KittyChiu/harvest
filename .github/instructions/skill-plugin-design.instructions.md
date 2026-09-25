@@ -1,17 +1,25 @@
 ---
 name: Skill and Plugin Design
-description: "Use when creating, reviewing, or refactoring Copilot skills, plugins, SKILL.md files, validators, references, scripts, or bundled assets. Enforces atomic capabilities, loose coupling, deterministic components, reuse, and concise maintenance."
+description: "Use when creating, reviewing, or refactoring Copilot skills, plugins, SKILL.md files, validators, evals, references, scripts, or bundled assets. Enforces Agent Skills conformance, atomic capabilities, loose coupling, deterministic components, and evidence-based evaluation."
 applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .claude/skills/**"
 ---
 # Skill and Plugin Design
 
+## Outcome and Sources of Truth
+
+Create skills that are portable, correctly packaged, independently useful, concise, and validated against current upstream standards and repository contracts.
+
+- Treat the current [Agent Skills specification](https://agentskills.io/specification) as normative for portable skill directory structure and `SKILL.md` format. Consult it during skill work instead of relying on remembered or locally copied constraints.
+- Follow the current [Evaluating skill output quality](https://agentskills.io/skill-creation/evaluating-skills) workflow for behavioral skill evals.
+- Apply [Best practices for skill creators](https://agentskills.io/skill-creation/best-practices) as authoring guidance when it does not conflict with a normative requirement.
+- Treat applicable Copilot and repository schemas as normative for plugin packaging and platform-specific extensions. Apply each schema only to the surface it governs. If two normative sources conflict on the same field or behavior, report the conflict instead of guessing.
+- Do not mirror upstream requirements or recommendations in this instruction. Add an overlapping local rule only when it is an intentional repository-specific extension or stricter requirement, and identify that distinction.
+
 ## Core Model
 
-- A **skill** is one user-facing capability. A **plugin** is the installable package that contains one or more skills. Keep these concepts and terms distinct.
-- Design each skill as an atomic, independently usable capability.
-- Connect capabilities through small, explicit, structured capability and data contracts. Never couple a skill or plugin to another component's name, caller identity, directory layout, or internal schema.
+- A **skill** is one atomic, independently usable, user-facing capability. A **plugin** is the installable package that contains one or more skills. Keep these concepts and terms distinct.
+- Connect capabilities through small, explicit, structured capability and data contracts rather than inferred conventions or prose-based coupling. Never couple a skill or plugin to another component's name, caller identity, directory layout, or internal schema.
 - Add a shared dependency only when its contract and availability are deliberate and guaranteed.
-- Prefer explicit structured contracts over inferred conventions or prose-based coupling.
 
 ## Skill Boundaries
 
@@ -23,12 +31,16 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 - Keep delegation optional whenever a capability can run directly; preserve a complete standalone path.
 - When delegation is appropriate, pass the context needed to continue the workflow without bypassing or weakening the delegated skill's approval gates.
 
-## Skill Structure and Safety
+## Required Skill Deliverables
 
-- Give every skill a unique, lowercase, hyphenated `name` that normally matches its directory.
-- Write a `description` that states both what the skill does and when it should be used.
+This repository requires every skill to include both:
+
+- A `SKILL.md` that conforms to the current Agent Skills specification.
+- An `evals/evals.json` behavioral eval suite that conforms to the current Evaluating skill output quality guidance.
+
+## Skill Authoring and Safety
+
 - Prefer deterministic components whenever behavior can be expressed reliably as executable logic, a schema, a validator, or a static asset. Reserve prompt instructions for judgment, decisions, interaction gates, and workflow orchestration.
-- Keep `SKILL.md` focused on decisions, interaction gates, and workflow orchestration. Put stable domain guidance in references, reusable static scaffolding in assets, and executable deterministic logic in scripts.
 - Grant only the minimum required `allowed-tools`. Do not pre-approve `shell` or `bash` unless both the skill and every script it references are trusted and require non-interactive execution.
 - Before an artifact-writing skill writes anything, confirm:
   - The authoritative source.
@@ -50,7 +62,7 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 - Put validation in the plugin directory only when it spans multiple skills packaged by that plugin.
 - Put validation at the marketplace layer only when it checks the catalog across plugins.
 - Test skill-owned scripts in the owning skill's test suite. At the plugin layer, unit-test only plugin-owned executable behavior, including hooks, MCP or LSP servers, and plugin-level scripts.
-- When changing a contract or taxonomy, update its `SKILL.md`, references, assets, scripts, and tests together. Search for stale terms, casing, and removed fields.
+- When changing a contract or taxonomy, update its `SKILL.md`, evals, references, assets, scripts, and tests together. Search for stale terms, casing, and removed fields.
 - Retain a compatibility alias only when it has a documented owner and either a removal condition or a removal deadline. Otherwise:
   - Migrate the capability.
   - Remove superseded skills or plugins and any empty directories.
@@ -60,9 +72,9 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 
 ### Skills
 
+- Validate against the current Agent Skills specification using the validation method it currently recommends, plus any applicable repository-specific checks.
 - Test or validate every deterministic behavior, including contracts, permissions, assets, parsing, transformations, naming, and artifacts.
 - Cover both compliant cases and representative violations. Do not include prompt-driven behavior in deterministic tests.
-- Use [Review Primitive](../prompts/review-primitive.prompt.md) to evaluate whether prompt-driven output achieves the intended behavioral outcome; do not infer behavioral reliability from structural checks.
 - Run the skill's declared or bundled test suite from its source directory.
 - After installation, run integration or smoke tests against the installed skill path.
 
