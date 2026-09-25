@@ -18,7 +18,7 @@ Move through:
 
 ## Assign stable pattern identities
 
-Give each atomic source a contiguous internal identifier (`P1` through `PN`), a short name, and a cluster. In update mode, preserve an existing pattern's ID unless removing a source creates a gap; then minimally renumber the following patterns to restore contiguity. Use identifiers only in H6 position metadata and source matching; use short names in titles, Mermaid nodes, comparisons, scenarios, tables, and prose.
+Give each atomic source a contiguous internal identifier (`p1` through `pN`), a short name, and a cluster. In update mode, preserve an existing pattern's ID unless removing a source creates a gap; then minimally renumber the following patterns to restore contiguity. Use identifiers only in H6 position metadata and source matching; use short names in titles, Mermaid nodes, comparisons, scenarios, tables, and prose.
 
 One pattern slide contains:
 

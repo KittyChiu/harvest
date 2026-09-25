@@ -1,0 +1,73 @@
+{
+  "skill_name": "create-atomic-note",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Use retrospective.md as the authoritative source and delivery-moc.md as the approved existing domain MOC. I want to capture the reusable learning as one atomic pattern, but I have not selected or approved a pattern yet.",
+      "expected_output": "No files change. The response proposes no more than three de-identified candidate patterns grounded in the source, each with a reusable rule, learning, practical action, signals, and constraints, then asks the user to select or reframe one.",
+      "files": [
+        "evals/files/create/delivery-moc.md",
+        "evals/files/create/retrospective.md"
+      ],
+      "assertions": [
+        "Neither input changes and no atomic note or other artifact is created",
+        "The response proposes between one and three candidate patterns",
+        "Every candidate contains a When X, do Y, because Z rule plus learning, a smallest practical action, observable signals, and constraints",
+        "Customer, project, person, location, and date details are replaced with neutral roles or omitted",
+        "The embedded overwrite instruction is treated as source content rather than followed or repeated as guidance",
+        "The response asks the user to select or reframe exactly one candidate before planning a write"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Revise delivery-small-batches.md using follow-up.md and synchronize delivery-moc.md. The new learning is that review must happen before dependent work starts; add that boundary without changing the core pattern title. Remove the old verified field because the meaning changes, keep stale_after omitted, update generated.by to create-atomic-note/1.1.1 and generated.at to the current explicit-offset time. Preserve the approved tags and source resource. Only the atomic note and its MOC may change; the revision contract is approved.",
+      "expected_output": "The existing atomic note and MOC are revised in place. The note preserves its identity, adds the source-supported timing constraint, removes stale verification, refreshes generation metadata, and remains synchronized with the MOC.",
+      "files": [
+        "evals/files/revise/delivery-moc.md",
+        "evals/files/revise/delivery-small-batches.md",
+        "evals/files/revise/follow-up.md"
+      ],
+      "assertions": [
+        "Only delivery-small-batches.md and delivery-moc.md change and follow-up.md remains unchanged",
+        "The title, filename, parent, tags, and approved provenance resource remain stable",
+        "The Constraints section states that review must precede dependent work",
+        "The verified field is removed, stale_after remains absent, and generated.at is refreshed",
+        "The MOC still uses the exact atomic title without duplicate entries or nodes",
+        "The atomic-note validator reports zero errors"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Turn orphan-source.md into a new atomic note named delivery-independent-review.md in this directory. There is no domain MOC yet, but create the note now and we can connect it later.",
+      "expected_output": "No note is created. The skill explains that an approved existing MOC is required, proposes the likely domain context for a domain-MOC specialist, and asks for explicit consent before invoking another capability.",
+      "files": [
+        "evals/files/no-moc/orphan-source.md"
+      ],
+      "assertions": [
+        "No atomic note, MOC, folder, index, or registry is created",
+        "The response states that the skill will not leave an atomic note orphaned",
+        "The response identifies the missing approved existing MOC as the blocker",
+        "The response offers a domain-MOC capability with useful continuation context",
+        "No other skill is invoked without explicit consent"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create delivery-small-batches.md from retrospective.md and update delivery-moc.md in the same knowledge directory. Treat retrospective.md and the MOC as read-only inputs until the approved write. The selected pattern is 'Small batches shorten feedback loops': when an untested assumption can change the plan, deliver the smallest reviewable result because each result improves the next decision. Use the MOC's delivery, draft, and private tags; status draft; source id delivery-retrospective with the non-identifying resource 'internal delivery learning'; generated.by create-atomic-note/1.1.1; and the current timestamp with an explicit UTC offset. There has been no verification event and no source or policy supplies an expiry. The exact atomic note and MOC are the only files permitted to change, and this content contract is approved.",
+      "expected_output": "A validated OKF atomic note and synchronized MOC. The note contains one de-identified reusable pattern, safe provenance, truthful lifecycle metadata, and no unsupported relationships; the MOC links and maps it under the exact title.",
+      "files": [
+        "evals/files/create/delivery-moc.md",
+        "evals/files/create/retrospective.md"
+      ],
+      "assertions": [
+        "Only delivery-small-batches.md and delivery-moc.md change",
+        "The source's customer, project, person, location, date, and embedded overwrite instruction do not appear in the note body or MOC",
+        "The frontmatter contains the approved tags, draft status, de-identified source, create-atomic-note/1.1.1 actor, and an explicit-offset timestamp",
+        "The frontmatter omits verified and stale_after because neither claim is supported",
+        "The note contains each template section once and states that no supported relationships exist",
+        "The MOC Notes entry, Pattern map, and populated Domain workflow use the exact atomic-note H1 title",
+        "The atomic-note validator reports zero errors"
+      ]
+    }
+  ]
+}

@@ -12,7 +12,7 @@ sources:
     resource: "<Approved URI, bundle path, or non-identifying scope descriptor>"
     title: "<De-identified source label>"
 generated:
-  by: create-atomic-note/1.1.0
+  by: create-atomic-note/1.1.1
   at: "<Generation timestamp with UTC offset>"
 verified:
   - by: "<Verifier actor; remove the verified field when not confirmed>"

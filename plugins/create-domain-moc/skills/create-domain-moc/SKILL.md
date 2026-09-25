@@ -2,7 +2,7 @@
 name: create-domain-moc
 description: Create or revise one domain Map of Content (MOC) for a file-based PKM knowledge graph. Use when defining a new knowledge domain, clarifying its boundaries, or organizing existing atomic notes with descriptive navigation links.
 license: MIT
-compatibility: Produces portable Markdown for file-based PKM tools. Python 3 is required for validation.
+compatibility: Produces portable Markdown for file-based PKM tools. Python 3.10 or later is required for validation.
 ---
 
 # Create Domain MOC
@@ -86,6 +86,10 @@ python3 "<skill-directory>/scripts/validate_moc.py" "<domain-moc.md>"
 ```
 
 Resolve `<skill-directory>` from this `SKILL.md`. Fix every error, then confirm qualitatively that the domain is coherent, distinct from neighboring MOCs, narrow enough to guide whether an atomic note belongs, and represented consistently across the Notes, Pattern map, and Domain workflow.
+
+## Presentation sync
+
+After validation, report whether `<domain>.marp.md` exists beside the MOC. If a revise operation changed note membership, pattern titles, Pattern map relationships, or Domain workflow topology, report that the presentation needs synchronization. Offer an available presentation specialist only with explicit consent.
 
 ## Completion
 

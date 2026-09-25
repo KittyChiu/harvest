@@ -20,7 +20,7 @@ body:
     id: version
     attributes:
       label: Plugin and Copilot CLI versions
-      placeholder: "Plugin 1.0.0; Copilot CLI 1.0.79"
+      placeholder: "Plugin x.y.z; Copilot CLI x.y.z"
     validations:
       required: true
   - type: textarea

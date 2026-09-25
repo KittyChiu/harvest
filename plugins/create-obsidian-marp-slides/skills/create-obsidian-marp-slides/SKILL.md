@@ -2,7 +2,7 @@
 name: create-obsidian-marp-slides
 description: Create or update one Obsidian Marp presentation that shows a knowledge domain as a connected system of reusable patterns and practices. Use when a domain MOC and its atomic notes should become one coherent <domain>.marp.md deck with optional coaching companions.
 license: MIT
-compatibility: Produces conservative Obsidian-compatible Marp Markdown ending in .marp.md. Python 3 is required for validation.
+compatibility: Produces conservative Obsidian-compatible Marp Markdown ending in .marp.md. Python 3.10 or later is required for validation.
 ---
 
 # Create Obsidian Marp Slides
@@ -41,7 +41,7 @@ The template requires Mermaid maps and flows. If the target setup does not rende
 
 1. Read the MOC's scope, `Pattern map`, `Domain workflow`, and `Notes` entries, every linked atomic note, and each available matching coaching companion. In update mode, also read the current deck.
 2. Extract each atomic note's Pattern, Practice, Signals, Constraints, and supported Relationships. From companions, extract relevant Conversation questions.
-3. Assign every pattern one stable contiguous internal identifier (`P1` through `PN`), one short memorable name, and one cluster. Preserve existing IDs when their pattern remains unless removing a source creates a gap; then minimally renumber the following patterns to restore contiguity.
+3. Assign every pattern one stable contiguous internal identifier (`p1` through `pN`), one short memorable name, and one cluster. Preserve existing IDs when their pattern remains unless removing a source creates a gap; then minimally renumber the following patterns to restore contiguity.
 4. Propose the domain promise, challenges and opportunities, a presentation rendering of the MOC pattern map and workflow, one slide per pattern, optional comparison, combined scenario, expected directional changes, remaining constraint, and closing experiment.
 5. Provide a source-to-pattern-ID plan and identify additions, revisions, removals, retained content, and synthesis. Distinguish source-grounded claims from presentation synthesis.
 6. Obtain approval for the plan, diagram format, Marp configuration, exact output path, and sole-file write authority.
@@ -78,7 +78,7 @@ Run:
 python3 "<skill-directory>/scripts/validate_marp_slides.py" "<domain>.marp.md" "<domain>-moc.md"
 ```
 
-Fix every error and review density warnings. Then verify qualitatively that internal IDs map sources without leaking into titles or diagrams, each short name is consistent, speaker notes carry the narrative and grounding, visible signals and practices remain concise, relationship labels are source-supported, the scenario combines patterns coherently, and the close offers a proportionate experiment.
+Resolve `<skill-directory>` from this `SKILL.md`. Fix every error and review density warnings. Then verify qualitatively that internal IDs map sources without leaking into titles or diagrams, each short name is consistent, speaker notes carry the narrative and grounding, visible signals and practices remain concise, relationship labels are source-supported, the scenario combines patterns coherently, and the close offers a proportionate experiment.
 
 ## Completion
 

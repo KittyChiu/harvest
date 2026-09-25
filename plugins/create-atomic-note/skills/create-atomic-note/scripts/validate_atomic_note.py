@@ -28,6 +28,21 @@ WIKI_LINK_WITH_LABEL = re.compile(
 MERMAID_NODE_LABEL = re.compile(
     r"\b[A-Za-z][A-Za-z0-9_-]*\s*\[\s*\"([^\"]+)\"\s*\]"
 )
+MERMAID_NODE = re.compile(
+    r'\b([A-Za-z][A-Za-z0-9_-]*)\s*\[\s*"([^"]+)"\s*\]',
+)
+MERMAID_ID_TOKEN = re.compile(r"\b([A-Za-z][A-Za-z0-9_-]*)\b")
+MERMAID_PIPE_LABEL = re.compile(r"\|\s*\"?([^\"|]+?)\"?\s*\|")
+MERMAID_INLINE_LABEL = re.compile(
+    r"(?:--|-\.)\s+(.+?)\s+(?:-->|\.->)|"
+    r"==\s+(.+?)\s+==>"
+)
+ATOMIC_RELATIONSHIP_LINE = re.compile(
+    r"^\s*[-*+]\s+(?:\*\*)?"
+    r"(prerequisite|extension|contrast|example)"
+    r"(?:\*\*)?:\s+",
+    re.IGNORECASE,
+)
 INLINE_TAG = re.compile(r"(?<!\w)#([a-z0-9][a-z0-9-]*)", re.IGNORECASE)
 WORD = re.compile(r"[A-Za-z0-9][A-Za-z0-9'-]*")
 WORKFLOW_TAGS = {"draft", "review", "publish"}
@@ -49,6 +64,14 @@ INTERNAL_FILENAME = re.compile(
 )
 EMPTY_MOC = re.compile(r"\bNo atomic notes yet\.", re.IGNORECASE)
 EMPTY_WORKFLOW = "No supported domain workflow yet."
+SUPPORTED_RELATIONSHIPS = {
+    "enables",
+    "precedes",
+    "informs",
+    "complements",
+    "contrasts with",
+    "depends on",
+}
 PATTERN_FORM = re.compile(
     r"^When\b.+,\s*.+,\s*because\b.+[.!?]$", re.IGNORECASE
 )
@@ -638,6 +661,12 @@ def validate_moc_diagram(
             f"MOC {section_name.title()} requires exactly one fenced Mermaid diagram."
         )
         return
+    visible_prose = strip_internal_links(strip_fenced_blocks(body))
+    if not WORD.search(visible_prose):
+        errors.append(
+            f"MOC {section_name.title()} requires introductory prose outside "
+            "the Mermaid diagram."
+        )
     labels = [
         label
         for line in diagrams[0].splitlines()
@@ -660,6 +689,113 @@ def validate_moc_diagram(
             + ", ".join(extra)
             + "."
         )
+
+
+def allowed_moc_relationships(
+    directory: Path,
+    targets: set[str],
+) -> set[tuple[str, str, str]]:
+    allowed: set[tuple[str, str, str]] = set()
+    for source in targets:
+        path = directory / source
+        if not path.is_file():
+            continue
+        relationships = section_body(
+            strip_fenced_blocks(path.read_text(encoding="utf-8")),
+            "relationships",
+        ) or ""
+        for line in relationships.splitlines():
+            match = ATOMIC_RELATIONSHIP_LINE.match(line)
+            if match is None:
+                continue
+            relationship_type = match.group(1).lower()
+            for _raw, raw_target in internal_links(line):
+                target = normalized_filename(raw_target)
+                if target not in targets or target == source:
+                    continue
+                if relationship_type == "prerequisite":
+                    allowed.add((source, "depends on", target))
+                    allowed.add((target, "precedes", source))
+                elif relationship_type == "extension":
+                    for label in ("enables", "informs", "complements"):
+                        allowed.add((source, label, target))
+                elif relationship_type == "contrast":
+                    allowed.add((source, "contrasts with", target))
+    return allowed
+
+
+def validate_moc_pattern_relationships(
+    body: str,
+    entries: list[tuple[str, str]],
+    allowed: set[tuple[str, str, str]],
+    errors: list[str],
+) -> None:
+    mermaid = [
+        content for language, content in fenced_blocks(body) if language == "mermaid"
+    ]
+    if len(mermaid) != 1:
+        return
+    targets_by_label = dict(entries)
+    nodes: dict[str, tuple[str, str | None]] = {}
+    for line in mermaid[0].splitlines():
+        if line.lstrip().startswith("subgraph "):
+            continue
+        nodes.update(
+            {
+                node_id: (label.strip(), targets_by_label.get(label.strip()))
+                for node_id, label in MERMAID_NODE.findall(line)
+            }
+        )
+    for line in mermaid[0].splitlines():
+        node_tokens = [
+            token
+            for token in MERMAID_ID_TOKEN.finditer(line)
+            if token.group(1) in nodes
+        ]
+        for source_token, target_token in zip(node_tokens, node_tokens[1:]):
+            connector = line[source_token.end() : target_token.start()]
+            if not re.search(r"[-=.~]{2}", connector):
+                continue
+            pairs = [(source_token, target_token)]
+            if connector.lstrip().startswith("<"):
+                pairs = [(target_token, source_token)]
+                if ">" in connector:
+                    pairs.append((source_token, target_token))
+            pipe_label = MERMAID_PIPE_LABEL.search(connector)
+            inline_label = MERMAID_INLINE_LABEL.search(connector)
+            label_text = (
+                pipe_label.group(1)
+                if pipe_label is not None
+                else next(
+                    (
+                        group
+                        for group in (inline_label.groups() if inline_label else ())
+                        if group is not None
+                    ),
+                    None,
+                )
+            )
+            for directed_source, directed_target in pairs:
+                source = nodes[directed_source.group(1)][1]
+                target = nodes[directed_target.group(1)][1]
+                if source is None or target is None or source == target:
+                    continue
+                if label_text is None:
+                    errors.append(
+                        "MOC Pattern map edges between patterns require a supported "
+                        f"relationship label: {line.strip()}."
+                    )
+                    continue
+                label = " ".join(label_text.lower().split())
+                if label not in SUPPORTED_RELATIONSHIPS:
+                    errors.append(
+                        f"MOC Pattern map uses unsupported relationship label: {label}."
+                    )
+                elif (source, label, target) not in allowed:
+                    errors.append(
+                        "MOC Pattern map relationship is not supported by the atomic "
+                        f"notes: {source} --{label}--> {target}."
+                    )
 
 
 def template_prompts(text: str) -> list[str]:
@@ -913,6 +1049,7 @@ def main() -> int:
         if current_display_labels != [note_title]:
             errors.append("MOC entry title must match the atomic-note title exactly.")
         all_display_labels: list[str] = []
+        moc_entries: list[tuple[str, str]] = []
         for line in moc_notes.splitlines():
             markdown = MARKDOWN_LINK_WITH_LABEL.search(line)
             if markdown and markdown_link_target(markdown.group(2)) is not None:
@@ -925,6 +1062,8 @@ def main() -> int:
                 display_label = (wiki.group(2) or Path(wiki.group(1)).stem).strip()
                 target = normalized_filename(wiki.group(1))
             all_display_labels.append(display_label)
+            if target is not None:
+                moc_entries.append((display_label, target))
             target_path = args.moc.parent / target if target is not None else None
             if target_path is None or not target_path.is_file():
                 continue
@@ -947,6 +1086,13 @@ def main() -> int:
             all_display_labels,
             errors,
             allow_empty=True,
+        )
+        moc_targets = {target for _label, target in moc_entries}
+        validate_moc_pattern_relationships(
+            section_body(raw_moc, "pattern map") or "",
+            moc_entries,
+            allowed_moc_relationships(args.moc.parent, moc_targets),
+            errors,
         )
     for _raw, target in internal_links(moc_notes):
         filename = normalized_filename(target)

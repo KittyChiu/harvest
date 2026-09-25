@@ -1110,7 +1110,7 @@ def main() -> int:
     expected_ids = list(range(1, len(expected_atomic) + 1))
     if sorted(pattern_slides) != expected_ids:
         errors.append(
-            f"Pattern slides must use contiguous internal IDs P1 through "
+            f"Pattern slides must use contiguous internal IDs p1 through "
             f"p{len(expected_atomic)}."
         )
     if declared_totals and declared_totals != {len(expected_atomic)}:

@@ -1,0 +1,76 @@
+{
+  "skill_name": "create-obsidian-marp-slides",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create delivery.marp.md beside the supplied delivery MOC, its two atomic notes, and the available coaching companion. All supplied files are read-only and the deck is the only permitted change. The audience is an engineering delivery team, the objective is to choose a small reviewable batch and improve it from feedback, the available time is 20 minutes, and the required example is a deployment plan with an untested assumption. Use the portable default Marp configuration. Mermaid rendering is confirmed. The source-to-pattern plan is approved: p1 is Small batches in the Planning cluster and p2 is Review feedback in the Learning cluster; preserve the MOC's enables relationship and workflow. The exact output path, diagram format, configuration, plan, and sole-file write authority are approved.",
+      "expected_output": "One validated delivery.marp.md that teaches the complete two-pattern domain as one coherent presentation, preserves the MOC topology, uses lowercase contiguous internal IDs only in H6 metadata, and links every source correctly.",
+      "files": [
+        "evals/files/complete/delivery-moc.md",
+        "evals/files/complete/delivery-small-batches.md",
+        "evals/files/complete/delivery-review-feedback.md",
+        "evals/files/complete/delivery-small-batches.coach.md"
+      ],
+      "assertions": [
+        "Exactly one file named delivery.marp.md is created and every supplied source remains unchanged",
+        "The deck follows the required slide sequence and has exactly one pattern slide for each MOC atomic note",
+        "Pattern metadata uses contiguous lowercase p1 and p2 identifiers only in H6 lines and never leaks IDs into titles, diagrams, tables, or prose",
+        "Both deck maps preserve Small batches enables Review feedback and the scenario preserves the MOC workflow topology",
+        "Each pattern slide has the required ordered speaker-note fields, exactly one atomic source, and an open Coach cue question; only p1 links the existing coaching companion",
+        "The Marp slides validator reports zero errors and density warnings are reviewed"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create delivery.marp.md from the supplied complete delivery domain. The target Obsidian Marp setup does not render Mermaid, so replace every required map and flow with a text diagram. You may change only the deck.",
+      "expected_output": "No deck is created. The skill explains that Mermaid rendering is a required compatibility gate for this presentation contract and does not substitute text maps.",
+      "files": [
+        "evals/files/complete/delivery-moc.md",
+        "evals/files/complete/delivery-small-batches.md",
+        "evals/files/complete/delivery-review-feedback.md"
+      ],
+      "assertions": [
+        "No .marp.md file or other artifact is created",
+        "The response identifies missing Mermaid rendering as the blocking incompatibility",
+        "The response does not replace required Mermaid diagrams with text maps",
+        "All source files remain unchanged",
+        "The response stops before proposing unsupported presentation content"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create discovery.marp.md from discovery-moc.md for a 15-minute workshop. Mermaid rendering works and the MOC has no atomic notes yet. Fill the deck with useful patterns from general knowledge so the audience has something to discuss.",
+      "expected_output": "No deck is created. The skill explains that the MOC has no linked atomic-note knowledge sources and refuses to invent patterns or create knowledge artifacts inside the presentation skill.",
+      "files": [
+        "evals/files/empty/discovery-moc.md"
+      ],
+      "assertions": [
+        "No deck, atomic note, coaching note, or MOC revision is created",
+        "The response identifies the absence of linked atomic notes as the blocker",
+        "The response does not invent patterns, relationships, evidence, or outcomes from general knowledge",
+        "The input MOC remains unchanged",
+        "The response stops rather than invoking another skill without consent"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Update the supplied delivery.marp.md in place after delivery-small-batches.coach.md was added. The MOC, both atomic notes, and coaching companion are read-only; the existing deck is the only permitted change. Preserve the confirmed default Marp configuration, narrative, short names, clusters, topology, and stable p1/p2 assignments. Add the matching companion source and use one of its Conversation questions for the p1 Coach cue; p2 has no companion. Mermaid rendering remains confirmed. The source-sync plan, exact path, and sole-file write authority are approved.",
+      "expected_output": "The existing delivery.marp.md is updated in place without fragmenting the deck. Both pattern IDs remain stable and contiguous, only p1 gains the matching companion source and grounded Coach cue, topology remains unchanged, and the final deck validates.",
+      "files": [
+        "evals/files/complete/delivery-moc.md",
+        "evals/files/complete/delivery-small-batches.md",
+        "evals/files/complete/delivery-review-feedback.md",
+        "evals/files/complete/delivery-small-batches.coach.md",
+        "evals/files/complete/delivery.marp.md"
+      ],
+      "assertions": [
+        "Only delivery.marp.md changes and every knowledge source remains unchanged",
+        "The retained patterns keep p1 and p2 with a total of 2 and no internal ID appears outside H6 metadata",
+        "The p1 Source field links delivery-small-batches.md and delivery-small-batches.coach.md while p2 links only its atomic note",
+        "The p1 Coach cue is an open question grounded in the companion Conversation section",
+        "Both maps and the scenario preserve Small batches enables Review feedback",
+        "The Marp slides validator reports zero errors and density warnings are reviewed"
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 name: create-coaching-note
 description: Create or revise the coaching companion for one approved OKF atomic pattern. Use when a coach needs concise teaching, recognition signals, discovery questions, an experiential exercise, adoption practices, progress signals, and resistance support.
 license: MIT
-compatibility: Consumes Open Knowledge Format v0.2 atomic notes and produces portable Markdown for file-based PKM tools. Python 3 is required for validation.
+compatibility: Consumes Open Knowledge Format v0.2 atomic notes and produces portable Markdown for file-based PKM tools. Python 3.10 or later is required for validation.
 ---
 
 # Create Coaching Note
@@ -79,6 +79,10 @@ python3 "<skill-directory>/scripts/validate_coaching_note.py" "<atomic-note.md>"
 ```
 
 Resolve `<skill-directory>` from this `SKILL.md`. Fix every error. Then confirm qualitatively that the teaching is faithful, the questions support discovery, the exercise creates useful experience, the adoption guidance preserves choice, the progress signals are not targets, and resistance is treated as information.
+
+## Presentation sync
+
+After validation, report whether `<domain>.marp.md` exists beside the companion. When it exists, report whether the matching pattern slide links `<atomic-stem>.coach.md` under `Source:`. Mark a missing link as stale presentation content. In revise mode, also report when a changed Conversation question is used as the deck's `Coach cue:`. Offer an available presentation specialist only with explicit consent.
 
 ## Completion
 

@@ -13,6 +13,7 @@ VALIDATOR = Path(__file__).with_name("validate_moc.py")
 TEMPLATE = (
     Path(__file__).parents[1] / "assets" / "domain-moc-template.md"
 ).read_text(encoding="utf-8")
+SKILL = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
 
 EMPTY_MOC = """# AI and engineering
 
@@ -96,6 +97,11 @@ def run_validator(
 
 
 class ValidateMocTests(unittest.TestCase):
+    def test_skill_reports_stale_presentations(self) -> None:
+        self.assertIn("## Presentation sync", SKILL)
+        self.assertIn("presentation needs synchronization", SKILL)
+        self.assertIn("only with explicit consent", SKILL)
+
     def test_accepts_new_moc_with_empty_state(self) -> None:
         result = run_validator()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -144,6 +150,21 @@ class ValidateMocTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 1)
         self.assertIn("Pattern Map requires exactly one fenced Mermaid diagram", result.stdout)
+
+    def test_requires_introductory_prose_for_mermaid_map(self) -> None:
+        moc = LINKED_MOC.replace(
+            "The pattern currently stands alone in this domain.\n\n",
+            "",
+        )
+        result = run_validator(
+            moc=moc,
+            linked_files=("ai-engineering-unit-of-work-changes.md",),
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "Pattern Map requires introductory prose outside the Mermaid diagram",
+            result.stdout,
+        )
 
     def test_accepts_populated_moc_without_supported_workflow(self) -> None:
         moc = LINKED_MOC.replace(

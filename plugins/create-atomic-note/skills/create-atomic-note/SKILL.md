@@ -2,7 +2,7 @@
 name: create-atomic-note
 description: Create or revise one OKF-compatible reusable knowledge pattern in a file-based PKM graph. Use when source material contains a repeatable rule that should be grounded in learning, connected to one domain MOC, and expressed with practical signals, actions, constraints, provenance, lifecycle, trust, freshness, and relationships.
 license: MIT
-compatibility: Produces Open Knowledge Format v0.2 Markdown for file-based PKM tools. Python 3 is required for validation.
+compatibility: Produces Open Knowledge Format v0.2 Markdown for file-based PKM tools. Python 3.10 or later is required for validation.
 ---
 
 # Create Atomic Note
@@ -62,7 +62,7 @@ Do not ask for information already supplied. Combine confirmations when the user
 - Set `status` to `draft` for the `draft` or `review` workflow, and `stable` for `publish`. Use `deprecated` only when revising a formerly published pattern that is intentionally retained for history.
 - Record at least one `sources` entry with a stable lowercase kebab-case `id` and `resource`. Prefer a non-identifying scope descriptor for sensitive input. Use a bundle-relative path or external URL only when the user explicitly approves exposing that source. An optional source `title` must also be de-identified.
 - Use source material only for grounding. Keep source names, filenames, meeting or transcript references, customer identities, citations, attribution prose, and external source URLs out of the body and MOC entry. Put approved provenance only in frontmatter `sources`.
-- Require `generated.by` and `generated.at`. Use `create-atomic-note/1.1.0` as the producer actor and an ISO 8601 generation timestamp with an explicit UTC offset. Update `generated.at` after every meaningful revision.
+- Require `generated.by` and `generated.at`. Use `create-atomic-note/1.1.1` as the producer actor and an ISO 8601 generation timestamp with an explicit UTC offset. Update `generated.at` after every meaningful revision.
 - Add `verified` only after an actual human or deterministic process confirms the content. Use `human:<stable-id>` or `process:<stable-id>` and an ISO 8601 timestamp. Omit `verified` rather than implying confirmation; remove stale verification after a meaningful change unless it remains truthful.
 - Add `stale_after` only when the source or an approved policy supplies a defensible expiry. Use an ISO 8601 timestamp with an explicit UTC offset. Omit it rather than inventing freshness.
 - Separate what was learned from what the pattern recommends.
@@ -85,7 +85,7 @@ Run:
 python3 "<skill-directory>/scripts/validate_atomic_note.py" "<atomic-note.md>" "<domain-moc.md>"
 ```
 
-Fix every error. Then confirm qualitatively that the source supports the learning, frontmatter provenance reveals only approved information, customer and team identities are obfuscated, lifecycle and trust claims are truthful, freshness is evidence-backed or omitted, the learning supports the pattern, the mechanism explains the recommendation, the signals indicate when to use it, the constraints prevent overgeneralization, and the MOC entry, Pattern map, and Domain workflow remain consistent.
+Resolve `<skill-directory>` from this `SKILL.md`. Fix every error. Then confirm qualitatively that the source supports the learning, frontmatter provenance reveals only approved information, customer and team identities are obfuscated, lifecycle and trust claims are truthful, freshness is evidence-backed or omitted, the learning supports the pattern, the mechanism explains the recommendation, the signals indicate when to use it, the constraints prevent overgeneralization, and the MOC entry, Pattern map, and Domain workflow remain consistent.
 
 ## Companion assets
 

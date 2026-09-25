@@ -428,7 +428,17 @@ def main() -> int:
     for section in REQUIRED_SECTIONS:
         body = section_body(text, section)
         if body is not None and not WORD.search(strip_internal_links(body)):
-            errors.append(f'MOC section "{section.title()}" must not be empty.')
+            raw_body = section_body(raw_text, section) or ""
+            if section in {"pattern map", "domain workflow"} and any(
+                language == "mermaid"
+                for language, _content in fenced_blocks(raw_body)
+            ):
+                errors.append(
+                    f"MOC {section.title()} requires introductory prose outside "
+                    "the Mermaid diagram."
+                )
+            else:
+                errors.append(f'MOC section "{section.title()}" must not be empty.')
         elif body is not None:
             section_bodies[section] = body
 

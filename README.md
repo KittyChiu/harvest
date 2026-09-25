@@ -3,7 +3,7 @@
 [![CI](https://github.com/KittyChiu/harvest/actions/workflows/ci.yml/badge.svg)](https://github.com/KittyChiu/harvest/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A GitHub Copilot CLI plugin marketplace for building a portable personal knowledge management (PKM) graph from domain Maps of Content, atomic notes, meaningful internal links, and filtering tags.
+A GitHub Copilot plugin marketplace for building a portable personal knowledge management (PKM) graph from domain Maps of Content, atomic notes, meaningful internal links, and filtering tags. Every package uses the portable Agent Plugins 1.0 manifest format.
 
 ## Available plugins
 
@@ -113,11 +113,22 @@ copilot --plugin-dir ./plugins/create-atomic-note plugin list
 
 Each directory under `plugins/` is an independent plugin. The marketplace catalog is defined in `.github/plugin/marketplace.json`.
 
-Run the marketplace contract tests after changing a plugin manifest, skill path, or catalog entry:
+Run the repository-owned Agent Skills, marketplace, manifest, resource, and
+eval contract tests after changing a plugin, skill, or catalog entry:
 
 ```bash
 python3 -m unittest discover -s .github/plugin/scripts -p 'test_*.py'
 ```
+
+Run the isolated marketplace installation smoke test when packaging changes:
+
+```bash
+bash .github/plugin/scripts/test_installation.sh
+```
+
+Each skill owns realistic behavioral scenarios in `evals/evals.json`. Update
+those scenarios, their assertions, and their input fixtures whenever the
+skill's behavior or contract changes.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development and pull
 request workflow.

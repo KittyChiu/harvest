@@ -472,7 +472,7 @@ Source:
             "Choose one pattern to try",
         ):
             self.assertIn(title, titles)
-        self.assertIn("###### P[1] of [N] · [Cluster]", TEMPLATE)
+        self.assertIn("###### p[1] of [N] · [Cluster]", TEMPLATE)
         self.assertIn("Pattern description:\nWhen [condition]", TEMPLATE)
         self.assertIn("Do not show identifiers in slide titles or Mermaid nodes.", TEMPLATE)
         self.assertGreaterEqual(TEMPLATE.count("```mermaid"), 3)
@@ -482,8 +482,8 @@ Source:
         self.assertIn("does not render Mermaid", COMPATIBILITY)
         self.assertIn("optional coaching companions", PLUGIN)
         self.assertNotIn("optional coaching questions", PLUGIN)
-        self.assertIn("P1, p2, p3", TEMPLATE)
-        self.assertNotIn("P1, P2, P3", TEMPLATE)
+        self.assertIn("p1, p2, p3", TEMPLATE)
+        self.assertNotIn("P1, p2, p3", TEMPLATE)
         self.assertIn("Omit Related when no source-supported relationship exists.", TEMPLATE)
         self.assertIn(
             "Coach cue: What changes when the audience applies this idea?",

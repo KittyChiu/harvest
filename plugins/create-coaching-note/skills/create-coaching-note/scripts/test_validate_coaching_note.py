@@ -14,6 +14,7 @@ VALIDATOR = Path(__file__).with_name("validate_coaching_note.py")
 TEMPLATE = (
     Path(__file__).parents[1] / "assets" / "coaching-note-template.md"
 ).read_text(encoding="utf-8")
+SKILL = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
 REQUIRED_SECTIONS = (
     "Teach",
     "Watch for",
@@ -38,7 +39,7 @@ sources:
   - id: source-learning
     resource: private source material
 generated:
-  by: create-atomic-note/1.1.0
+  by: create-atomic-note/1.1.1
   at: 2026-09-23T13:00:00Z
 ---
 
@@ -191,6 +192,11 @@ def replace_section_body(note: str, section: str, body: str) -> str:
 
 
 class ValidateCoachingNoteTests(unittest.TestCase):
+    def test_skill_reports_stale_presentations(self) -> None:
+        self.assertIn("## Presentation sync", SKILL)
+        self.assertIn("matching pattern slide links", SKILL)
+        self.assertIn("only with explicit consent", SKILL)
+
     def assert_invalid(
         self, coach: str, message: str, **kwargs: object
     ) -> None:

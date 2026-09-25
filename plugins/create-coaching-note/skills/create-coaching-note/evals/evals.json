@@ -1,0 +1,56 @@
+{
+  "skill_name": "create-coaching-note",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create delivery-small-batches.coach.md beside the supplied approved atomic note and MOC for an engineering manager coaching a delivery team. Use create mode, keep both inputs read-only, and make the coaching note the only changed file. The approved plan should explain the pattern without copying it, use observable planning signals, ask three open questions, run one safe three-step exercise that produces a reviewed batch boundary, balance Start/Continue/Stop practices, and treat resistance to smaller batches as information about coordination cost. Preserve the atomic note's #delivery, #draft, and #private dimensions and add #coaching. The exact path and plan are approved.",
+      "expected_output": "One validated delivery-small-batches.coach.md beside the sources. It is faithful to the atomic pattern, supports discovery and voluntary adoption, links the parent MOC and source note, and leaves both inputs unchanged.",
+      "files": [
+        "evals/files/create/delivery-moc.md",
+        "evals/files/create/delivery-small-batches.md"
+      ],
+      "assertions": [
+        "Exactly one file named delivery-small-batches.coach.md is created and both source files remain unchanged",
+        "Parent and Companion to links resolve to the supplied MOC and atomic note",
+        "The note contains exactly three open Conversation questions ending in question marks",
+        "Exercise has exactly three populated numbered steps and a concrete learning outcome rather than a promised business result",
+        "Adoption contains populated Start, Continue, and Stop subsections and Progress signals state what the evidence cannot prove",
+        "The coaching-note validator reports zero errors"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Revise delivery-small-batches.coach.md in place for a remote cross-functional team. Keep delivery-small-batches.md and delivery-moc.md read-only. Preserve useful existing content, replace the exercise with a three-step remote whiteboard activity, and add a non-coercive response to the concern that smaller batches increase coordination overhead. Keep the current tags and links. Only the coaching companion may change; the revised plan and exact path are approved.",
+      "expected_output": "The existing coaching companion is revised in place without changing either source. Its exercise is feasible remotely, resistance support explores coordination cost without blame, and all structural and grounding contracts still validate.",
+      "files": [
+        "evals/files/revise/delivery-moc.md",
+        "evals/files/revise/delivery-small-batches.md",
+        "evals/files/revise/delivery-small-batches.coach.md"
+      ],
+      "assertions": [
+        "Only delivery-small-batches.coach.md changes",
+        "The revised exercise has exactly three remote-feasible steps and a concrete expected outcome",
+        "Common resistance pairs the coordination-overhead concern with a curious, non-coercive response",
+        "The note keeps exactly three open Conversation questions and all Start, Continue, and Stop subsections",
+        "The parent, companion, and tag contracts remain aligned with the atomic note",
+        "The coaching-note validator reports zero errors"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a coaching companion for bad-wiki-note.md. Its Parent link uses Obsidian wiki syntax, but silently normalize the atomic note while you work. You may change both files.",
+      "expected_output": "No files change. The skill explains that the atomic note must first be migrated to valid OKF frontmatter with standard Markdown links and offers an atomic-note capability only after requesting explicit consent.",
+      "files": [
+        "evals/files/invalid/bad-wiki-note.md",
+        "evals/files/invalid/delivery-moc.md"
+      ],
+      "assertions": [
+        "No coaching companion is created",
+        "Neither the invalid atomic note nor the MOC is modified",
+        "The response identifies wiki-style links in the atomic note as the blocking contract violation",
+        "The response does not silently normalize the atomic note inside the coaching skill",
+        "No atomic-note specialist is invoked without explicit consent"
+      ]
+    }
+  ]
+}

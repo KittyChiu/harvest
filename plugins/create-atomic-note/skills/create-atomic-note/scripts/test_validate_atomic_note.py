@@ -44,7 +44,7 @@ sources:
     resource: private source material supplied for pattern extraction
     title: De-identified learning source
 generated:
-  by: create-atomic-note/1.1.0
+  by: create-atomic-note/1.1.1
   at: 2026-09-23T13:00:00Z
 ---
 
@@ -118,6 +118,7 @@ def run_validator(
     moc_name: str = "platform-moc.md",
     separate_directories: bool = False,
     linked_files: tuple[str, ...] = ("platform-team-as-a-product.md",),
+    linked_contents: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -128,7 +129,8 @@ def run_validator(
         note_path.write_text(note, encoding="utf-8")
         moc_path.write_text(moc, encoding="utf-8")
         for filename in linked_files:
-            (root / filename).write_text("# Existing note\n", encoding="utf-8")
+            content = (linked_contents or {}).get(filename, "# Existing note\n")
+            (root / filename).write_text(content, encoding="utf-8")
         return subprocess.run(
             ["python3", str(VALIDATOR), str(note_path), str(moc_path)],
             capture_output=True,
@@ -174,6 +176,44 @@ class ValidateAtomicNoteTests(unittest.TestCase):
         result = run_validator()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("0 error(s)", result.stdout)
+
+    def test_requires_moc_diagram_introductory_prose(self) -> None:
+        moc = MOC.replace(
+            "This map shows the current platform pattern and its supported "
+            "relationships.\n\n",
+            "",
+        )
+        result = run_validator(moc=moc)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn(
+            "Pattern Map requires introductory prose outside the Mermaid diagram",
+            result.stdout,
+        )
+
+    def test_rejects_unsupported_moc_pattern_relationship(self) -> None:
+        moc = MOC.replace(
+            '    A["Golden paths reduce cognitive load"]',
+            '    A["Golden paths reduce cognitive load"]\n'
+            '    B["Platform teams as products"]\n'
+            "    A -->|causes| B",
+        ).replace(
+            "## Notes\n\n",
+            "## Notes\n\n"
+            "- [Platform teams as products](platform-team-as-a-product.md) "
+            "— Decide how to maintain internal platform capabilities.\n",
+        )
+        result = run_validator(
+            moc=moc,
+            linked_contents={
+                "platform-team-as-a-product.md": (
+                    "# Platform teams as products\n\n"
+                    "## Relationships\n\n"
+                    "No supported relationships yet.\n"
+                )
+            },
+        )
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("unsupported relationship label: causes", result.stdout)
 
     def test_accepts_explicit_no_relationships_state(self) -> None:
         note = replace_section_body(
@@ -313,7 +353,7 @@ class ValidateAtomicNoteTests(unittest.TestCase):
 
     def test_requires_generated_actor_and_timestamp(self) -> None:
         note = NOTE.replace(
-            "  by: create-atomic-note/1.1.0",
+            "  by: create-atomic-note/1.1.1",
             "  by: invalid actor",
         )
         self.assert_invalid(note, "producer/version")

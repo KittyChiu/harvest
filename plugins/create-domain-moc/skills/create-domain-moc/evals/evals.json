@@ -1,0 +1,52 @@
+{
+  "skill_name": "create-domain-moc",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create delivery-moc.md in the same knowledge directory as the supplied files. Use delivery-source.md as the authoritative read-only source, inspect platform-engineering-moc.md for overlap, and use create mode with #delivery, #draft, and #private. The approved scope is reusable patterns for planning, sequencing, and learning from delivery work; product setup and one-off retrospective records are excluded. The exact output is delivery-moc.md and it is the only file you may change. The domain contract and path are approved, so write and validate the MOC now.",
+      "expected_output": "One validated delivery-moc.md beside the inputs. It defines the approved boundaries and tags, does not duplicate the neighboring platform domain, and uses honest empty states because no approved atomic notes exist.",
+      "files": [
+        "evals/files/create/delivery-source.md",
+        "evals/files/create/platform-engineering-moc.md"
+      ],
+      "assertions": [
+        "Exactly one file named delivery-moc.md is created and neither input file changes",
+        "The MOC contains Scope, Pattern map, Domain workflow, and Notes exactly once",
+        "The tags include #delivery, #moc, #draft, and #private with no second workflow or visibility tag",
+        "Pattern map, Domain workflow, and Notes use the skill's exact empty states rather than invented atomic patterns",
+        "The domain MOC validator reports zero errors"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Revise the supplied delivery-moc.md in place using delivery-small-batches.md as a read-only approved atomic note. Preserve the existing delivery scope and tags. Upgrade the legacy MOC so the note appears under its exact H1 title in Notes, Pattern map, and Domain workflow. No relationship to another pattern is supported. Only delivery-moc.md may change; this revision plan and path are approved.",
+      "expected_output": "The existing delivery-moc.md is upgraded in place. It links the atomic note descriptively, includes the exact pattern title in both Mermaid diagrams, adds no unsupported relationship edge, and validates successfully.",
+      "files": [
+        "evals/files/revise/delivery-moc.md",
+        "evals/files/revise/delivery-small-batches.md"
+      ],
+      "assertions": [
+        "Only delivery-moc.md changes and the atomic note remains byte-for-byte unchanged",
+        "The Notes entry links delivery-small-batches.md and explains why a reader would open it",
+        "Both populated Mermaid diagrams contain the exact title Small batches shorten feedback loops",
+        "No relationship label or second pattern is invented",
+        "The domain MOC validator reports zero errors"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a new platform-delivery-moc.md beside the supplied platform-engineering-moc.md for reusable guidance about maintained delivery paths, platform defaults, and feedback from product teams. Do not modify the existing MOC.",
+      "expected_output": "No file is written. The skill identifies the substantial overlap with the existing Platform engineering MOC, recommends reusing or revising it, and asks for a focused decision before any write.",
+      "files": [
+        "evals/files/overlap/platform-engineering-moc.md"
+      ],
+      "assertions": [
+        "No new MOC or directory is created",
+        "The response identifies the overlap with maintained delivery paths and product-team feedback",
+        "The response recommends reusing or revising platform-engineering-moc.md instead of silently duplicating it",
+        "The existing MOC remains unchanged",
+        "The response requests one clear scope decision before proceeding"
+      ]
+    }
+  ]
+}

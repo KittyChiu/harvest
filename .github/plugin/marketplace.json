@@ -11,28 +11,28 @@
     {
       "name": "create-domain-moc",
       "description": "Create or revise one domain Map of Content that defines scope and provides descriptive navigation to atomic notes.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "license": "MIT",
       "source": "./plugins/create-domain-moc"
     },
     {
       "name": "create-atomic-note",
       "description": "Create or revise one OKF-compatible reusable knowledge pattern with provenance, lifecycle, trust, freshness, and domain graph links.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "license": "MIT",
       "source": "./plugins/create-atomic-note"
     },
     {
       "name": "create-coaching-note",
       "description": "Create or revise a coaching companion for an OKF atomic note with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "license": "MIT",
       "source": "./plugins/create-coaching-note"
     },
     {
       "name": "create-obsidian-marp-slides",
       "description": "Create or update one domain's Obsidian Marp presentation as a connected system of atomic patterns, practices, relationships, application, and optional coaching companions.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "license": "MIT",
       "source": "./plugins/create-obsidian-marp-slides"
     }

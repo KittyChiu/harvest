@@ -1,7 +1,8 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "create-atomic-note",
   "description": "Create or revise one OKF-compatible reusable knowledge pattern with provenance, lifecycle, trust, freshness, and domain graph links.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "Kitty Chiu",
     "url": "https://github.com/KittyChiu"
@@ -15,6 +16,5 @@
     "open-knowledge-format",
     "okf",
     "pkm"
-  ],
-  "skills": "skills/"
+  ]
 }

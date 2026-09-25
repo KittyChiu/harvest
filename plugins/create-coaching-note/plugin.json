@@ -1,7 +1,8 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "create-coaching-note",
   "description": "Create or revise a coaching companion for an OKF atomic note with teaching, discovery questions, an exercise, adoption practices, progress signals, and resistance support.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": {
     "name": "Kitty Chiu",
     "url": "https://github.com/KittyChiu"
@@ -13,6 +14,5 @@
     "coaching",
     "atomic-notes",
     "knowledge-graph"
-  ],
-  "skills": "skills/"
+  ]
 }

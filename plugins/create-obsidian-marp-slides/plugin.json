@@ -1,7 +1,8 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "create-obsidian-marp-slides",
   "description": "Create or update one domain's Obsidian Marp presentation as a connected system of atomic patterns, practices, relationships, application, and optional coaching companions.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Kitty Chiu",
     "url": "https://github.com/KittyChiu"
@@ -14,6 +15,5 @@
     "obsidian",
     "coaching",
     "domain-moc"
-  ],
-  "skills": "skills/"
+  ]
 }

@@ -21,7 +21,7 @@ Use:
 AUTHORING RULES
 
 Patterns:
-- Assign stable internal identifiers: P1, p2, p3, and so on.
+- Assign stable internal identifiers: p1, p2, p3, and so on.
 - Give each pattern a short, memorable name.
 - Present one pattern per slide.
 - Do not show identifiers in slide titles or Mermaid nodes.
@@ -169,7 +169,7 @@ Duplicate this slide once for each pattern.
 Replace the position, total, cluster, name, signals, practices, and notes.
 -->
 
-###### P[1] of [N] · [Cluster]
+###### p[1] of [N] · [Cluster]
 
 # [Short pattern name]
 
