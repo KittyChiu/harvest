@@ -10,6 +10,7 @@ applyTo: ".github/skills/**, .github/plugin/**, plugins/**, .agents/skills/**, .
 Create skills that are portable, correctly packaged, independently useful, concise, and validated against current upstream standards and repository contracts.
 
 - Treat the current [Agent Skills specification](https://agentskills.io/specification) as normative for portable skill directory structure and `SKILL.md` format. Consult it during skill work instead of relying on remembered or locally copied constraints.
+- The specification shows validation examples or demonstrations (e.g. `skills-ref`). Do not install, bundle, or require these examples or demonstrations in CI, release, or runtime paths.
 - Follow the current [Evaluating skill output quality](https://agentskills.io/skill-creation/evaluating-skills) workflow for behavioral skill evals.
 - Apply [Best practices for skill creators](https://agentskills.io/skill-creation/best-practices) as authoring guidance when it does not conflict with a normative requirement.
 - Treat applicable Copilot and repository schemas as normative for plugin packaging and platform-specific extensions. Apply each schema only to the surface it governs. If two normative sources conflict on the same field or behavior, report the conflict instead of guessing.
@@ -72,7 +73,7 @@ This repository requires every skill to include both:
 
 ### Skills
 
-- Validate against the current Agent Skills specification using the validation method it currently recommends, plus any applicable repository-specific checks.
+- Validate against the current Agent Skills specification with repository-owned contract tests plus applicable platform checks.
 - Test or validate every deterministic behavior, including contracts, permissions, assets, parsing, transformations, naming, and artifacts.
 - Cover both compliant cases and representative violations. Do not include prompt-driven behavior in deterministic tests.
 - Run the skill's declared or bundled test suite from its source directory.
